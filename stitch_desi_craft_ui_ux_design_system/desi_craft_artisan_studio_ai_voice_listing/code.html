@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@400;500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface-container-lowest":"#ffffff","surface-container":"#ffe9e3","on-secondary-container":"#305183","surface-bright":"#fff8f6","on-surface-variant":"#57423b","surface":"#fff8f6","surface-container-high":"#f9e4de","primary":"#9f3c16","outline":"#8a726a","background":"#fff8f6","surface-tint":"#a23e18","surface-variant":"#f3ded8","on-primary":"#ffffff","on-primary-fixed-variant":"#822801","surface-container-low":"#fff1ed","tertiary-container":"#966c41","on-error-container":"#93000a","on-secondary-fixed-variant":"#254778","tertiary-fixed-dim":"#f0bd8b","inverse-on-surface":"#ffede8","secondary-fixed":"#d6e3ff","on-surface":"#241916","on-tertiary":"#ffffff","on-tertiary-container":"#fffbff","on-secondary-fixed-variant":"#254778","secondary-container":"#a5c5fe","tertiary-fixed":"#ffdcbd","error":"#ba1a1a","on-tertiary-fixed-variant":"#623f18","on-secondary":"#ffffff","primary-container":"#bf542c","error-container":"#ffdad6","on-primary-fixed":"#390c00","primary-fixed-dim":"#ffb59c","secondary-fixed-dim":"#a9c7ff","inverse-surface":"#3a2e2a","tertiary":"#7b542b","on-secondary-fixed":"#001b3d","on-error":"#ffffff","on-tertiary-fixed":"#2c1600","secondary":"#3f5f92","surface-container-highest":"#f3ded8","surface-dim":"#ead6d0","outline-variant":"#dec0b7","primary-fixed":"#ffdbcf","inverse-primary":"#ffb59c","on-background":"#241916","on-primary-container":"#fffbff"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-sm":"8px","space-lg":"24px","space-xs":"4px","space-xl":"48px","grid-columns":"12","space-md":"16px","margin":"32px","gutter":"24px","space-2xl":"80px"},"fontFamily":{"headline-sm":["Noto Serif"],"headline-lg":["Noto Serif"],"headline-md":["Noto Serif"],"label-md":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"headline-xl":["Noto Serif"]},"fontSize":{"headline-sm":["22px",{"lineHeight":"28px","fontWeight":"500"}],"headline-lg":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-md":["28px",{"lineHeight":"36px","fontWeight":"500"}],"label-md":["14px",{"lineHeight":"20px","letterSpacing":"0.02em","fontWeight":"500"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"body-md":["15px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["13px",{"lineHeight":"20px","fontWeight":"400"}],"label-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"500"}],"headline-xl":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"600"}]}}}}</script></head><body class="bg-surface font-body text-on-surface"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-4"><div class="flex items-center gap-6"><a class="text-xl font-headline-lg font-bold tracking-tight text-primary" data-path="explore-marketplace" href="#">Desi Craft</a><nav class="hidden lg:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-xl"><a class="px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors rounded-xl" data-path="explore-marketplace" href="#">Marketplace</a><a class="px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors rounded-xl" data-path="ai-storyteller" href="#">AI Heritage</a><a aria-current="page" class="px-4 py-2 transition-colors bg-primary-container text-on-primary-container font-bold rounded-xl" data-path="artisan-studio" href="#">Artisan Studio</a></nav></div><div class="flex items-center gap-4"><div class="hidden md:flex items-center bg-surface-container-low px-3 py-1.5 rounded-xl border border-outline-variant/30"><span class="material-symbols-outlined text-[18px] text-on-surface-variant mr-2">search</span><input class="bg-transparent text-sm text-on-surface focus:outline-none w-48" placeholder="Search crafts, regions..." type="text"/></div><div class="flex items-center bg-surface-container-low px-3 py-1.5 rounded-xl text-sm text-on-surface-variant"><span class="material-symbols-outlined text-[18px] mr-1">translate</span><select class="bg-transparent text-on-surface focus:outline-none cursor-pointer"><option>English</option><option>हिंदी</option><option>తెలుగు</option><option>தமிழ்</option></select></div><div class="bg-surface-container-high p-1 rounded-xl flex items-center text-xs font-label-md"><button class="px-3 py-1.5 rounded-lg bg-primary text-on-primary shadow-sm">Customer</button><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface" data-path="artisan-dashboard" href="#">Artisan</a></div><button class="relative p-2 text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full"></span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary cursor-pointer"><span class="material-symbols-outlined text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-surface min-h-[819px]"><div class="flex flex-col w-full px-6 lg:px-16 py-10 gap-16">
+<!-- Artisan Welcome Banner -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-surface-container-low p-8 lg:p-10 rounded-xl gap-6 shadow-sm">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 text-xs font-label-sm text-primary uppercase tracking-widest">
+<span class="material-symbols-outlined text-sm">verified</span>
+        Verified Master Artisan • Varanasi Guild
+      </div>
+<h1 class="text-headline-lg text-on-surface">Namaste, Rajesh Kumar</h1>
+<p class="text-body-md text-on-surface-variant max-w-xl">Your loom has crafted 14 masterpieces this month. AI demand insights show a 34% surge in Kanjeevaram &amp; Banarasi silk inquiries from overseas collectors.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end bg-surface-container-highest p-4 rounded-xl">
+<span class="text-xs text-on-surface-variant font-label-sm">AI Studio Credits</span>
+<span class="text-headline-sm text-primary font-bold">24 / 30</span>
+</div>
+<button class="px-6 py-3 bg-primary text-on-primary font-label-md rounded-xl shadow-sm hover:bg-primary-container transition-all flex items-center gap-2">
+<span class="material-symbols-outlined">add_circle</span>
+        New Craft Listing
+      </button>
+</div>
+</div>
+<!-- Main Studio Workspace Grid: Voice Creator & Photo Enhancement -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Voice-First Product Creation Simulator -->
+<div class="lg:col-span-6 bg-surface-container p-8 rounded-xl flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary/5 rounded-full blur-2xl"></div>
+<div class="flex flex-col gap-6 relative z-10">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">mic</span>
+<h3 class="text-headline-sm text-on-surface">Voice-First AI Creator</h3>
+</div>
+<span class="px-3 py-1 bg-surface-container-lowest text-on-surface-variant text-xs font-label-sm rounded-full">Bhashini AI Enabled</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Speak naturally in your native tongue. Our regional AI transcribes, translates, and drafts your product story instantly.</p>
+<!-- Interactive Voice Recorder Mock -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button class="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md transition-transform hover:scale-105" id="mic-btn" onclick="toggleRecording()">
+<span class="material-symbols-outlined" id="mic-icon">keyboard_voice</span>
+</button>
+<div class="flex flex-col">
+<span class="text-sm font-label-md text-on-surface" id="rec-status">Tap to speak in Hindi / Telugu / Tamil</span>
+<span class="text-xs text-on-surface-variant">Listening for dialect nuances...</span>
+</div>
+</div>
+<div class="hidden items-center gap-1" id="soundwave">
+<span class="w-1 h-6 bg-primary animate-pulse"></span>
+<span class="w-1 h-10 bg-primary animate-pulse delay-75"></span>
+<span class="w-1 h-4 bg-primary animate-pulse delay-150"></span>
+<span class="w-1 h-8 bg-primary animate-pulse delay-200"></span>
+</div>
+</div>
+<!-- Live Transcription Output Box -->
+<div class="bg-surface-container-low p-4 rounded-xl text-sm font-body-md text-on-surface italic min-h-[80px] flex items-center">
+<span class="text-on-surface-variant" id="transcript-text">"मैंने यह बनारसी साड़ी हाथ से सोने के ज़री धागे से बनाई है। इसे बुनने में 14 दिन लगे..."</span>
+</div>
+</div>
+<!-- AI Generated Fields Preview -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-4 rounded-xl">
+<span class="text-xs text-on-surface-variant font-label-sm block mb-1">Detected Material</span>
+<span class="text-sm font-bold text-on-surface">Pure Katan Silk &amp; Real Gold Zari</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl">
+<span class="text-xs text-on-surface-variant font-label-sm block mb-1">Estimated Craft Time</span>
+<span class="text-sm font-bold text-on-surface">14 Days (Handloom)</span>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end relative z-10">
+<button class="px-5 py-2.5 bg-primary text-on-primary text-sm font-label-md rounded-xl hover:bg-primary-container transition-colors">
+          Generate Full Listing &amp; Story
+        </button>
+</div>
+</div>
+<!-- AI Photo Enhancement Studio -->
+<div class="lg:col-span-6 bg-surface-container p-8 rounded-xl flex flex-col justify-between shadow-sm">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">auto_fix_high</span>
+<h3 class="text-headline-sm text-on-surface">AI Photo Enhancement</h3>
+</div>
+<div class="flex bg-surface-container-highest p-1 rounded-xl text-xs font-label-md">
+<button class="px-3 py-1 rounded-lg bg-surface text-on-surface shadow-sm" id="btn-orig" onclick="switchPhotoView('original')">Original</button>
+<button class="px-3 py-1 rounded-lg text-on-surface-variant" id="btn-enh" onclick="switchPhotoView('enhanced')">Enhanced Studio</button>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant">Remove background noise, optimize warm lighting, and showcase intricate weave textures automatically.</p>
+<!-- Image Preview Container -->
+<div class="relative w-full h-64 rounded-xl overflow-hidden shadow-sm bg-surface-container-highest">
+<div class="w-full h-full bg-cover bg-center transition-all duration-500" data-alt="Close up photograph of a master artisan hands weaving a rich red and gold Banarasi silk saree on a wooden handloom, warm golden hour lighting casting soft shadows, photorealistic editorial style" id="img-container" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCb5wy4C3QgBeN1nMz446tNZubiPvRKr47mbPQdJeuUNy9hxXZFY39Kc1RRUCEjQ8vhJI9-rEGkSUl1MPH9C9Jv87h5r93NHTIELkGS3tCcf9xzSqc7fZMU2oJEVit9NE2YzT92KrUZh9shBCU508-ehyo92E7A8FL-1UjpPJDwzEoSR10IttVvi2BHM2qqQhO35_QXq5ZuPVIsljt9MQkT6PSD7DhEtrodOSlWpbMnIUxaUrxpEA_ucA')"></div>
+<div class="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-label-md text-on-surface shadow-sm" id="badge-overlay">
+            Original Mobile Capture
+          </div>
+</div>
+<div class="flex items-center justify-between text-xs text-on-surface-variant bg-surface-container-lowest p-4 rounded-xl">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Lighting Balanced</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Loom Texture Sharpened</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-primary">check_circle</span> Studio BG Removed</span>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="px-5 py-2.5 bg-secondary text-on-secondary text-sm font-label-md rounded-xl hover:bg-secondary-container hover:text-on-secondary-container transition-colors">
+          Apply to All Product Photos
+        </button>
+</div>
+</div>
+</div>
+<!-- Secondary Section: Fair Price Advisor & Digital Craft Passport -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- AI Fair Price Advisor -->
+<div class="lg:col-span-7 bg-surface-container p-8 rounded-xl flex flex-col justify-between shadow-sm">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">calculate</span>
+<h3 class="text-headline-sm text-on-surface">AI Fair Price Advisor</h3>
+</div>
+<span class="text-xs font-label-sm text-on-surface-variant bg-surface-container-lowest px-3 py-1 rounded-full">Ethical Pricing Engine</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Calculates fair compensation based on raw material weight, artisan labor hours, regional heritage rarity, and direct-to-consumer export demand.</p>
+<!-- Price Range Visualizer -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col gap-6 shadow-sm">
+<div class="flex justify-between items-center">
+<div>
+<span class="text-xs text-on-surface-variant font-label-sm">Recommended Price Range</span>
+<div class="text-headline-md text-primary font-bold">₹12,500 – ₹16,800</div>
+</div>
+<div class="text-right">
+<span class="text-xs text-on-surface-variant font-label-sm">Artisan Wage Share</span>
+<div class="text-headline-sm text-on-surface font-bold">85% Guaranteed</div>
+</div>
+</div>
+<!-- Interactive Slider -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-xs text-on-surface-variant">
+<span>Cost Floor (₹9,000)</span>
+<span>Market Ceiling (₹22,000)</span>
+</div>
+<input class="w-full accent-primary cursor-pointer" max="22000" min="9000" oninput="updatePrice(this.value)" type="range" value="14500"/>
+<div class="flex justify-between text-sm font-bold text-on-surface pt-1">
+<span>Your Set Price:</span>
+<span class="text-primary font-headline-sm" id="selected-price">₹14,500</span>
+</div>
+</div>
+<!-- Breakdown pills -->
+<div class="grid grid-cols-3 gap-2 pt-2">
+<div class="bg-surface-container-low p-3 rounded-xl text-center">
+<span class="text-xs text-on-surface-variant block">Raw Material</span>
+<span class="text-sm font-bold text-on-surface">₹4,200</span>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl text-center">
+<span class="text-xs text-on-surface-variant block">Labor (14 hrs)</span>
+<span class="text-sm font-bold text-on-surface">₹7,000</span>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl text-center">
+<span class="text-xs text-on-surface-variant block">Heritage Index</span>
+<span class="text-sm font-bold text-primary">+15% Premium</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="px-5 py-2.5 bg-primary text-on-primary text-sm font-label-md rounded-xl hover:bg-primary-container transition-colors">
+          Lock Price &amp; Publish
+        </button>
+</div>
+</div>
+<!-- Digital Craft Passport Generator -->
+<div class="lg:col-span-5 bg-surface-container p-8 rounded-xl flex flex-col justify-between shadow-sm">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">qr_code_2</span>
+<h3 class="text-headline-sm text-on-surface">Craft Passport NFC</h3>
+</div>
+<span class="text-xs font-label-sm text-primary bg-surface-container-lowest px-3 py-1 rounded-full">Blockchain Authenticated</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Every item gets a digital passport containing your signature, loom origin, and GI tag certification.</p>
+<!-- Passport Card Preview -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col gap-4 shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between border-b border-outline-variant/20 pb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">RK</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Rajesh Kumar</h4>
+<span class="text-xs text-on-surface-variant">Master Weavers Guild, Varanasi</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl">verified</span>
+</div>
+<div class="flex justify-between items-center text-xs text-on-surface-variant">
+<div>
+<span class="block text-on-surface font-bold text-sm">GI Tag #UP-8842</span>
+<span>Geographical Indication Registry</span>
+</div>
+<div class="w-16 h-16 bg-surface-container-high rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">qr_code</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="px-5 py-2.5 bg-primary text-on-primary text-sm font-label-md rounded-xl hover:bg-primary-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">print</span>
+          Generate NFC Tag Kit
+        </button>
+</div>
+</div>
+</div>
+<!-- Inventory Overview & Demand Insights Bento -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Inventory Overview -->
+<div class="lg:col-span-8 bg-surface-container p-8 rounded-xl flex flex-col gap-6 shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+<h3 class="text-headline-sm text-on-surface">Active Inventory &amp; Stock</h3>
+</div>
+<a class="text-sm text-primary font-label-md hover:underline" href="#">View All (28 Items)</a>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Item Row 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high rounded-lg bg-cover bg-center" data-alt="Miniature thumbnail of handwoven Banarasi saree" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBgMXDMBzgltVRgjO4sOzX5xe6eaxcwi_x2ZnlRbbokAkgnS8y-OlrXXtwxKq6v68vfmq4-XkP7oowjcMN3tp9ECubGR_W1pYE5HzRCwQiEyTXEKYGcyfMns70G5FzYxy3TJ9Y834d5FSig0LG83rxi5l3Ty5tFMY93B62_ZTmia5QQugsVtLCAw0qYd9qhhI8KC6MoGVYXTJXiGWFIf9EmJiexYzysM5XP4EG41ORkn50PzJynADIYQA')"></div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Royal Crimson Banarasi Saree</h4>
+<span class="text-xs text-on-surface-variant">SKU: BAN-902 • Added 3 days ago</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<span class="text-xs text-on-surface-variant block">Stock</span>
+<span class="text-sm font-bold text-primary">4 Available</span>
+</div>
+<div class="text-right">
+<span class="text-xs text-on-surface-variant block">Price</span>
+<span class="text-sm font-bold text-on-surface">₹14,500</span>
+</div>
+</div>
+</div>
+<!-- Item Row 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high rounded-lg bg-cover bg-center" data-alt="Miniature thumbnail of silk dupatta" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAdihLU_o0GaztPi5mWIOgr36hWBGmRbqpMktdP2HVQ3x6sqaD2grmGsTimuOvreju6QppTUzyrkhUXgGqnCD5TorzvvIVKBvHxUZ0HLN7s7id7luUAd50u6Cbw4KBoVTB6mQ9PvNU9zMlrXmZQ3CIPFgBzXujHbZwdZoIL6nl9zPsPE7KvH90iU7XcQqNx5Oa02ITEZ_yaD9n0EmSY73hIW3lZhjhXLztQduTaDM2kwGDq3_ho8wR69A')"></div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Chanderi Brocade Silk Dupatta</h4>
+<span class="text-xs text-on-surface-variant">SKU: CHA-412 • Added 1 week ago</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<span class="text-xs text-on-surface-variant block">Stock</span>
+<span class="text-sm font-bold text-primary">12 Available</span>
+</div>
+<div class="text-right">
+<span class="text-xs text-on-surface-variant block">Price</span>
+<span class="text-sm font-bold text-on-surface">₹4,800</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Demand Insights -->
+<div class="lg:col-span-4 bg-surface-container p-8 rounded-xl flex flex-col justify-between shadow-sm">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">trending_up</span>
+<h3 class="text-headline-sm text-on-surface">Demand Pulse</h3>
+</div>
+<span class="text-xs font-label-sm text-primary bg-surface-container-lowest px-2.5 py-1 rounded-full">Live AI Data</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Collectors in Mumbai &amp; London are actively searching for pastel silk hues this festive season.</p>
+<div class="bg-surface-container-lowest p-5 rounded-xl flex flex-col gap-4 shadow-sm">
+<div class="flex justify-between items-center">
+<span class="text-sm text-on-surface font-medium">Pastel Pink Banarasi</span>
+<span class="text-xs font-bold text-primary bg-primary-fixed p-1 rounded">+64% Surge</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-on-surface font-medium">Handloom Kanjeevaram</span>
+<span class="text-xs font-bold text-primary bg-primary-fixed p-1 rounded">+42% Surge</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-on-surface font-medium">Zari Work Stoles</span>
+<span class="text-xs font-bold text-primary bg-primary-fixed p-1 rounded">+28% Surge</span>
+</div>
+</div>
+</div>
+<div class="mt-8">
+<a class="w-full py-3 bg-surface-container-lowest text-on-surface text-center font-label-md rounded-xl block shadow-sm hover:bg-surface-container-high transition-colors" href="#">
+          View Full Regional Report
+        </a>
+</div>
+</div>
+</div>
+<!-- Client-side Interactive Script -->
+<script>
+    let isRecording = false;
+    function toggleRecording() {
+      isRecording = !isRecording;
+      const btn = document.getElementById('mic-btn');
+      const status = document.getElementById('rec-status');
+      const soundwave = document.getElementById('soundwave');
+      const transcript = document.getElementById('transcript-text');
+
+      if (isRecording) {
+        btn.classList.add('bg-error');
+        btn.classList.remove('bg-primary');
+        status.textContent = "Listening... Speak now";
+        soundwave.classList.remove('hidden');
+        soundwave.classList.add('flex');
+        transcript.textContent = "सुन रहा हूँ... बोलिए, आपका उत्पाद कैसा है?";
+      } else {
+        btn.classList.remove('bg-error');
+        btn.classList.add('bg-primary');
+        status.textContent = "Transcription Complete";
+        soundwave.classList.add('hidden');
+        soundwave.classList.remove('flex');
+        transcript.textContent = "“यह शुद्ध कातन सिल्क साड़ी है जिस पर असली सोने के ज़री से काम किया गया है। वजन 850 ग्राम है।”";
+      }
+    }
+
+    function switchPhotoView(mode) {
+      const imgContainer = document.getElementById('img-container');
+      const badge = document.getElementById('badge-overlay');
+      const btnOrig = document.getElementById('btn-orig');
+      const btnEnh = document.getElementById('btn-enh');
+
+      if (mode === 'original') {
+        imgContainer.style.filter = "none";
+        badge.textContent = "Original Mobile Capture";
+        btnOrig.className = "px-3 py-1 rounded-lg bg-surface text-on-surface shadow-sm";
+        btnEnh.className = "px-3 py-1 rounded-lg text-on-surface-variant";
+      } else {
+        imgContainer.style.filter = "contrast(1.1) brightness(1.05) saturate(1.15)";
+        badge.textContent = "AI Enhanced Studio Lighting";
+        btnEnh.className = "px-3 py-1 rounded-lg bg-surface text-on-surface shadow-sm";
+        btnOrig.className = "px-3 py-1 rounded-lg text-on-surface-variant";
+      }
+    }
+
+    function updatePrice(val) {
+      document.getElementById('selected-price').textContent = '₹' + Number(val).toLocaleString('en-IN');
+    }
+  </script>
+</div></main><footer class="w-full bg-surface-container-low py-12 border-t border-outline-variant/20"><div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-6"><div class="text-center md:text-left"><h3 class="text-lg font-headline-sm text-primary mb-1">Desi Craft Ecosystem</h3><p class="text-sm text-on-surface-variant">Preserving Indian heritage through AI and authentic artisan empowerment.</p></div><div class="flex gap-6 text-sm text-on-surface-variant"><a class="hover:text-primary transition-colors" href="#">About Us</a><a class="hover:text-primary transition-colors" href="#">Artisan Guidelines</a><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a><a class="hover:text-primary transition-colors" href="#">Support</a></div><div class="text-sm text-on-surface-variant">© 2024 Desi Craft. All rights reserved.</div></div></footer></body></html>

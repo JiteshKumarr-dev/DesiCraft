@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #fff8f6;
+    color: #241916;
+  }
+  
+  /* Custom scrollbar matching terracotta theme */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #fff1ed;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #dec0b7;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9f3c16;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.material-symbols-fill {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* Subtle handloom / terracotta background pattern */
+.bg-heritage-pattern {
+  background-image: radial-gradient(circle at 2px 2px, #9f3c16 1px, transparent 0);
+  background-size: 32px 32px;
+}

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@400;500&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface-container-lowest":"#ffffff","surface-container":"#ffe9e3","on-secondary-container":"#305183","surface-bright":"#fff8f6","on-surface-variant":"#57423b","surface":"#fff8f6","surface-container-high":"#f9e4de","primary":"#9f3c16","outline":"#8a726a","background":"#fff8f6","surface-tint":"#a23e18","surface-variant":"#f3ded8","on-primary":"#ffffff","on-primary-fixed-variant":"#822801","surface-container-low":"#fff1ed","tertiary-container":"#966c41","on-error-container":"#93000a","on-secondary-fixed-variant":"#254778","tertiary-fixed-dim":"#f0bd8b","inverse-on-surface":"#ffede8","secondary-fixed":"#d6e3ff","on-surface":"#241916","on-tertiary":"#ffffff","on-tertiary-container":"#fffbff","on-secondary-fixed-variant":"#254778","secondary-container":"#a5c5fe","tertiary-fixed":"#ffdcbd","error":"#ba1a1a","on-tertiary-fixed-variant":"#623f18","on-secondary":"#ffffff","primary-container":"#bf542c","error-container":"#ffdad6","on-primary-fixed":"#390c00","primary-fixed-dim":"#ffb59c","secondary-fixed-dim":"#a9c7ff","inverse-surface":"#3a2e2a","tertiary":"#7b542b","on-secondary-fixed":"#001b3d","on-error":"#ffffff","on-tertiary-fixed":"#2c1600","secondary":"#3f5f92","surface-container-highest":"#f3ded8","surface-dim":"#ead6d0","outline-variant":"#dec0b7","primary-fixed":"#ffdbcf","inverse-primary":"#ffb59c","on-background":"#241916","on-primary-container":"#fffbff"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-sm":"8px","space-lg":"24px","space-xs":"4px","space-xl":"48px","grid-columns":"12","space-md":"16px","margin":"32px","gutter":"24px","space-2xl":"80px"},"fontFamily":{"headline-sm":["Noto Serif"],"headline-lg":["Noto Serif"],"headline-md":["Noto Serif"],"label-md":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"headline-xl":["Noto Serif"]},"fontSize":{"headline-sm":["22px",{"lineHeight":"28px","fontWeight":"500"}],"headline-lg":["36px",{"lineHeight":"44px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-md":["28px",{"lineHeight":"36px","fontWeight":"500"}],"label-md":["14px",{"lineHeight":"20px","letterSpacing":"0.02em","fontWeight":"500"}],"body-lg":["18px",{"lineHeight":"28px","fontWeight":"400"}],"body-md":["15px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["13px",{"lineHeight":"20px","fontWeight":"400"}],"label-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.04em","fontWeight":"500"}],"headline-xl":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"600"}]}}}}</script></head><body class="bg-surface font-body text-on-surface"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-4"><div class="flex items-center gap-6"><a class="text-xl font-headline-lg font-bold tracking-tight text-primary" data-path="explore-marketplace" href="#">Desi Craft</a><nav class="hidden lg:flex items-center gap-2" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-xl"><a aria-current="page" class="px-4 py-2 transition-colors bg-primary-container text-on-primary-container font-bold rounded-xl" data-path="explore-marketplace" href="#">Marketplace</a><a class="px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors rounded-xl" data-path="ai-storyteller" href="#">AI Heritage</a><a class="px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors rounded-xl" data-path="artisan-studio" href="#">Artisan Studio</a></nav></div><div class="flex items-center gap-4"><div class="hidden md:flex items-center bg-surface-container-low px-3 py-1.5 rounded-xl border border-outline-variant/30"><span class="material-symbols-outlined text-[18px] text-on-surface-variant mr-2">search</span><input class="bg-transparent text-sm text-on-surface focus:outline-none w-48" placeholder="Search crafts, regions..." type="text"/></div><div class="flex items-center bg-surface-container-low px-3 py-1.5 rounded-xl text-sm text-on-surface-variant"><span class="material-symbols-outlined text-[18px] mr-1">translate</span><select class="bg-transparent text-on-surface focus:outline-none cursor-pointer"><option>English</option><option>हिंदी</option><option>తెలుగు</option><option>தமிழ்</option></select></div><div class="bg-surface-container-high p-1 rounded-xl flex items-center text-xs font-label-md"><button class="px-3 py-1.5 rounded-lg bg-primary text-on-primary shadow-sm">Customer</button><a class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface" data-path="artisan-dashboard" href="#">Artisan</a></div><button class="relative p-2 text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full"></span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary cursor-pointer"><span class="material-symbols-outlined text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-surface min-h-[80vh]"><div class="flex flex-col w-full">
+<!-- Immersive Hero Section -->
+<section class="relative w-full min-h-[70vh] flex items-center justify-center overflow-hidden bg-surface-container-low px-6 lg:px-12 py-20">
+<div class="absolute inset-0 z-0 opacity-15" style="background-image: radial-gradient(circle at 2px 2px, #9f3c16 1px, transparent 0); background-size: 32px 32px;"></div>
+<div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-tertiary/10 blur-3xl pointer-events-none"></div>
+<div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+<div class="lg:col-span-7 flex flex-col items-start gap-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high text-primary text-label-sm font-label-md">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>Authentic Digital Craft Passports</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface">
+          Timeless Traditions, <br/><span class="text-primary italic">Living Heritage</span> of India
+        </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+          Step into the heart of authentic Indian craftsmanship. Every textile, pottery piece, and metalwork carries generations of stories, preserved through direct artisan connections and blockchain provenance.
+        </p>
+<div class="flex flex-wrap items-center gap-4 pt-2">
+<a class="px-8 py-4 bg-primary text-on-primary font-label-md rounded-xl shadow-md hover:bg-primary-container transition-all flex items-center gap-2" data-path="explore-marketplace" href="#">
+<span>Explore Marketplace</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+<a class="px-8 py-4 bg-surface-container-high text-on-surface font-label-md rounded-xl hover:bg-surface-dim transition-all flex items-center gap-2" data-path="ai-storyteller" href="#">
+<span class="material-symbols-outlined text-[18px] text-primary">auto_awesome</span>
+<span>AI Heritage Explorer</span>
+</a>
+</div>
+<div class="flex items-center gap-8 pt-6 border-t border-outline-variant/30 w-full">
+<div>
+<p class="font-headline-md text-headline-md text-primary">1,400+</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Verified Artisans</p>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div>
+<p class="font-headline-md text-headline-md text-primary">28 States</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Craft Clusters</p>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div>
+<p class="font-headline-md text-headline-md text-primary">100%</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Fair Trade</p>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 relative">
+<div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-2xl bg-surface-container-highest">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A master Indian artisan meticulously hand-painting a vibrant traditional Madhubani art piece on handmade paper with delicate natural pigments, warm golden studio lighting highlighting the rich terracotta and indigo tones." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDg3Ug5GCf-9AoafCkXunz-MnIJKrozCUB9cNbI2NBoKoCsWyg1rBZNXcp14_cAeYDZPWQRAuBeAKaDYGx4WoJ5Bm0mQdzENfGHa83m2eSA6xGGVthx-rzHiQDk2jtDPxp7dG4F_eOwKC65ihkPwaLtkO2UWQPmzPppWAnpYjjjRV2S-7BuHqj1Pkj65lT1Nrflm-ZHs66hxRKqIrAlgTCzlzpzW-rg_A6OZWBop1ZwSEqsgPV3e2Shyg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent flex flex-col justify-end p-8 text-inverse-on-surface">
+<span class="text-label-sm uppercase tracking-wider text-primary-fixed">Featured Craft of the Week</span>
+<h3 class="font-headline-md text-headline-md mt-1">Madhubani Folk Painting</h3>
+<p class="font-body-sm text-body-sm text-inverse-on-surface/80 mt-2">Crafted by Padma Shri Awardee Sita Devi's Guild, Mithila, Bihar.</p>
+</div>
+</div>
+<div class="absolute -bottom-6 -left-6 bg-surface-container-lowest p-4 rounded-xl shadow-lg flex items-center gap-4 max-w-xs">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined">qr_code_2</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Digital Passport #IN-8821</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Traceable to artisan household</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Regional Craft Browser -->
+<section class="max-w-7xl mx-auto px-6 lg:px-12 py-24 w-full">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<span class="text-primary text-label-sm font-label-md uppercase tracking-wider">Geographic Diversity</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mt-1">Browse by Regions of India</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+        From the snow-kissed looms of Kashmir to the terracotta masters of Tamil Nadu, explore distinctive cultural geographies.
+      </p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+<!-- North -->
+<a class="group relative aspect-[3/4] rounded-xl overflow-hidden flex flex-col justify-end p-6 bg-surface-container-high transition-transform hover:-translate-y-1 shadow-sm" href="#">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 opacity-85" data-alt="Kashmiri artisan weaving an intricate Pashmina shawl with traditional wooden bobbins in a sunlit wooden workshop." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuATPWbZ5AiMKq8D43b4HIVzogGsxzEjKh3T2sC016tNv8dDGZwu96c9Z4x83_dss6CYtSJaiS11yhrJorkW98dGGt6eQrz0zQxXbPv6IM8wMsU_PWmTQiE1c6zezCoxnvU71YuC4lsMYXkP1ETiPjj4BUwwXA1NTvo6LEyMkrIJsdFpDvkeSVKD2MShIUwy-kG5p0E2ofEw4g7i2J2tESxS2AGx0-Oe6tsx47zT0KeiMKLGDa4TaRocpA')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/20 to-transparent"></div>
+<span class="relative z-10 text-inverse-on-surface font-headline-sm">North India</span>
+<span class="relative z-10 text-inverse-on-surface/70 text-body-sm">Pashmina &amp; Blue Pottery</span>
+</a>
+<!-- South -->
+<a class="group relative aspect-[3/4] rounded-xl overflow-hidden flex flex-col justify-end p-6 bg-surface-container-high transition-transform hover:-translate-y-1 shadow-sm" href="#">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 opacity-85" data-alt="Bronze idol casting using the ancient Lost Wax Chola technique in Swamimalai, Tamil Nadu." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBXp5A7wSs71RjKpvsoh0p-lhZtgxKPpk4ERFuYXq707VuS066WucYmwYQW0sVuoagqClSk0oOXqcjlD1hbdF0iS9ZyQaTvaIbos-skFbVfDaZ1V-NEddKqe6gYVGcsktSTcq64V35PGgpKlZtItBQj8fvYyvKOhVqiA_b4KWE9Upw617D-PydjswLC9_62QZyqtLtYRB1vcrP2b9yhIICpA-zUyEl-BIBRKV_NDYE9BWY3TOXCSGvhKw')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/20 to-transparent"></div>
+<span class="relative z-10 text-inverse-on-surface font-headline-sm">South India</span>
+<span class="relative z-10 text-inverse-on-surface/70 text-body-sm">Bronze &amp; Kanjivaram</span>
+</a>
+<!-- East -->
+<a class="group relative aspect-[3/4] rounded-xl overflow-hidden flex flex-col justify-end p-6 bg-surface-container-high transition-transform hover:-translate-y-1 shadow-sm" href="#">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 opacity-85" data-alt="Dokra metal casting artisan pouring molten brass in rural West Bengal workshop." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAfZct0WrxmFQkKO-y5wwk9w0yOJnXjq2Tj2scl2revvG43poJa7rHZGrX7biJDB08GI7vpHpKi3xrbNxrM8W7iDdAcoWW7y12YobZ2h7Zh58m-lk_oSwINgwlxDv1M3uXwJ5hRC0aqQ2DLUCHLPEOlLPzGpM35A-PY_ZMoxJHcjP0WT37sqv2L8qr6LoFva-pX2Mej4U6n5XxnhRgb_5gckkTNSN9FzNhKcDEFCjXl-n4DGBRJWxH-Sw')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/20 to-transparent"></div>
+<span class="relative z-10 text-inverse-on-surface font-headline-sm">East India</span>
+<span class="relative z-10 text-inverse-on-surface/70 text-body-sm">Dokra &amp; Kantha</span>
+</a>
+<!-- West -->
+<a class="group relative aspect-[3/4] rounded-xl overflow-hidden flex flex-col justify-end p-6 bg-surface-container-high transition-transform hover:-translate-y-1 shadow-sm" href="#">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 opacity-85" data-alt="Kutchi artisan tie-dyeing Bandhani textiles in vivid crimson and mustard yellow in Kutch, Gujarat." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAt7ep_MP24x_h1zP7bRfM1GTfUoq4uBBiGfqbZyqI_q1KiT5l177Yf71Ttnpekv512wZ68ia2eYUTOYIU8H2F_aD0bcrEaxrgSEXGAMLU-tVi769HWTxY-nPiH-SGuZ0ArVsit-3JWz5wZPbFEO5sqiO96H3N3gg0fdXl8_HWyYdl6gqkPBpRX6ZbgGwXiQNIXgPTlD-Iz0rTZnNxeM6YxP3YzcicxEwj0K6hSKoZz4wxYanWGF8om4w')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/20 to-transparent"></div>
+<span class="relative z-10 text-inverse-on-surface font-headline-sm">West India</span>
+<span class="relative z-10 text-inverse-on-surface/70 text-body-sm">Bandhani &amp; Block Print</span>
+</a>
+<!-- Northeast -->
+<a class="group relative aspect-[3/4] rounded-xl overflow-hidden flex flex-col justify-end p-6 bg-surface-container-high transition-transform hover:-translate-y-1 shadow-sm" href="#">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 opacity-85" data-alt="Northeastern artisan weaving natural bamboo and cane baskets in Nagaland with intricate geometric patterns." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBkFXZAcZCpaGCTZwgXuIiFiLhrrktvh-0-A_PdXGwC48daEFZ4hbOaWDBStHsveTUVEy07cP4ggvge__ikBJRzGk-V3qJFbS9ebuRxZOtxtwZglZ3bV-xKX8nTW48tfafPNB8cE9i8o06ZZj1DAXB35v97hTlRa9Ix5OyqhBhn2WZfMssptIfTqLb76Lmqj_uFTDonOrZRe2A8HOXmJaOyEKJvuap_os12FkZ3Ri-WGKjwD4e5XCtubg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/20 to-transparent"></div>
+<span class="relative z-10 text-inverse-on-surface font-headline-sm">Northeast</span>
+<span class="relative z-10 text-inverse-on-surface/70 text-body-sm">Bamboo &amp; Eri Silk</span>
+</a>
+<!-- Central -->
+<a class="group relative aspect-[3/4] rounded-xl overflow-hidden flex flex-col justify-end p-6 bg-surface-container-high transition-transform hover:-translate-y-1 shadow-sm" href="#">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105 opacity-85" data-alt="Chanderi loom weaver holding translucent gold-threaded silk cotton saree in Madhya Pradesh." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAD9sjZNC3GdElu5eZloZB6iBhS_32L1CObwCsJInacFS_nQBD_F1xyd-IJzGMBnapeNqx18ysoVhmC93FNMTpNuShS2dATZXAwFhEo7lsq_m9_kT7Bg_IQQjd11NU5JgcKPdwVy-30CU2BrtX0XQLVU-nZA6y4BcRg4Me5y_7pH-af6olsP3o7_NcDA5X2qb64O1p6FDbg1t_sG6rThbrtY041MEZnZJGp5ufoPL87y68uNxN9roAIMQ')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/20 to-transparent"></div>
+<span class="relative z-10 text-inverse-on-surface font-headline-sm">Central India</span>
+<span class="relative z-10 text-inverse-on-surface/70 text-body-sm">Chanderi &amp; Terracotta</span>
+</a>
+</div>
+</section>
+<!-- Featured Authentic Products with Digital Craft Passport -->
+<section class="bg-surface-container-low py-24 w-full">
+<div class="max-w-7xl mx-auto px-6 lg:px-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<span class="text-primary text-label-sm font-label-md uppercase tracking-wider">Curated Masterpieces</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mt-1">Certified Authentic Creations</h2>
+</div>
+<div class="flex items-center gap-2 bg-surface-container p-1 rounded-xl">
+<button class="px-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-label-md shadow-sm">All Crafts</button>
+<button class="px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md">Textiles</button>
+<button class="px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md">Metalwork</button>
+<button class="px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md">Pottery</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
+<!-- Product 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+<div class="relative aspect-[4/3] bg-surface-container">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Handcrafted Banarasi silk brocade saree featuring intricate gold zari floral motifs on deep royal indigo silk fabric." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCX2TK5EYev3ufN5iOQgZVugSrDYJ2wW2TWI4AZe7pKufQtBebbornte_dsXIY6GnD7gKtw-vBaZyoJbPwITWIymPeKpdn6vaEhjX4FbbFl0fpMgbwblroO8wVtDjzIr-_uwkIO5e8nOUu-LYv6bpyVTbRVDn3kEajux585TprxzelcTBWlthVSfQxpRoMcJUM_QYidNKfZqBc-IdJV1CJjG2kXY06c1cvQjqCc0PYGDNCjIbcLVkwtIg')"></div>
+<div class="absolute top-4 left-4 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-label-sm font-label-md text-on-surface">Passport #BN-3049</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow justify-between gap-4">
+<div>
+<div class="flex items-center justify-between text-body-sm text-on-surface-variant mb-1">
+<span>Varanasi, Uttar Pradesh</span>
+<span class="text-primary font-label-md">Handloom Pure Silk</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Royal Zari Kora Banarasi Saree</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 line-clamp-2">Woven meticulously over 45 days by master weaver Ustad Ansari using certified gold-plated silver zari.</p>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div>
+<span class="text-label-sm text-on-surface-variant block">Price</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">₹24,500</span>
+</div>
+<button class="px-5 py-2.5 bg-primary text-on-primary font-label-md rounded-xl hover:bg-primary-container transition-colors">
+                View Passport
+              </button>
+</div>
+</div>
+</div>
+<!-- Product 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+<div class="relative aspect-[4/3] bg-surface-container">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Blue pottery decorative vase with traditional Persian-influenced floral patterns in turquoise and cobalt blue, Jaipur." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDD2K0Zm5q9JJWoxE_s0-B7LohhuyjEKM3pqnQv9P_Qu9NGHr91-XYeut4JCDqc3O8DcvVJ0MCeyo0JbwMmXA5vY85dLGfMr1s9CJD4RwHl0bAodSkVKQvyXShHpji3s2BvB408WlPHOW4UmBL-pgQTGa6bPhCZ3zUcWdmQDoZU1S2-tSUy7Rri-5EDR_VrB8y7JtFo1l25zORt7ZrX6tGgqjLQQB6FMTLZ3iIrFOhE-Ic64U5SwL2Etg')"></div>
+<div class="absolute top-4 left-4 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-label-sm font-label-md text-on-surface">Passport #JP-1902</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow justify-between gap-4">
+<div>
+<div class="flex items-center justify-between text-body-sm text-on-surface-variant mb-1">
+<span>Jaipur, Rajasthan</span>
+<span class="text-primary font-label-md">Quartz Pottery</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Turquoise Floral Blue Pottery Urn</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 line-clamp-2">Crafted without clay using crushed quartz stone, glass, and natural gum, fired in traditional kilns.</p>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div>
+<span class="text-label-sm text-on-surface-variant block">Price</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">₹4,800</span>
+</div>
+<button class="px-5 py-2.5 bg-primary text-on-primary font-label-md rounded-xl hover:bg-primary-container transition-colors">
+                View Passport
+              </button>
+</div>
+</div>
+</div>
+<!-- Product 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+<div class="relative aspect-[4/3] bg-surface-container">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Brass Dokra dancing figurine showcasing primitive tribal folk aesthetics and intricate wire-coiling details." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBABKr-n0fXyjsXEeMKTeO3Yy5ySBbvCLd7eGDM-1tOL2G8bmccJcKCnGd_aGBPW-26KihXcxGJfKH7Fw3-OECf_l7LZYdDnGUR5qY5hva6TwV0JQoJ4YYBycMu3CmvAi71njmYSODkI1HZJR8grDFwW2Zvp0LZjKaY6zgOeEBrNmjDcngQkcdzGs5Sud_fPYeZb3JWxYfVp-lcPzAhxs0hUHbN9-niGChQTlpO3WutMLT-jfcGCo8ErA')"></div>
+<div class="absolute top-4 left-4 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-label-sm font-label-md text-on-surface">Passport #OR-5512</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow justify-between gap-4">
+<div>
+<div class="flex items-center justify-between text-body-sm text-on-surface-variant mb-1">
+<span>Bastar, Chhattisgarh</span>
+<span class="text-primary font-label-md">Lost-Wax Brass</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Tribal Brass Dokra Nataraja Figurine</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2 line-clamp-2">Created using 4,000-year-old bell metal casting technique by the Dhurwa tribal community.</p>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div>
+<span class="text-label-sm text-on-surface-variant block">Price</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">₹7,200</span>
+</div>
+<button class="px-5 py-2.5 bg-primary text-on-primary font-label-md rounded-xl hover:bg-primary-container transition-colors">
+                View Passport
+              </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Meet the Artisans Section -->
+<section class="max-w-7xl mx-auto px-6 lg:px-12 py-24 w-full">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+<div>
+<span class="text-primary text-label-sm font-label-md uppercase tracking-wider">Human Stories</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mt-1">Meet the Master Artisans</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+        Discover the skilled hands and profound lineages behind India's most treasured cultural artifacts.
+      </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Artisan Card 1 -->
+<div class="bg-surface-container-high rounded-xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<div class="w-full h-full bg-cover bg-center" data-alt="Portrait of elderly Indian artisan master weaver Ustad Ansari smiling warmly in his workshop." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBH1Q-7rKBmypmtEGaq8pWTy-9JJPXK5Onu5g-6JB_B7zQFietV94EigMn4tZpAn_rDwvG8fc5E3dxT0HYJsS_oHjs67jWnWlfgWGk3T_0qOHLQggR1IHjmiDZ1yY1IrnElbGt7So-UeWARnuIp4ruponnMDMkPKD8k5uUfgfAGwuwO3e6xSgWVfiqt363U308Mr-XOUQuwCkTisLHZOZu7RctHcdxK_yz_QJWyiscF1_Hi-9ImNBDAyw')"></div>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Ustad Ansari</h3>
+<p class="text-primary text-label-sm font-label-md">Master Silk Weaver • 42 yrs exp</p>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic">
+          "My grandfather wove for royal courts. Today, through Desi Craft, my looms speak directly to patrons across the globe who value our sweat and heritage."
+        </p>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<span class="text-body-sm text-on-surface-variant">Varanasi, UP</span>
+<a class="text-primary font-label-md flex items-center gap-1 hover:underline" href="#">
+<span>Read Story</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Artisan Card 2 -->
+<div class="bg-surface-container-high rounded-xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<div class="w-full h-full bg-cover bg-center" data-alt="Portrait of talented female artisan Kamala Devi crafting pottery in Jaipur." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBo6l959IFwtaX8MsTi677BM7n3dEAO6BWftNFZ10HDNTi1TuigYY5-dKbXfd8ICWTBscbEEpHV212PHGYMLz8_zBuh_rxWuSi8VQunci6vU4YCZX2OPJAtty_KT-FMEdtCCoKW6jbdn28yb9fhrLjr0IqnuXfEPWii6CUC06m8UNMyxaT16A4kZs6OmBqtsczl0RoqRmupUe3cw_1z2TvC8hnbV6LJfkMEzHzEm06Ja9azqBjTzddGbA')"></div>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Kamala Devi</h3>
+<p class="text-primary text-label-sm font-label-md">Blue Pottery Artisan • 28 yrs exp</p>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic">
+          "Blue pottery is unforgiving. Every brushstroke must be exact. I am proud to teach the younger generation so our secret glazes never fade away."
+        </p>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<span class="text-body-sm text-on-surface-variant">Jaipur, Rajasthan</span>
+<a class="text-primary font-label-md flex items-center gap-1 hover:underline" href="#">
+<span>Read Story</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Artisan Card 3 -->
+<div class="bg-surface-container-high rounded-xl p-8 flex flex-col justify-between gap-6 relative overflow-hidden">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 bg-surface-container">
+<div class="w-full h-full bg-cover bg-center" data-alt="Portrait of tribal brass craftsman Debnath Malhar in Bastar." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDUoJ3-SU9jJwYb2W-CEajlsD5GdXEIgizS0p0jQj_hpcfN7swVwWfl-98P_S6Q7bvf2Cl_tFhzQeI7itw7uIEBFUShpwBVwv00lUJ6mg3eWaLo2kO711s0ZQdD7aw3MBBwyi8sTHRFYO9MPoL7ma9H-fyRzJPeG4YQWXzSDA5dPJDDKiSIHkM1LoFv06C96dS_NR_aDHhvIb9cED442Ms1UVhXmaDbcpKbp0SziJUoFYHQ2LdNKUCZDA')"></div>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Debnath Malhar</h3>
+<p class="text-primary text-label-sm font-label-md">Dokra Sculptor • 35 yrs exp</p>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant italic">
+          "We take beeswax, mud, and raw brass to shape ancient deities. Knowing someone in New York cherishes my sculpture gives me immense joy."
+        </p>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<span class="text-body-sm text-on-surface-variant">Bastar, Chhattisgarh</span>
+<a class="text-primary font-label-md flex items-center gap-1 hover:underline" href="#">
+<span>Read Story</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Switch to Artisan Mode Banner -->
+<section class="max-w-7xl mx-auto px-6 lg:px-12 mb-24 w-full">
+<div class="bg-primary rounded-xl p-8 md:p-12 text-on-primary flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-xl">
+<div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-primary-container/40 blur-2xl pointer-events-none"></div>
+<div class="relative z-10 max-w-2xl">
+<span class="px-3 py-1 rounded-full bg-on-primary/10 text-inverse-on-surface text-label-sm font-label-md">Are you a creator?</span>
+<h2 class="font-headline-lg text-headline-lg text-inverse-on-surface mt-3">Join Desi Craft as an Artisan</h2>
+<p class="font-body-lg text-body-lg text-inverse-on-surface/80 mt-2">
+          List your handmade creations, mint digital craft passports, connect directly with global connoisseurs, and receive instant payouts with zero middleman friction.
+        </p>
+</div>
+<div class="relative z-10 flex flex-col sm:flex-row gap-4 flex-shrink-0">
+<a class="px-8 py-4 bg-surface-container-lowest text-on-surface font-label-md rounded-xl shadow-md hover:bg-surface-bright transition-all text-center" data-path="artisan-dashboard" href="#">
+          Switch to Artisan Studio
+        </a>
+</div>
+</div>
+</section>
+</div></main><footer class="w-full bg-surface-container-low py-12 border-t border-outline-variant/20"><div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-6"><div class="text-center md:text-left"><h3 class="text-lg font-headline-sm text-primary mb-1">Desi Craft Ecosystem</h3><p class="text-sm text-on-surface-variant">Preserving Indian heritage through AI and authentic artisan empowerment.</p></div><div class="flex gap-6 text-sm text-on-surface-variant"><a class="hover:text-primary transition-colors" href="#">About Us</a><a class="hover:text-primary transition-colors" href="#">Artisan Guidelines</a><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a><a class="hover:text-primary transition-colors" href="#">Support</a></div><div class="text-sm text-on-surface-variant">© 2024 Desi Craft. All rights reserved.</div></div></footer></body></html>
