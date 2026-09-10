@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { LanguageCode } from '../../types';
+import { universalVoiceEngine, PHONETIC_SAMPLES } from '../../services/voiceLanguageService';
 import {
   Globe,
   Search,
@@ -111,6 +112,17 @@ export const LanguageSelectionPopup: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [speakingCode, setSpeakingCode] = useState<LanguageCode | null>(null);
 
+  // Synchronize with universal voice engine state
+  useEffect(() => {
+    const unsubscribe = universalVoiceEngine.subscribe((speaking, activeLang) => {
+      setSpeakingCode(speaking ? activeLang : null);
+    });
+    return () => {
+      unsubscribe();
+      universalVoiceEngine.stop();
+    };
+  }, []);
+
   if (!isLanguagePopupOpen) return null;
 
   // Filter languages by name or native script
@@ -120,34 +132,30 @@ export const LanguageSelectionPopup: React.FC = () => {
       lang.native.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Audio Speech Pronunciation using Web Speech API
+  // Audio Speech Pronunciation using Universal Voice Engine
   const handlePronounce = (e: React.MouseEvent, lang: LanguageOption) => {
     e.stopPropagation();
-    if (!('speechSynthesis' in window)) return;
 
-    window.speechSynthesis.cancel();
-    setSpeakingCode(lang.code);
-
-    const utterance = new SpeechSynthesisUtterance(lang.speechSample);
-    utterance.rate = 0.9;
-    utterance.pitch = 1.0;
-
-    const voices = window.speechSynthesis.getVoices();
-    // Try finding matching voice for language
-    const langPrefix = lang.code === 'en' ? 'en-IN' : lang.code;
-    const matchedVoice = voices.find(
-      (v) => v.lang.toLowerCase().includes(langPrefix.toLowerCase()) || v.name.includes('India')
-    );
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
+    // Toggle off if already speaking this language
+    if (speakingCode === lang.code) {
+      universalVoiceEngine.stop();
+      setSpeakingCode(null);
+      return;
     }
 
-    utterance.onend = () => setSpeakingCode(null);
-    utterance.onerror = () => setSpeakingCode(null);
-    window.speechSynthesis.speak(utterance);
+    const phonetic = PHONETIC_SAMPLES[lang.code]?.sample;
+    universalVoiceEngine.play({
+      text: lang.speechSample,
+      lang: lang.code,
+      phoneticFallback: phonetic,
+      onStart: () => setSpeakingCode(lang.code),
+      onEnd: () => setSpeakingCode(null),
+      onError: () => setSpeakingCode(null),
+    });
   };
 
   const handleConfirm = () => {
+    universalVoiceEngine.stop();
     setLanguage(selectedCode);
     localStorage.setItem('desi_craft_lang_selected', 'true');
     setIsLanguagePopupOpen(false);
@@ -162,6 +170,7 @@ export const LanguageSelectionPopup: React.FC = () => {
         <div className="bg-surface-container-high border-b border-outline/20 p-6 sm:p-7 text-center relative">
           <button
             onClick={() => {
+              universalVoiceEngine.stop();
               localStorage.setItem('desi_craft_lang_selected', 'true');
               setIsLanguagePopupOpen(false);
               // Trigger 2nd popup: Guided Help immediately

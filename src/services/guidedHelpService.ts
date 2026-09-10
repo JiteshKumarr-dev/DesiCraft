@@ -2,6 +2,7 @@
 // Provides localized step tours, Web Speech Synthesis controller, and audio controls across 10 Indian languages
 
 import { LanguageCode } from '../types';
+import { universalVoiceEngine } from './voiceLanguageService';
 
 export interface TourStep {
   target: string; // CSS data-guide attribute
@@ -1666,6 +1667,11 @@ class SpeechGuidanceController {
         this.loadVoices();
       };
     }
+    // Synchronize speaking state with universal voice engine
+    universalVoiceEngine.subscribe((speaking) => {
+      this.isSpeaking = speaking;
+      this.notify();
+    });
   }
 
   private loadVoices() {
@@ -1687,23 +1693,11 @@ class SpeechGuidanceController {
   }
 
   public isSupported(): boolean {
-    return typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+    return true;
   }
 
   public isVoiceAvailableForLanguage(lang: LanguageCode): boolean {
-    if (!this.isSupported()) return false;
-    if (this.availableVoices.length === 0) {
-      this.loadVoices();
-    }
-    const bcp47 = VOICE_LANG_MAP[lang] || 'en-IN';
-    const langPrefix = bcp47.split('-')[0].toLowerCase();
-
-    // Check if any installed voice matches the BCP47 code or prefix
-    return this.availableVoices.some(
-      (v) =>
-        v.lang.toLowerCase() === bcp47.toLowerCase() ||
-        v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix)
-    );
+    return true; // 100% available for all 10 languages via universal engine
   }
 
   public speak(
@@ -1713,103 +1707,53 @@ class SpeechGuidanceController {
     onEnd?: () => void,
     onError?: (err: any) => void
   ): boolean {
-    if (!this.isSupported()) {
-      onError?.(new Error('SpeechSynthesis not supported'));
-      return false;
-    }
-
-    // Cancel any existing speech
     this.stop();
+    this.isSpeaking = true;
+    this.isPaused = false;
+    this.notify();
 
-    try {
-      const utterance = new SpeechSynthesisUtterance(text);
-      const bcp47 = VOICE_LANG_MAP[lang] || 'en-IN';
-      utterance.lang = bcp47;
-      utterance.rate = 0.95; // Friendly and accessible pace for clarity
-      utterance.pitch = 1.0;
-
-      // Find best matching voice
-      if (this.availableVoices.length === 0) {
-        this.loadVoices();
-      }
-      const langPrefix = bcp47.split('-')[0].toLowerCase();
-      const matchedVoice = this.availableVoices.find(
-        (v) =>
-          v.lang.toLowerCase() === bcp47.toLowerCase() ||
-          v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix)
-      );
-      if (matchedVoice) {
-        utterance.voice = matchedVoice;
-      }
-
-      utterance.onstart = () => {
+    universalVoiceEngine.play({
+      text,
+      lang,
+      onStart: () => {
         this.isSpeaking = true;
         this.isPaused = false;
         this.notify();
         onStart?.();
-      };
-
-      utterance.onend = () => {
+      },
+      onEnd: () => {
         this.isSpeaking = false;
         this.isPaused = false;
-        this.currentUtterance = null;
         this.notify();
         onEnd?.();
-      };
-
-      utterance.onerror = (e) => {
-        // 'interrupted' or 'canceled' are intentional when users switch steps or close
-        if (e.error !== 'interrupted' && e.error !== 'canceled') {
-          console.warn('SpeechSynthesis error:', e);
-        }
+      },
+      onError: (err) => {
         this.isSpeaking = false;
         this.isPaused = false;
-        this.currentUtterance = null;
         this.notify();
-        onError?.(e);
-      };
-
-      utterance.onpause = () => {
-        this.isPaused = true;
-        this.notify();
-      };
-
-      utterance.onresume = () => {
-        this.isPaused = false;
-        this.notify();
-      };
-
-      this.currentUtterance = utterance;
-      window.speechSynthesis.speak(utterance);
-      return true;
-    } catch (e) {
-      console.warn('Failed to speak with SpeechSynthesis:', e);
-      this.isSpeaking = false;
-      this.isPaused = false;
-      this.notify();
-      onError?.(e);
-      return false;
-    }
+        onError?.(err);
+      },
+    });
+    return true;
   }
 
   public pause() {
-    if (this.isSupported() && window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+    universalVoiceEngine.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
       window.speechSynthesis.pause();
-      this.isPaused = true;
-      this.notify();
     }
+    this.isPaused = true;
+    this.notify();
   }
 
   public resume() {
-    if (this.isSupported() && window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
-      this.isPaused = false;
-      this.notify();
-    }
+    this.isPaused = false;
+    this.notify();
   }
 
   public stop() {
-    if (this.isSupported()) {
+    universalVoiceEngine.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
     this.isSpeaking = false;
@@ -1822,7 +1766,7 @@ class SpeechGuidanceController {
     return {
       isSpeaking: this.isSpeaking,
       isPaused: this.isPaused,
-      isSupported: this.isSupported(),
+      isSupported: true,
     };
   }
 }

@@ -3,6 +3,7 @@
 
 import { LanguageCode } from '../types';
 import { aiServices, VoiceParsedListing } from './aiServices';
+import { universalVoiceEngine } from './voiceLanguageService';
 
 // Mapping app language codes to Indian BCP-47 speech recognition codes
 export const SPEECH_LANG_MAP: Record<LanguageCode, string> = {
@@ -284,33 +285,10 @@ export class RealtimeVoiceSession {
  * Intelligent Real-Time Speech Synthesizer (Speaks confirmation back to artisan)
  */
 export function speakAssistantFeedback(text: string, lang: LanguageCode = 'en') {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
-  try {
-    window.speechSynthesis.cancel(); // cancel any active speech
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.95;
-    utterance.pitch = 1.0;
-
-    const speechCode = SPEECH_LANG_MAP[lang] || 'en-IN';
-    utterance.lang = speechCode;
-
-    const voices = window.speechSynthesis.getVoices();
-    const indianVoice = voices.find(
-      (v) =>
-        v.lang === speechCode ||
-        v.lang.includes('IN') ||
-        v.name.toLowerCase().includes('india')
-    );
-
-    if (indianVoice) {
-      utterance.voice = indianVoice;
-    }
-
-    window.speechSynthesis.speak(utterance);
-  } catch (err) {
-    console.warn('[RealtimeVoice] Speech synthesis feedback error:', err);
-  }
+  universalVoiceEngine.play({
+    text,
+    lang,
+  });
 }
 
 /**
@@ -366,9 +344,7 @@ export function simulateVoiceStreaming(
   return () => {
     isCancelled = true;
     clearInterval(intervalId);
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    universalVoiceEngine.stop();
   };
 }
 
