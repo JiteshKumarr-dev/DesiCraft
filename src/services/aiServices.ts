@@ -44,6 +44,13 @@ export interface DemandInsight {
   growth_rate: string;
 }
 
+// SIH Demo Video Voice Sample Preset
+export const SIH_DEMO_VOICE_SAMPLE = {
+  label: 'SIH Demo (Kalamkari Cotton Dupatta)',
+  craft: 'Srikalahasti Kalamkari',
+  text: 'Hand-painted Kalamkari cotton dupatta, made using natural dyes and traditional bamboo pen on organic cotton with sacred Tree of Life and peacock motifs. It took 18 days of handcrafting, suggested price is 4800 rupees.',
+};
+
 // Simulated Multilingual Speech Recognition Presets for testing
 export const VOICE_SAMPLE_PRESETS: Record<LanguageCode, { text: string; label: string; craft: string }> = {
   en: {
@@ -578,17 +585,23 @@ export const aiServices = {
       lower.includes('కలంకారి') ||
       lower.includes('कलमकारी')
     ) {
+      const productTitle = isDupatta
+        ? 'Hand-Painted Kalamkari Natural Dye Cotton Dupatta'
+        : isSaree
+        ? 'Hand-Painted Kalamkari Pure Silk Saree'
+        : 'Authentic Srikalahasti Hand-Painted Natural Dye Kalamkari Tapestry';
+
       return {
         craft_id: 'craft-kalamkari',
         craft_name: 'Srikalahasti Kalamkari',
-        name: 'Authentic Srikalahasti Hand-Painted Natural Dye Kalamkari Tapestry',
-        description: `Freehand painted using sharpened bamboo kalam reed pens dipped in fermented jaggery and iron mordants on organic cotton treated with buffalo milk wash. Certified GI craft of Andhra Pradesh.`,
-        materials: ['Organic Desi Cotton', 'Bamboo Kalam Pen', 'Buffalo Milk Wash', 'Natural Fermented Rust & Alizarin Dyes'],
+        name: productTitle,
+        description: `Hand-painted using sharpened bamboo kalam reed pens dipped in fermented jaggery and iron mordants on organic cotton treated with buffalo milk wash. Features the sacred Tree of Life and blooming forest motifs. Certified GI heritage craft of Andhra Pradesh.`,
+        materials: ['100% Handspun Mangalagiri Cotton', 'Bamboo Reed Kalam Pen', 'Natural Botanical Dyes', 'Buffalo Milk Mordant'],
         technique: 'Freehand Kalam Pen Drawing and 17-Step Natural Vat Dyeing',
-        suggested_price: spokenPrice || (isSaree ? 16500 : isDupatta ? 6400 : 9800),
-        production_time: spokenDays || '21 Days',
+        suggested_price: spokenPrice || (isSaree ? 16500 : isDupatta ? 4800 : 8500),
+        production_time: spokenDays || (isDupatta ? '18 Days' : '21 Days'),
         region: 'South',
-        confidence_score: 0.97,
+        confidence_score: 0.98,
         image_url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1000&q=80',
         gi_tag: 'GI-2006-AP-0028',
       };

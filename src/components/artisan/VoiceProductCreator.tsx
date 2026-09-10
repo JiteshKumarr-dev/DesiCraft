@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { aiServices, VOICE_SAMPLE_PRESETS } from '../../services/aiServices';
+import { aiServices, VOICE_SAMPLE_PRESETS, SIH_DEMO_VOICE_SAMPLE } from '../../services/aiServices';
 import {
   RealtimeVoiceSession,
   speakAssistantFeedback,
@@ -250,6 +250,53 @@ export const VoiceProductCreator: React.FC = () => {
           setAudioLevel(0);
           setInterimText('');
           triggerAiExtraction(completedText, lang);
+        },
+      },
+      spokenFeedbackEnabled
+    );
+
+    cancelSimulationRef.current = cancelFn;
+  };
+
+  // Handle exact SIH Script Demo sample (Kalamkari Dupatta)
+  const handleLoadSihDemo = () => {
+    setActiveSpeechLang('en');
+    setIsPublishedSuccess(false);
+
+    if (voiceSessionRef.current) {
+      voiceSessionRef.current.stop();
+      voiceSessionRef.current = null;
+      setIsRecording(false);
+    }
+
+    if (cancelSimulationRef.current) {
+      cancelSimulationRef.current();
+      cancelSimulationRef.current = null;
+    }
+
+    setIsSimulating(true);
+    setAudioLevel(45);
+    setInterimText('');
+    setSpokenTranscript('');
+    setStatusMessage('▶️ Streaming SIH Demo Sample: Kalamkari Dupatta...');
+
+    const cancelFn = simulateVoiceStreaming(
+      SIH_DEMO_VOICE_SAMPLE.text,
+      'en',
+      {
+        onStart: () => {
+          setIsSimulating(true);
+        },
+        onProgress: (currentTranscript, interim, level) => {
+          setSpokenTranscript(currentTranscript);
+          setInterimText(interim);
+          setAudioLevel(level);
+        },
+        onComplete: (completedText) => {
+          setIsSimulating(false);
+          setAudioLevel(0);
+          setInterimText('');
+          triggerAiExtraction(completedText, 'en');
         },
       },
       spokenFeedbackEnabled
@@ -758,6 +805,26 @@ export const VoiceProductCreator: React.FC = () => {
                   {statusMessage}
                 </p>
               )}
+
+              {/* SIH Video Demo Quick Trigger */}
+              <div className="pt-2 flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleLoadSihDemo}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2 shadow-xs border ${
+                    spokenTranscript.includes('Kalamkari')
+                      ? 'bg-amber-600 text-white border-amber-500 ring-2 ring-amber-400'
+                      : 'bg-gradient-to-r from-amber-500/15 via-primary/10 to-amber-500/15 border-amber-500/40 text-on-surface hover:border-primary hover:shadow-sm'
+                  }`}
+                  title="Play exact SIH Video Demo sample: Hand-painted Kalamkari cotton dupatta"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
+                  <span>🎬 SIH Demo Sample: Kalamkari Cotton Dupatta</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 uppercase tracking-wide font-mono">
+                    Script Sample
+                  </span>
+                </button>
+              </div>
 
               {/* Quick Test Voice Presets with Live Audio Demo */}
               <div className="pt-3 border-t border-outline/10 space-y-2">

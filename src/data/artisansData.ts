@@ -246,4 +246,74 @@ export const artisansData: ArtisanProfile[] = [
       }
     ]
   },
+  {
+    id: 'artisan-subbaiah-kalamkari',
+    user_id: 'user-artisan-8',
+    name: 'Guru Subbaiah Reddy',
+    craft_id: 'craft-kalamkari',
+    craft_name: 'Srikalahasti Kalamkari',
+    state: 'Andhra Pradesh',
+    district: 'Tirupati (Srikalahasti)',
+    experience_years: 32,
+    bio: 'National Award-winning Kalamkari master artist from Srikalahasti. Master of freehand bamboo pen drawing with fermented natural botanical dyes on buffalo-milk treated organic cotton.',
+    craft_story: 'In our tradition along the Swarnamukhi river, we do not use stencils or chemicals. Our brush is a sharpened bamboo reed wrapped with wool called a Kalam. We dip it into fermented jaggery and rusted iron to draw the sacred lines of trees, lotuses, and peacocks. The fabric is treated with raw buffalo milk to prevent dye bleeding, and then washed in the flowing river. Each piece is a living prayer of nature.',
+    story_audio_url: 'https://cdn.freesound.org/previews/518/518882_11861866-lq.mp3',
+    learning_available: true,
+    collaboration_available: true,
+    verification_status: 'VERIFIED',
+    languages_spoken: ['Telugu', 'Hindi', 'English', 'Tamil'],
+    avatar_url: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=400&q=80',
+    guild_name: 'Srikalahasti Kalamkari Vankar & Artists Sangham',
+    rating: 4.96,
+    reviews_count: 148,
+    skills: ['Freehand Bamboo Kalam Drawing', 'Natural Botanical Dye Formulation', 'Buffalo Milk Cloth Mordanting', 'Alum Color Fixation', 'River Swarnamukhi Washing'],
+    collaboration_interests: ['Craft Fusion', 'Joint Collection', 'Product Collaboration', 'Workshop'],
+    traditional_techniques: ['17-Step Natural Dyeing Process', 'Bamboo Reed Kalam Pen Freehand Drawing', 'Fermented Kasim Iron Ink Formulation'],
+    materials: ['Organic Desi Cotton', 'Bamboo Kalam Reed', 'Buffalo Milk', 'Myrobalan (Karakkaya)', 'Alum Mordant', 'Madder Root'],
+    previous_collaborations: [
+      {
+        title: 'Kalamkari & Pochampally Fusion Dupatta',
+        partner_name: 'Gaddam Lakshmi Devi',
+        partner_craft: 'Pochampally Ikat',
+        year: '2024',
+        image_url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=400&q=80',
+        description: 'Hand-painted Kalamkari pallu joined with double ikat geometric borders.'
+      }
+    ]
+  },
+  {
+    id: 'artisan-panchanan-terracotta',
+    user_id: 'user-artisan-9',
+    name: 'Panchanan Kumbhakar',
+    craft_id: 'craft-bankura-terracotta',
+    craft_name: 'Bankura Terracotta & Clay Craft',
+    state: 'West Bengal',
+    district: 'Bankura (Panchmura)',
+    experience_years: 29,
+    bio: 'Panchmura terracotta master sculptor carrying forward the sacred Bankura horse lineage. Renowned for wheel-thrown and coil-assembled earthen heritage sculptures.',
+    craft_story: 'The red alluvial clay of the Damodar and Gandheswari rivers has run in my family for seven generations. When we throw the tall neck of the Bankura horse on our heavy stone wheel, it demands gentle rhythm. The ears are shaped like open leaves to listen to the gods, and the body is fired in a slow wood-fired kiln under straw and rice husk for three full days. The earth itself becomes immortal.',
+    story_audio_url: 'https://cdn.freesound.org/previews/518/518882_11861866-lq.mp3',
+    learning_available: true,
+    collaboration_available: true,
+    verification_status: 'VERIFIED',
+    languages_spoken: ['Bengali', 'Hindi', 'English'],
+    avatar_url: 'https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?auto=format&fit=crop&w=400&q=80',
+    guild_name: 'Panchmura Terracotta Artisans Guild',
+    rating: 4.93,
+    reviews_count: 112,
+    skills: ['Panchmura Sacred Horse Sculpting', 'Wheel-Thrown Segment Assembly', 'Natural Clay Silt Slip Glaze', 'Wood-Fired Closed Kiln Baking'],
+    collaboration_interests: ['Craft Fusion', 'Product Collaboration', 'Custom Project', 'Exhibition'],
+    traditional_techniques: ['Coil and Slab Hand-Modelling', 'Segmented Wheel Throwing', 'Slow Smoke Kiln Reduction'],
+    materials: ['Gandheswari Alluvial Clay', 'Natural River Silt', 'Rice Husk Ash Temper', 'Red Ochre Mineral Slip'],
+    previous_collaborations: [
+      {
+        title: 'Terracotta & Bastar Brass Bell Chimes',
+        partner_name: 'Somnath Ghadwa',
+        partner_craft: 'Bastar Dhokra Bell Metal',
+        year: '2023',
+        image_url: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=400&q=80',
+        description: 'Hand-sculpted terracotta wind cylinders hung with lost-wax cast bell metal tinklers.'
+      }
+    ]
+  }
 ];
