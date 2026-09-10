@@ -116,7 +116,7 @@ export const CustomerHome: React.FC = () => {
   return (
     <div className="space-y-12 pb-16 animate-fadeIn">
       {/* 1. HERO SHOWCASE */}
-      <section className="relative rounded-3xl overflow-hidden bg-surface-container-high border border-outline/20 p-8 sm:p-12 lg:p-16">
+      <section data-guide="hero-banner" className="relative rounded-3xl overflow-hidden bg-surface-container-high border border-outline/20 p-8 sm:p-12 lg:p-16">
         <div className="relative z-10 max-w-3xl space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-primary/15 text-primary border border-primary/20 backdrop-blur-xs">
             <Sparkles className="w-4 h-4 text-primary animate-pulse" />
@@ -254,7 +254,9 @@ export const CustomerHome: React.FC = () => {
       ) : (
         <>
           {/* 3. INTERACTIVE 3D INDIA HERITAGE MAP */}
-          <IndiaHeritageMap />
+          <div data-guide="india-heritage-map-section">
+            <IndiaHeritageMap />
+          </div>
 
           {/* 3B. GEOGRAPHIC REGIONAL CRAFT EXPLORER */}
           <section className="space-y-5">
@@ -290,7 +292,7 @@ export const CustomerHome: React.FC = () => {
             </div>
 
             {/* Crafts Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-guide="craft-grid">
               {filteredCrafts.slice(0, 4).map((craft) => (
                 <div
                   key={craft.id}

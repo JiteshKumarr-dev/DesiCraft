@@ -12,6 +12,8 @@ import {
   Heart,
   Globe,
   LogOut,
+  HelpCircle,
+  Volume2,
 } from 'lucide-react';
 
 interface UserProfileModalProps {
@@ -30,6 +32,12 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     setIsLanguagePopupOpen,
     logoutUser,
     setIsAuthModalOpen,
+    guidedHelpEnabled,
+    setGuidedHelpEnabled,
+    voiceGuidanceEnabled,
+    setVoiceGuidanceEnabled,
+    autoStartHelp,
+    setAutoStartHelp,
   } = useApp();
 
   if (!isOpen) return null;
@@ -166,6 +174,80 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
             >
               Change Language
             </button>
+          </div>
+
+          {/* Accessibility & Assistance Settings */}
+          <div className="p-4 rounded-xl bg-surface-container-low border border-primary/25 space-y-4">
+            <div className="flex items-center gap-2 text-xs font-serif font-bold text-on-surface">
+              <HelpCircle className="w-4 h-4 text-primary" />
+              <span>Accessibility & Assistance</span>
+            </div>
+
+            {/* Guided Help Switch */}
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h4 className="text-xs font-bold text-on-surface">Guided Help</h4>
+                <p className="text-[11px] text-on-surface-variant">
+                  Get step-by-step guidance while using Desi Craft.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGuidedHelpEnabled(!guidedHelpEnabled)}
+                className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer shrink-0 ${
+                  guidedHelpEnabled
+                    ? 'bg-primary text-on-primary shadow-xs'
+                    : 'bg-surface-container-highest text-on-surface-variant border border-outline/30'
+                }`}
+              >
+                {guidedHelpEnabled ? 'ON' : 'OFF'}
+              </button>
+            </div>
+
+            {/* Voice Guidance Switch */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-outline/10">
+              <div>
+                <h4 className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+                  <Volume2 className="w-3.5 h-3.5 text-primary" />
+                  <span>Voice Guidance</span>
+                </h4>
+                <p className="text-[11px] text-on-surface-variant">
+                  Hear instructions aloud in your selected language.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setVoiceGuidanceEnabled(!voiceGuidanceEnabled)}
+                className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer shrink-0 ${
+                  voiceGuidanceEnabled
+                    ? 'bg-secondary text-on-secondary shadow-xs'
+                    : 'bg-surface-container-highest text-on-surface-variant border border-outline/30'
+                }`}
+              >
+                {voiceGuidanceEnabled ? 'ON' : 'OFF'}
+              </button>
+            </div>
+
+            {/* Auto-start Help Switch */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t border-outline/10">
+              <div>
+                <h4 className="text-xs font-bold text-on-surface">Auto-start Help</h4>
+                <p className="text-[11px] text-on-surface-variant">
+                  Start guidance automatically on new features.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAutoStartHelp(!autoStartHelp)}
+                className={`px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer shrink-0 ${
+                  autoStartHelp
+                    ? 'bg-primary/80 text-on-primary shadow-xs'
+                    : 'bg-surface-container-highest text-on-surface-variant border border-outline/30'
+                }`}
+              >
+                {autoStartHelp ? 'ON' : 'OFF'}
+              </button>
+            </div>
           </div>
 
           {/* Master Artisan Credentials */}

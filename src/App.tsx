@@ -17,6 +17,9 @@ import { HeritageAiCoPilot } from './components/common/HeritageAiCoPilot';
 import { LanguageSelectionPopup } from './components/common/LanguageSelectionPopup';
 import { AuthModal } from './components/common/AuthModal';
 import { SignupSuccessModal } from './components/common/SignupSuccessModal';
+import { GuidedHelpOverlay } from './components/common/GuidedHelpOverlay';
+import { GuidedHelpMenuModal } from './components/common/GuidedHelpMenuModal';
+import { FirstTimeWelcomeModal } from './components/common/FirstTimeWelcomeModal';
 
 // Customer View
 import { CustomerHome } from './components/customer/CustomerHome';
@@ -90,6 +93,9 @@ export const App: React.FC = () => {
       <LanguageSelectionPopup />
       <AuthModal />
       <SignupSuccessModal />
+      <GuidedHelpOverlay />
+      <GuidedHelpMenuModal />
+      <FirstTimeWelcomeModal />
       <NotificationToast />
     </div>
   );

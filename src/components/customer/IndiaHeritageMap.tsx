@@ -319,7 +319,7 @@ export const IndiaHeritageMap: React.FC = () => {
           </div>
 
           {/* CENTER 3D ISOMETRIC VECTOR MAP */}
-          <div className="lg:col-span-6 flex justify-center items-center py-4 relative">
+          <div className="lg:col-span-6 flex justify-center items-center py-4 relative" data-guide="india-map-canvas">
             <div
               className={`relative w-full max-w-[540px] aspect-[612/696] transition-transform duration-700 ease-out ${
                 is3DEnabled
@@ -477,7 +477,7 @@ export const IndiaHeritageMap: React.FC = () => {
           {/* RIGHT STATS COLUMN (Matching reference image) */}
           <div className="lg:col-span-3 space-y-7">
             {/* Stat Badges */}
-            <div className="space-y-4 bg-white/60 dark:bg-black/40 backdrop-blur-md p-5 rounded-2xl border border-amber-900/15 shadow-xs">
+            <div data-guide="state-preview-card" className="space-y-4 bg-white/60 dark:bg-black/40 backdrop-blur-md p-5 rounded-2xl border border-amber-900/15 shadow-xs">
               <div className="flex items-center gap-3.5">
                 <span className="text-2xl p-2 rounded-xl bg-amber-500/15">🏺</span>
                 <div>

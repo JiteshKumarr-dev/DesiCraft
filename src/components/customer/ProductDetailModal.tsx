@@ -66,7 +66,7 @@ export const ProductDetailModal: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8">
           {/* Left Column: Image Gallery & Studio Lighting Toggle */}
-          <div className="space-y-4">
+          <div className="space-y-4" data-guide="product-gallery">
             <div className="relative rounded-2xl overflow-hidden aspect-square border border-outline/20 bg-surface-container-low shadow-sm">
               <img
                 src={selectedProduct.images[activeImageIdx] || selectedProduct.primary_image}
@@ -114,7 +114,7 @@ export const ProductDetailModal: React.FC = () => {
             )}
 
             {/* Digital Craft Passport Callout Card */}
-            <div className="p-4 rounded-xl bg-surface-container-low border border-primary/30 flex items-center justify-between">
+            <div data-guide="gi-passport-badge" className="p-4 rounded-xl bg-surface-container-low border border-primary/30 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                   <Award className="w-5 h-5" />
@@ -202,7 +202,9 @@ export const ProductDetailModal: React.FC = () => {
               </div>
 
               {/* AI Demand Predictor Widget */}
-              <DemandPredictorWidget product={selectedProduct} />
+              <div data-guide="demand-badge">
+                <DemandPredictorWidget product={selectedProduct} />
+              </div>
 
               {/* Indigenous Materials */}
               <div className="space-y-1.5">
@@ -259,7 +261,7 @@ export const ProductDetailModal: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-2 pt-4 border-t border-outline/20">
+            <div data-guide="order-actions" className="space-y-2 pt-4 border-t border-outline/20">
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => addToCart(selectedProduct, 1)}

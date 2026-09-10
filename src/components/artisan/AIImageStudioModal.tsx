@@ -199,6 +199,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               type="button"
+              data-guide="photo-upload-zone"
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition cursor-pointer"
             >
@@ -231,7 +232,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
             <label className="text-xs font-bold text-on-surface uppercase tracking-wider">
               Deblur Strength
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" data-guide="enhancement-modes">
               {DEBLUR_PRESETS.map((preset) => {
                 const isSelected = activeLevel === preset.id;
                 return (
@@ -361,6 +362,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
             {activeViewTab === 'SPLIT' && (
               <div
                 ref={splitContainerRef}
+                data-guide="compare-slider-view"
                 onPointerMove={handlePointerMove}
                 onPointerDown={handlePointerDown}
                 onPointerUp={handlePointerUp}
@@ -482,6 +484,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
 
             <button
               type="button"
+              data-guide="enhance-action-btn"
               onClick={() => runDeblur(originalImageSrc, activeLevel, customStrength)}
               disabled={isProcessing}
               className="px-3.5 py-2 rounded-lg border border-outline/30 text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer flex items-center gap-1.5"
@@ -503,6 +506,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
 
           <button
             type="button"
+            data-guide="apply-to-product-btn"
             onClick={handleApplyDeblurred}
             disabled={isProcessing || !deblurredResultUrl}
             className="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs sm:text-sm font-bold shadow-md hover:bg-primary/90 transition flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"

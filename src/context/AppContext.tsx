@@ -21,6 +21,7 @@ import { artisansData } from '../data/artisansData';
 import { productsData, passportsData } from '../data/productsData';
 import { opportunitiesData } from '../data/opportunitiesData';
 import { translations, TranslationStrings, createTranslator, TranslateFn } from '../data/translations';
+import { speechController, TOURS } from '../services/guidedHelpService';
 import {
   supabase,
   testSupabaseConnection,
@@ -170,6 +171,27 @@ interface AppContextType {
   setIsSignupSuccessModalOpen: (open: boolean) => void;
   isVoiceArtisanSetupOpen: boolean;
   setIsVoiceArtisanSetupOpen: (open: boolean) => void;
+  // Guided Help & Voice Assistance Mode
+  guidedHelpEnabled: boolean;
+  setGuidedHelpEnabled: (enabled: boolean) => void;
+  voiceGuidanceEnabled: boolean;
+  setVoiceGuidanceEnabled: (enabled: boolean) => void;
+  autoStartHelp: boolean;
+  setAutoStartHelp: (enabled: boolean) => void;
+  activeTourId: string | null;
+  activeStepIndex: number;
+  completedTours: string[];
+  startTour: (tourId: string, stepIndex?: number) => void;
+  nextTourStep: () => void;
+  prevTourStep: () => void;
+  skipTour: () => void;
+  finishTour: () => void;
+  restartTour: (tourId: string) => void;
+  closeTour: () => void;
+  isHelpMenuOpen: boolean;
+  setIsHelpMenuOpen: (open: boolean) => void;
+  isFirstTimeWelcomeOpen: boolean;
+  setIsFirstTimeWelcomeOpen: (open: boolean) => void;
   // Supabase Backend Sync
   supabaseStatus: 'connected' | 'offline' | 'checking';
   isSupabaseConnected: boolean;
@@ -326,9 +348,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : defaultUser;
   });
 
-  const [language, setLanguage] = useState<LanguageCode>(() => {
+  const [language, setLanguageState] = useState<LanguageCode>(() => {
     return (localStorage.getItem('desi_craft_lang') as LanguageCode) || 'en';
   });
+
+  const setLanguage = (lang: LanguageCode) => {
+    speechController.stop();
+    setLanguageState(lang);
+  };
 
   const [products, setProducts] = useState<Product[]>(() => {
     try {
@@ -424,13 +451,121 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'SIGNUP' | 'LOGIN'>('SIGNUP');
 
-  // First-visit check: show language popup if not previously established
-  const [isLanguagePopupOpen, setIsLanguagePopupOpen] = useState<boolean>(() => {
-    return !localStorage.getItem('desi_craft_lang_selected');
-  });
+  // First popup on every visit or refresh: show language preference selection
+  const [isLanguagePopupOpen, setIsLanguagePopupOpen] = useState<boolean>(true);
 
   const [isSignupSuccessModalOpen, setIsSignupSuccessModalOpen] = useState(false);
   const [isVoiceArtisanSetupOpen, setIsVoiceArtisanSetupOpen] = useState(false);
+
+  // Guided Help & Voice Assistance State
+  const [guidedHelpEnabled, setGuidedHelpEnabledState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('desi_craft_guided_help_enabled');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  const [voiceGuidanceEnabled, setVoiceGuidanceEnabledState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('desi_craft_voice_guidance_enabled');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  const [autoStartHelp, setAutoStartHelpState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('desi_craft_auto_start_help');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  const [completedTours, setCompletedTours] = useState<string[]>(() => {
+    const saved = localStorage.getItem('desi_craft_completed_tours');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [activeTourId, setActiveTourId] = useState<string | null>(null);
+  const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
+  const [isHelpMenuOpen, setIsHelpMenuOpen] = useState<boolean>(false);
+  const [isFirstTimeWelcomeOpen, setIsFirstTimeWelcomeOpen] = useState<boolean>(false);
+
+  const setGuidedHelpEnabled = (enabled: boolean) => {
+    setGuidedHelpEnabledState(enabled);
+    localStorage.setItem('desi_craft_guided_help_enabled', JSON.stringify(enabled));
+    if (!enabled) {
+      speechController.stop();
+      setActiveTourId(null);
+    }
+  };
+
+  const setVoiceGuidanceEnabled = (enabled: boolean) => {
+    setVoiceGuidanceEnabledState(enabled);
+    localStorage.setItem('desi_craft_voice_guidance_enabled', JSON.stringify(enabled));
+    if (!enabled) {
+      speechController.stop();
+    }
+  };
+
+  const setAutoStartHelp = (enabled: boolean) => {
+    setAutoStartHelpState(enabled);
+    localStorage.setItem('desi_craft_auto_start_help', JSON.stringify(enabled));
+  };
+
+  const startTour = (tourId: string, stepIndex = 0) => {
+    if (!guidedHelpEnabled) return;
+    speechController.stop();
+    setActiveTourId(tourId);
+    setActiveStepIndex(stepIndex);
+  };
+
+  const nextTourStep = () => {
+    if (!activeTourId) return;
+    const tour = TOURS[activeTourId];
+    if (!tour) return;
+    speechController.stop();
+    if (activeStepIndex + 1 < tour.steps.length) {
+      setActiveStepIndex((prev) => prev + 1);
+    } else {
+      finishTour();
+    }
+  };
+
+  const prevTourStep = () => {
+    if (!activeTourId) return;
+    speechController.stop();
+    if (activeStepIndex > 0) {
+      setActiveStepIndex((prev) => prev - 1);
+    }
+  };
+
+  const skipTour = () => {
+    speechController.stop();
+    setActiveTourId(null);
+    setActiveStepIndex(0);
+  };
+
+  const finishTour = () => {
+    speechController.stop();
+    if (activeTourId) {
+      setCompletedTours((prev) => {
+        const next = Array.from(new Set([...prev, activeTourId]));
+        localStorage.setItem('desi_craft_completed_tours', JSON.stringify(next));
+        return next;
+      });
+    }
+    setActiveTourId(null);
+    setActiveStepIndex(0);
+  };
+
+  const restartTour = (tourId: string) => {
+    speechController.stop();
+    setCompletedTours((prev) => {
+      const next = prev.filter((id) => id !== tourId);
+      localStorage.setItem('desi_craft_completed_tours', JSON.stringify(next));
+      return next;
+    });
+    startTour(tourId, 0);
+  };
+
+  const closeTour = () => {
+    speechController.stop();
+    setActiveTourId(null);
+    setActiveStepIndex(0);
+  };
 
   // Supabase Backend Status & Sync
   const [supabaseStatus, setSupabaseStatus] = useState<'connected' | 'offline' | 'checking'>('checking');
@@ -583,11 +718,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Single Account Mode Switcher
   const toggleMode = () => {
+    speechController.stop();
     const newMode: UserMode = user.active_mode === 'CUSTOMER' ? 'ARTISAN' : 'CUSTOMER';
     setUser((prev) => ({
       ...prev,
       active_mode: newMode,
     }));
+    // If a tour was active, close it so mode-specific tour can start
+    if (activeTourId) {
+      setActiveTourId(null);
+      setActiveStepIndex(0);
+    }
     showNotification(
       newMode === 'ARTISAN'
         ? 'Switched to Artisan Studio Mode — Welcome to your digital loom workspace!'
@@ -597,6 +738,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setMode = (mode: UserMode) => {
     if (user.active_mode === mode) return;
+    speechController.stop();
+    if (activeTourId) {
+      setActiveTourId(null);
+      setActiveStepIndex(0);
+    }
     setUser((prev) => ({
       ...prev,
       active_mode: mode,
@@ -1025,6 +1171,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsSignupSuccessModalOpen,
         isVoiceArtisanSetupOpen,
         setIsVoiceArtisanSetupOpen,
+        guidedHelpEnabled,
+        setGuidedHelpEnabled,
+        voiceGuidanceEnabled,
+        setVoiceGuidanceEnabled,
+        autoStartHelp,
+        setAutoStartHelp,
+        activeTourId,
+        activeStepIndex,
+        completedTours,
+        startTour,
+        nextTourStep,
+        prevTourStep,
+        skipTour,
+        finishTour,
+        restartTour,
+        closeTour,
+        isHelpMenuOpen,
+        setIsHelpMenuOpen,
+        isFirstTimeWelcomeOpen,
+        setIsFirstTimeWelcomeOpen,
         signUpUser,
         loginUser,
         logoutUser,

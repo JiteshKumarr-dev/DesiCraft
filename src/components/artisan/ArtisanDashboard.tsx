@@ -59,7 +59,7 @@ export const ArtisanDashboard: React.FC = () => {
   return (
     <div className="space-y-8 pb-16 animate-fadeIn">
       {/* Studio Header Banner */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-surface-container-high border border-outline/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div data-guide="artisan-welcome-card" className="p-6 sm:p-8 rounded-3xl bg-surface-container-high border border-outline/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary text-on-primary uppercase tracking-wider">
@@ -90,6 +90,7 @@ export const ArtisanDashboard: React.FC = () => {
 
           {/* Quick Voice Creator Button */}
           <button
+            data-guide="voice-creator-trigger"
             onClick={() => setIsVoiceCreatorOpen(true)}
             className="px-6 py-3.5 rounded-full bg-primary text-on-primary text-xs sm:text-sm font-bold hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
@@ -166,6 +167,7 @@ export const ArtisanDashboard: React.FC = () => {
         </button>
 
         <button
+          data-guide="fair-price-advisor-trigger"
           onClick={() => setIsPriceAdvisorOpen(true)}
           className="p-5 rounded-2xl bg-surface border border-outline/20 hover:border-primary transition shadow-xs text-left space-y-2 cursor-pointer group"
         >
@@ -181,6 +183,7 @@ export const ArtisanDashboard: React.FC = () => {
         </button>
 
         <button
+          data-guide="ai-enhancer-trigger"
           onClick={() => setIsPhotoEnhancerOpen(true)}
           className="p-5 rounded-2xl bg-surface border border-outline/20 hover:border-primary transition shadow-xs text-left space-y-2 cursor-pointer group"
         >
@@ -209,6 +212,7 @@ export const ArtisanDashboard: React.FC = () => {
         ].map((tab) => (
           <button
             key={tab.id}
+            {...(tab.id === 'DEMAND' ? { 'data-guide': 'demand-predictor-card' } : {})}
             onClick={() => setActiveTab(tab.id as any)}
             className={`px-4 py-2 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer ${
               activeTab === tab.id
@@ -406,7 +410,7 @@ export const ArtisanDashboard: React.FC = () => {
         <StudioAnalytics />
       ) : (
         /* Orders & Fulfillment Stepper */
-        <div className="space-y-4">
+        <div className="space-y-4" data-guide="orders-management-section">
           <h3 className="font-serif text-lg font-bold text-on-surface">
             Active Loom Fulfillment ({orders.length})
           </h3>

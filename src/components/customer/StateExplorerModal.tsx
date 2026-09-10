@@ -300,7 +300,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
           </div>
 
           {/* 3. FAMOUS CRAFTS CAROUSEL */}
-          <div className="space-y-3">
+          <div className="space-y-3" data-guide="state-crafts-list">
             <div className="flex items-center justify-between">
               <h3 className="font-serif text-lg sm:text-xl font-bold text-on-surface">
                 Famous Crafts of {stateData.name}
@@ -455,7 +455,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
           )}
 
           {/* 5. SUGGESTED ARTISANS SECTION */}
-          <div className="space-y-4">
+          <div className="space-y-4" data-guide="explore-artisans-action">
             <div className="flex items-center justify-between">
               <h3 className="font-serif text-lg sm:text-xl font-bold text-on-surface">
                 Suggested Artisans

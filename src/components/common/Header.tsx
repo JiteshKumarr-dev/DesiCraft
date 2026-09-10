@@ -17,6 +17,7 @@ import {
   Mic,
   QrCode,
   MapPin,
+  HelpCircle,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -50,6 +51,8 @@ export const Header: React.FC<HeaderProps> = ({
     setIsAuthModalOpen,
     setAuthMode,
     setIsLanguagePopupOpen,
+    setIsHelpMenuOpen,
+    guidedHelpEnabled,
   } = useApp();
 
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
@@ -112,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex items-center justify-between gap-4">
           {/* Logo & Brand Identity */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3" data-guide="brand-logo">
             <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-xs">
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
@@ -138,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Search Bar (Desktop) */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-4">
+          <div className="hidden md:flex flex-1 max-w-lg mx-4" data-guide="craft-search">
             <div className="relative w-full">
               <Search className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -176,6 +179,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* ONE ACCOUNT → TWO MODES TOGGLE BUTTON */}
             <button
               onClick={toggleMode}
+              data-guide="artisan-switch"
               className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-xs font-semibold shadow-xs transition cursor-pointer border ${
                 activeMode === 'CUSTOMER'
                   ? 'bg-surface-container-highest text-primary border-primary/30 hover:bg-primary/10'
@@ -193,7 +197,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* Language Dropdown Selector (10 Indian Languages) */}
-            <div className="relative">
+            <div className="relative" data-guide="language-select">
               <button
                 onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-outline/30 bg-surface-container-low text-xs font-medium text-on-surface hover:bg-surface-container transition cursor-pointer"
@@ -247,6 +251,17 @@ export const Header: React.FC<HeaderProps> = ({
                 </>
               )}
             </div>
+
+            {/* PERSISTENT GUIDED HELP / ASSISTANCE BUTTON */}
+            <button
+              onClick={() => setIsHelpMenuOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold transition shadow-2xs cursor-pointer group"
+              title="Guided Help & Voice Assistance"
+              aria-label="Guided Help"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+              <span className="hidden sm:inline font-semibold">{t('Guided Help')}</span>
+            </button>
 
             {/* Wishlist & Cart Icons (Customer Mode) */}
             {activeMode === 'CUSTOMER' && (

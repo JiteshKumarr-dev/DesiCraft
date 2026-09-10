@@ -656,7 +656,7 @@ export const VoiceProductCreator: React.FC = () => {
               </p>
 
               {/* Language Dialect Selector */}
-              <div className="flex items-center justify-center gap-2">
+              <div className="flex items-center justify-center gap-2" data-guide="voice-lang-selector">
                 <Globe className="w-3.5 h-3.5 text-primary" />
                 <span className="text-xs font-medium text-on-surface">Listening Language:</span>
                 <select
@@ -700,6 +700,7 @@ export const VoiceProductCreator: React.FC = () => {
 
                   <button
                     type="button"
+                    data-guide="voice-mic-record-btn"
                     onClick={toggleRealtimeRecording}
                     className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all cursor-pointer ${
                       isRecording
@@ -720,22 +721,24 @@ export const VoiceProductCreator: React.FC = () => {
                 </div>
 
                 {/* Real-Time Waveform Frequency Bars */}
-                {(isRecording || isSimulating) && (
-                  <div className="flex items-center justify-center gap-1.5 h-8 mt-1">
-                    {[35, 65, 90, 60, 100, 85, 50, 95, 70, 90, 45, 80, 55].map((h, i) => {
-                      const dynamicH = Math.max(6, Math.min(30, (h * (audioLevel || 25)) / 65));
-                      return (
-                        <div
-                          key={i}
-                          className={`w-1 rounded-full transition-all duration-75 ${
-                            isRecording ? 'bg-red-500' : 'bg-primary'
-                          }`}
-                          style={{ height: `${dynamicH}px` }}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
+                <div data-guide="voice-waveform-transcript">
+                  {(isRecording || isSimulating) && (
+                    <div className="flex items-center justify-center gap-1.5 h-8 mt-1">
+                      {[35, 65, 90, 60, 100, 85, 50, 95, 70, 90, 45, 80, 55].map((h, i) => {
+                        const dynamicH = Math.max(6, Math.min(30, (h * (audioLevel || 25)) / 65));
+                        return (
+                          <div
+                            key={i}
+                            className={`w-1 rounded-full transition-all duration-75 ${
+                              isRecording ? 'bg-red-500' : 'bg-primary'
+                            }`}
+                            style={{ height: `${dynamicH}px` }}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <span className="text-xs font-bold text-on-surface block">
@@ -856,7 +859,7 @@ export const VoiceProductCreator: React.FC = () => {
             )}
 
             {/* AI-Extracted Structured Form */}
-            <div ref={formRef}>
+            <div ref={formRef} data-guide="extracted-fields-preview">
               <form onSubmit={handlePublishListing} className="space-y-5 pt-4 border-t border-outline/20">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
@@ -1203,6 +1206,7 @@ export const VoiceProductCreator: React.FC = () => {
 
                   <button
                     type="submit"
+                    data-guide="publish-product-btn"
                     className="px-6 py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-md cursor-pointer flex items-center gap-2 hover:scale-[1.02]"
                   >
                     <span>Publish Listing with Digital Craft Passport</span>

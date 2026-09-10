@@ -105,7 +105,7 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
 ];
 
 export const LanguageSelectionPopup: React.FC = () => {
-  const { language, setLanguage, isLanguagePopupOpen, setIsLanguagePopupOpen } = useApp();
+  const { language, setLanguage, isLanguagePopupOpen, setIsLanguagePopupOpen, setIsHelpMenuOpen } = useApp();
 
   const [selectedCode, setSelectedCode] = useState<LanguageCode>(language);
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,17 +151,21 @@ export const LanguageSelectionPopup: React.FC = () => {
     setLanguage(selectedCode);
     localStorage.setItem('desi_craft_lang_selected', 'true');
     setIsLanguagePopupOpen(false);
+    // Trigger 2nd popup: Guided Help immediately
+    setIsHelpMenuOpen(true);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/65 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-2xl bg-surface rounded-3xl shadow-2xl border border-outline/30 flex flex-col max-h-[92vh] overflow-hidden">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-2xl bg-surface rounded-3xl shadow-2xl border border-outline/30 flex flex-col max-h-[92vh] overflow-hidden z-[10000]">
         {/* Header Ribbon */}
         <div className="bg-surface-container-high border-b border-outline/20 p-6 sm:p-7 text-center relative">
           <button
             onClick={() => {
               localStorage.setItem('desi_craft_lang_selected', 'true');
               setIsLanguagePopupOpen(false);
+              // Trigger 2nd popup: Guided Help immediately
+              setIsHelpMenuOpen(true);
             }}
             className="absolute top-4 right-4 p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface transition cursor-pointer"
             aria-label="Close"
