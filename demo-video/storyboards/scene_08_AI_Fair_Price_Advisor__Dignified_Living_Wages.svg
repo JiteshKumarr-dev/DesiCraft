@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1C1917" />
+      <stop offset="60%" stop-color="#121110" />
+      <stop offset="100%" stop-color="#0A0908" />
+    </radialGradient>
+    <linearGradient id="goldBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)" />
+
+  <!-- Outer Filigree Border -->
+  <rect x="40" y="40" width="1840" height="1000" rx="20" fill="none" stroke="rgba(217,119,6,0.25)" stroke-width="3" />
+  <rect x="40" y="40" width="1840" height="8" fill="url(#goldBar)" />
+
+  <!-- Header Branding -->
+  <text x="80" y="110" fill="#FFFFFF" font-family="Georgia, serif" font-size="36" font-weight="bold">Desi<tspan fill="#F59E0B" font-style="italic">Craft</tspan></text>
+  <text x="260" y="106" fill="rgba(255,255,255,0.6)" font-family="sans-serif" font-size="15" letter-spacing="2">INDIA'S LIVING HERITAGE &amp; ARTISAN TECHNOLOGY ECOSYSTEM</text>
+
+  <!-- SIH Badge -->
+  <rect x="1540" y="75" width="300" height="42" rx="21" fill="rgba(217,119,6,0.18)" stroke="#F59E0B" stroke-width="1.5" />
+  <text x="1690" y="102" fill="#F59E0B" font-family="sans-serif" font-size="15" font-weight="bold" text-anchor="middle">★ SMART INDIA HACKATHON ★</text>
+
+  <!-- Scene Badge & Header -->
+  <rect x="80" y="170" width="240" height="36" rx="18" fill="#D97706" />
+  <text x="200" y="194" fill="#FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">08 / FAIR TRADE AI</text>
+  <text x="80" y="260" fill="#FFFFFF" font-family="Georgia, serif" font-size="44" font-weight="bold">AI Fair Price Advisor: Dignified Living Wages</text>
+  <text x="80" y="305" fill="rgba(255,255,255,0.8)" font-family="sans-serif" font-size="22">Transparent Formula: Materials + Labor Days + GI Mastery Premium</text>
+
+  <!-- Central Visual Container -->
+  <rect x="80" y="350" width="1760" height="510" rx="20" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" />
+
+  <!-- Right Side: Key Innovations Column -->
+  <rect x="1230" y="380" width="580" height="450" rx="18" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.1)" />
+  <text x="1260" y="420" fill="#F59E0B" font-family="sans-serif" font-size="18" font-weight="bold">KEY INNOVATIONS &amp; CAPABILITIES</text>
+  
+      <g transform="translate(1260, 440)">
+        <rect width="580" height="70" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" />
+        <circle cx="45" cy="35" r="16" fill="#D97706" />
+        <text x="45" y="41" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">✓</text>
+        <text x="75" y="41" fill="#F3F4F6" font-family="sans-serif" font-size="16">Dynamic Sliders: Material Cost (₹4,500) & Handloom Time (25 Days)</text>
+      </g>
+      <g transform="translate(1260, 525)">
+        <rect width="580" height="70" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" />
+        <circle cx="45" cy="35" r="16" fill="#D97706" />
+        <text x="45" y="41" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">✓</text>
+        <text x="75" y="41" fill="#F3F4F6" font-family="sans-serif" font-size="16">Craft Mastery Multipliers: Skilled Artisan ⇋ Senior Master ⇋ National Awardee</text>
+      </g>
+      <g transform="translate(1260, 610)">
+        <rect width="580" height="70" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" />
+        <circle cx="45" cy="35" r="16" fill="#D97706" />
+        <text x="45" y="41" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">✓</text>
+        <text x="75" y="41" fill="#F3F4F6" font-family="sans-serif" font-size="16">Fair Living Wage Calculation: ₹750/Day Minimum Baseline</text>
+      </g>
+      <g transform="translate(1260, 695)">
+        <rect width="580" height="70" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" />
+        <circle cx="45" cy="35" r="16" fill="#D97706" />
+        <text x="45" y="41" fill="#FFFFFF" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">✓</text>
+        <text x="75" y="41" fill="#F3F4F6" font-family="sans-serif" font-size="16">Fair Trade Guarantee Badge Certified on Product Listing</text>
+      </g>
+
+  <!-- Left Side: Scene Visual Area -->
+  <rect x="110" y="380" width="1090" height="450" rx="18" fill="rgba(0,0,0,0.3)" stroke="rgba(255,255,255,0.06)" />
+  <text x="655" y="615" fill="#D97706" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">SCENE 8 DEMO INTERFACE</text>
+  <text x="655" y="655" fill="rgba(255,255,255,0.7)" font-family="sans-serif" font-size="18" text-anchor="middle">AI Fair Price Advisor: Dignified Living Wages</text>
+
+  <!-- Subtitles Banner -->
+  <rect x="80" y="885" width="1760" height="85" rx="16" fill="rgba(10,9,8,0.9)" stroke="rgba(217,119,6,0.35)" />
+  <text x="960" y="938" fill="#FEF3C7" font-family="sans-serif" font-size="22" font-style="italic" text-anchor="middle">"Ending distress selling and predatory middlemen markups."</text>
+
+  <!-- Progress Bar -->
+  <rect x="80" y="995" width="1760" height="8" rx="4" fill="rgba(255,255,255,0.15)" />
+  <rect x="80" y="995" width="1136.6666666666667" height="8" rx="4" fill="#F59E0B" />
+  <text x="80" y="1025" fill="rgba(255,255,255,0.6)" font-family="monospace" font-size="16">2:20 / 04:00</text>
+  <text x="1840" y="1025" fill="rgba(255,255,255,0.6)" font-family="sans-serif" font-size="16" text-anchor="end">Scene 8 of 13</text>
+</svg>

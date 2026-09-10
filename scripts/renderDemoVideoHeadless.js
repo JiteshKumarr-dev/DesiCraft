@@ -29,9 +29,13 @@ console.log('================================================================');
 const rootDir = path.resolve(fileURLToPath(import.meta.url), '../../');
 const distDir = path.join(rootDir, 'dist');
 const storyboardDir = path.join(distDir, 'demo-video-storyboards');
+const permanentDir = path.join(rootDir, 'demo-video');
+const permanentStoryboardDir = path.join(permanentDir, 'storyboards');
 
 if (!fs.existsSync(distDir)) fs.mkdirSync(distDir, { recursive: true });
 if (!fs.existsSync(storyboardDir)) fs.mkdirSync(storyboardDir, { recursive: true });
+if (!fs.existsSync(permanentDir)) fs.mkdirSync(permanentDir, { recursive: true });
+if (!fs.existsSync(permanentStoryboardDir)) fs.mkdirSync(permanentStoryboardDir, { recursive: true });
 
 // 1. Export Master Timeline JSON
 const timelineData = {
@@ -51,8 +55,10 @@ const timelineData = {
 };
 
 const timelineJsonPath = path.join(distDir, 'demo-video-timeline.json');
+const permTimelineJsonPath = path.join(permanentDir, 'demo-video-timeline.json');
 fs.writeFileSync(timelineJsonPath, JSON.stringify(timelineData, null, 2), 'utf-8');
-console.log(`✓ Master timeline manifest written: ${timelineJsonPath}`);
+fs.writeFileSync(permTimelineJsonPath, JSON.stringify(timelineData, null, 2), 'utf-8');
+console.log(`✓ Master timeline manifest written: ${permTimelineJsonPath}`);
 
 // 2. Generate 1920x1080 SVG Storyboard Keyframes for each of the 13 scenes
 DEMO_SCENES.forEach((scene) => {
@@ -133,9 +139,10 @@ DEMO_SCENES.forEach((scene) => {
 </svg>`;
 
   fs.writeFileSync(svgFilePath, svgContent, 'utf-8');
+  fs.writeFileSync(path.join(permanentStoryboardDir, svgFileName), svgContent, 'utf-8');
 });
 
-console.log(`✓ 13 full 1080p SVG storyboard snapshots rendered in: ${storyboardDir}`);
+console.log(`✓ 13 full 1080p SVG storyboard snapshots rendered in: ${permanentStoryboardDir}`);
 
 // 3. Generate Self-Contained Standalone 1080p HTML Player
 const standalonePlayerHtml = `<!DOCTYPE html>
@@ -231,8 +238,10 @@ const standalonePlayerHtml = `<!DOCTYPE html>
 </html>`;
 
 const standaloneHtmlPath = path.join(distDir, 'DesiCraft_SIH_Demo_Standalone_Player.html');
+const permStandaloneHtmlPath = path.join(permanentDir, 'DesiCraft_SIH_Demo_Standalone_Player.html');
 fs.writeFileSync(standaloneHtmlPath, standalonePlayerHtml, 'utf-8');
-console.log(`✓ Standalone offline 1080p HTML5 player generated: ${standaloneHtmlPath}`);
+fs.writeFileSync(permStandaloneHtmlPath, standalonePlayerHtml, 'utf-8');
+console.log(`✓ Standalone offline 1080p HTML5 player generated: ${permStandaloneHtmlPath}`);
 
 console.log('----------------------------------------------------------------');
 console.log('🎉 [SUCCESS] Headless demo video assets & storyboard generated!');
