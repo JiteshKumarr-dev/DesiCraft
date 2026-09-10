@@ -18,6 +18,7 @@ import {
   QrCode,
   MapPin,
   HelpCircle,
+  Film,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -52,6 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
     setAuthMode,
     setIsLanguagePopupOpen,
     setIsHelpMenuOpen,
+    setIsDemoVideoOpen,
     guidedHelpEnabled,
   } = useApp();
 
@@ -106,6 +108,14 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Gift className="w-3.5 h-3.5" />
               <span>{t('Handmade Gift Mode')}</span>
+            </button>
+            <div className="h-3 w-px bg-on-primary/30" />
+            <button
+              onClick={() => setIsDemoVideoOpen(true)}
+              className="flex items-center gap-1 text-amber-200 hover:text-white font-bold transition-colors cursor-pointer animate-pulse"
+            >
+              <Film className="w-3.5 h-3.5" />
+              <span>{t('🎬 3-Min Demo Video')}</span>
             </button>
           </div>
         </div>
@@ -261,6 +271,18 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <HelpCircle className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
               <span className="hidden sm:inline font-semibold">{t('Guided Help')}</span>
+            </button>
+
+            {/* CINEMATIC SIH DEMO VIDEO BUTTON */}
+            <button
+              onClick={() => setIsDemoVideoOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/50 bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 text-xs font-bold transition shadow-2xs cursor-pointer group animate-pulse"
+              title="Watch Official 3-Minute SIH Demo Video & Walkthrough"
+              aria-label="SIH Demo Video"
+            >
+              <Film className="w-3.5 h-3.5 text-amber-500 group-hover:scale-110 transition-transform" />
+              <span className="hidden sm:inline font-bold">{t('🎬 Demo Video')}</span>
+              <span className="sm:hidden">{t('Demo')}</span>
             </button>
 
             {/* Wishlist & Cart Icons (Customer Mode) */}

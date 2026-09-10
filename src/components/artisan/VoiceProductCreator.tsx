@@ -121,6 +121,19 @@ export const VoiceProductCreator: React.FC = () => {
     };
   }, [isVoiceCreatorOpen]);
 
+  // Listen for automated walkthrough SIH demo voice trigger
+  useEffect(() => {
+    const handleTriggerSih = () => {
+      if (isVoiceCreatorOpen) {
+        handleLoadSihDemo();
+      }
+    };
+    window.addEventListener('desicraft:run-sih-voice-demo', handleTriggerSih);
+    return () => {
+      window.removeEventListener('desicraft:run-sih-voice-demo', handleTriggerSih);
+    };
+  }, [isVoiceCreatorOpen]);
+
   if (!isVoiceCreatorOpen) return null;
 
   // Real-Time Speech Recognition toggle
@@ -832,6 +845,17 @@ export const VoiceProductCreator: React.FC = () => {
                   Quick Test Voice Presets in Indian Languages (Click to Simulate Live Speech):
                 </span>
                 <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+                  {/* SIH Official Demo Script Voice Sample */}
+                  <button
+                    type="button"
+                    onClick={handleLoadSihDemo}
+                    className="px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 hover:brightness-110 shadow-sm border border-amber-400"
+                    title="Run exact SIH Demo Script: Hand-painted Kalamkari Dupatta"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 fill-current" />
+                    <span>🎬 SIH Demo: Kalamkari Sample</span>
+                  </button>
+
                   {[
                     { code: 'hi', label: 'हिन्दी', desc: 'बनारसी जरी' },
                     { code: 'te', label: 'తెలుగు', desc: 'పోచంపల్లి ఇక్కత్' },

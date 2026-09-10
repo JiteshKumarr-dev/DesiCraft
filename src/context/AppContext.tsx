@@ -208,6 +208,10 @@ interface AppContextType {
   setIsVisualSearchOpen: (open: boolean) => void;
   notification: string | null;
   showNotification: (msg: string) => void;
+  isDemoVideoOpen: boolean;
+  setIsDemoVideoOpen: (open: boolean) => void;
+  isLiveWalkthroughOpen: boolean;
+  setIsLiveWalkthroughOpen: (open: boolean) => void;
 
   // Authentication & First-Visit Personalization
   isLoggedIn: boolean;
@@ -711,6 +715,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
   const [activeChatRecipient, setActiveChatRecipient] = useState<{ id: string; name: string; avatar?: string } | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [isDemoVideoOpen, setIsDemoVideoOpen] = useState(false);
+  const [isLiveWalkthroughOpen, setIsLiveWalkthroughOpen] = useState(false);
 
   // Authentication & First-Visit Personalization
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -1794,6 +1800,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsVisualSearchOpen,
         notification,
         showNotification,
+        isDemoVideoOpen,
+        setIsDemoVideoOpen,
+        isLiveWalkthroughOpen,
+        setIsLiveWalkthroughOpen,
         isLoggedIn,
         isAuthModalOpen,
         setIsAuthModalOpen,

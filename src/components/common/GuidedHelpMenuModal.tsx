@@ -22,6 +22,7 @@ import {
   Camera,
   Layers,
   ArrowRight,
+  Film,
 } from 'lucide-react';
 
 export const GuidedHelpMenuModal: React.FC = () => {
@@ -39,6 +40,7 @@ export const GuidedHelpMenuModal: React.FC = () => {
     isPhotoEnhancerOpen,
     isVoiceCreatorOpen,
     selectedProduct,
+    setIsDemoVideoOpen,
   } = useApp();
 
   if (!isHelpMenuOpen) return null;
@@ -170,6 +172,28 @@ export const GuidedHelpMenuModal: React.FC = () => {
 
         {/* Action Options */}
         <div className="space-y-2">
+          {/* 0. Watch Official 3-Min SIH Demo Video */}
+          <button
+            onClick={() => {
+              setIsHelpMenuOpen(false);
+              setIsDemoVideoOpen(true);
+            }}
+            className="w-full p-3.5 rounded-xl border-2 border-amber-500/50 bg-amber-500/15 hover:bg-amber-500/25 transition text-left flex items-center gap-3.5 cursor-pointer group shadow-xs animate-pulse"
+          >
+            <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <Film className="w-4 h-4" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-xs font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                <span>🎬 Watch 3-Min SIH Demo Video</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-900 dark:text-amber-200">1080p</span>
+              </h4>
+              <p className="text-[11px] text-on-surface-variant">
+                Full platform walkthrough with voiceover narration and Indian instrumental music.
+              </p>
+            </div>
+          </button>
+
           {/* 1. Guide me through this page */}
           <button
             onClick={handleStartTour}

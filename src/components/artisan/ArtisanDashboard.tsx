@@ -24,6 +24,7 @@ import {
   Sparkles,
   MessageSquare,
   UserCheck,
+  Film,
 } from 'lucide-react';
 import { CollaborationDiscoveryPage } from './CollaborationDiscoveryPage';
 import { SellerMessagesPage } from './SellerMessagesPage';
@@ -49,6 +50,7 @@ export const ArtisanDashboard: React.FC = () => {
     openChatWith,
     sellerTab,
     setSellerTab,
+    setIsDemoVideoOpen,
     collaborationRequests,
     sellerConversations,
     t,
@@ -132,6 +134,16 @@ export const ArtisanDashboard: React.FC = () => {
           >
             <ShieldCheck className="w-4 h-4 text-primary" />
             <span>Pehchan & Studio Credentials</span>
+          </button>
+
+          {/* 3-Minute SIH Demo Video Button */}
+          <button
+            onClick={() => setIsDemoVideoOpen(true)}
+            className="px-4 py-3 rounded-full border-2 border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-300 text-xs font-bold hover:bg-amber-500/20 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs animate-pulse"
+            title="Watch 3-Minute SIH Platform Walkthrough"
+          >
+            <Film className="w-4 h-4 text-amber-500" />
+            <span>🎬 3-Min Demo Video</span>
           </button>
 
           {/* Quick Voice Creator Button */}

@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Gift,
   Search,
+  Film,
 } from 'lucide-react';
 import { LearningView } from './LearningView';
 import { OpportunitiesView } from './OpportunitiesView';
@@ -38,6 +39,7 @@ export const CustomerHome: React.FC = () => {
     toggleWishlist,
     searchTerm,
     setIsGiftModeModalOpen,
+    setIsDemoVideoOpen,
     openChatWith,
     language,
     t,
@@ -156,6 +158,14 @@ export const CustomerHome: React.FC = () => {
             >
               <Gift className="w-4 h-4 text-secondary" />
               <span>{t('Handmade Gift Mode')}</span>
+            </button>
+
+            <button
+              onClick={() => setIsDemoVideoOpen(true)}
+              className="px-5 py-3.5 rounded-full bg-amber-500/15 border-2 border-amber-500/50 text-amber-700 dark:text-amber-300 text-xs sm:text-sm font-bold hover:bg-amber-500/25 transition flex items-center gap-2 cursor-pointer shadow-sm group"
+            >
+              <Film className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
+              <span>{t('🎬 Watch 3-Min SIH Demo Video')}</span>
             </button>
           </div>
 

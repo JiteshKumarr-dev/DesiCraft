@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verify:demo": "node scripts/verifyDemoVideo.js",
+    "render:demo": "node scripts/renderDemoVideoHeadless.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",

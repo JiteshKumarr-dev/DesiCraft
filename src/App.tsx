@@ -20,6 +20,8 @@ import { SignupSuccessModal } from './components/common/SignupSuccessModal';
 import { GuidedHelpOverlay } from './components/common/GuidedHelpOverlay';
 import { GuidedHelpMenuModal } from './components/common/GuidedHelpMenuModal';
 import { FirstTimeWelcomeModal } from './components/common/FirstTimeWelcomeModal';
+import { CinematicDemoModal } from './components/common/CinematicDemoModal';
+import { LiveDemoWalkthroughOverlay } from './components/common/LiveDemoWalkthroughOverlay';
 
 // Customer View
 import { CustomerHome } from './components/customer/CustomerHome';
@@ -35,7 +37,13 @@ import { PhotoEnhancerModal } from './components/artisan/PhotoEnhancerModal';
 import { VoiceArtisanSetupModal } from './components/artisan/VoiceArtisanSetupModal';
 
 export const App: React.FC = () => {
-  const { activeMode } = useApp();
+  const {
+    activeMode,
+    isDemoVideoOpen,
+    setIsDemoVideoOpen,
+    isLiveWalkthroughOpen,
+    setIsLiveWalkthroughOpen,
+  } = useApp();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
@@ -96,6 +104,22 @@ export const App: React.FC = () => {
       <GuidedHelpOverlay />
       <GuidedHelpMenuModal />
       <FirstTimeWelcomeModal />
+      <CinematicDemoModal
+        isOpen={isDemoVideoOpen}
+        onClose={() => setIsDemoVideoOpen(false)}
+        onStartLiveWalkthrough={() => {
+          setIsDemoVideoOpen(false);
+          setIsLiveWalkthroughOpen(true);
+        }}
+      />
+      <LiveDemoWalkthroughOverlay
+        isActive={isLiveWalkthroughOpen}
+        onClose={() => setIsLiveWalkthroughOpen(false)}
+        onOpenCinematicPlayer={() => {
+          setIsLiveWalkthroughOpen(false);
+          setIsDemoVideoOpen(true);
+        }}
+      />
       <NotificationToast />
     </div>
   );
