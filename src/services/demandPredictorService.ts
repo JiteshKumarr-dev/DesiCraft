@@ -84,7 +84,19 @@ export function calculateProductDemand(product: Product): ProductDemandPredictio
   ];
 
   // Specific craft detection:
-  if (allText.includes('ikat') || allText.includes('pochampally') || allText.includes('telia')) {
+  if (
+    allText.includes('ikat') ||
+    allText.includes('ikkat') ||
+    allText.includes('pochampally') ||
+    allText.includes('pochampalli') ||
+    allText.includes('pochampali') ||
+    allText.includes('పోచంపల్లి') ||
+    allText.includes('ఇక్కత్') ||
+    allText.includes('पोचमपल्ली') ||
+    allText.includes('telia') ||
+    allText.includes('chitiki') ||
+    allText.includes('pagdu bandhu')
+  ) {
     // Pochampally Double Ikat / Telia Rumal (User's screenshot!)
     baseScore = 96;
     growthRate = '+82% search velocity in handloom category';

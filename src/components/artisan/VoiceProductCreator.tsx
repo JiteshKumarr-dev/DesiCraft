@@ -36,6 +36,7 @@ import {
   Image as ImageIcon,
   RefreshCw,
   Sliders,
+  Edit3,
 } from 'lucide-react';
 import { AIImageStudioModal } from './AIImageStudioModal';
 
@@ -60,6 +61,8 @@ export const VoiceProductCreator: React.FC = () => {
   const [activeSpeechLang, setActiveSpeechLang] = useState<LanguageCode>(language);
   const [isPublishedSuccess, setIsPublishedSuccess] = useState(false);
   const [publishedPassportTag, setPublishedPassportTag] = useState('');
+  const [isEditingTranscript, setIsEditingTranscript] = useState(false);
+  const [manualTextInput, setManualTextInput] = useState('');
 
   // Editable Form fields populated by AI
   const [title, setTitle] = useState('');
@@ -791,6 +794,43 @@ export const VoiceProductCreator: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Quick Type Input Alternative */}
+              <div className="pt-2.5 border-t border-outline/10 max-w-lg mx-auto">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Or type craft phrase (e.g. pochampalli sarees, banarasi silk)..."
+                    value={manualTextInput}
+                    onChange={(e) => setManualTextInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && manualTextInput.trim()) {
+                        e.preventDefault();
+                        const val = manualTextInput.trim();
+                        setSpokenTranscript(val);
+                        setManualTextInput('');
+                        triggerAiExtraction(val, activeSpeechLang);
+                      }
+                    }}
+                    className="flex-1 px-3 py-1.5 text-xs bg-surface border border-outline/30 rounded-lg text-on-surface placeholder:text-on-surface-variant/60 focus:ring-1 focus:ring-primary shadow-2xs"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (manualTextInput.trim()) {
+                        const val = manualTextInput.trim();
+                        setSpokenTranscript(val);
+                        setManualTextInput('');
+                        triggerAiExtraction(val, activeSpeechLang);
+                      }
+                    }}
+                    className="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition cursor-pointer shrink-0 shadow-xs flex items-center gap-1"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <span>Extract</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Real-time Spoken Text Transcript Box */}
@@ -805,23 +845,63 @@ export const VoiceProductCreator: React.FC = () => {
                       ? 'Live Speech Streaming:'
                       : 'Audio Transcript Detected:'}
                   </span>
-                  {isExtracting ? (
-                    <span className="text-primary font-medium flex items-center gap-1.5 text-xs">
-                      <Sparkles className="w-3.5 h-3.5 animate-spin" /> AI Extracting Lineage...
-                    </span>
-                  ) : (
-                    <span className="text-xs font-semibold text-green-700 dark:text-green-400 flex items-center gap-1">
-                      <CheckCircle className="w-3.5 h-3.5" /> Recognized
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {isExtracting ? (
+                      <span className="text-primary font-medium flex items-center gap-1.5 text-xs">
+                        <Sparkles className="w-3.5 h-3.5 animate-spin" /> AI Extracting Lineage...
+                      </span>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingTranscript(!isEditingTranscript)}
+                          className="text-[11px] text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                          <span>{isEditingTranscript ? 'Done Editing' : 'Edit Transcript'}</span>
+                        </button>
+                        <span className="text-xs font-semibold text-green-700 dark:text-green-400 flex items-center gap-1">
+                          <CheckCircle className="w-3.5 h-3.5" /> Recognized
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <p className="text-xs sm:text-sm text-on-surface leading-relaxed font-serif bg-surface p-3 rounded-lg border border-outline/10">
-                  <span>"{spokenTranscript}"</span>
-                  {interimText && (
-                    <span className="text-primary italic font-sans font-medium"> {interimText}...</span>
-                  )}
-                </p>
+                {isEditingTranscript ? (
+                  <div className="space-y-1.5">
+                    <textarea
+                      value={spokenTranscript}
+                      onChange={(e) => setSpokenTranscript(e.target.value)}
+                      rows={2}
+                      className="w-full text-xs sm:text-sm text-on-surface leading-relaxed font-serif bg-surface p-3 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs"
+                      placeholder="Type or edit detected transcript..."
+                    />
+                    <div className="text-[10px] text-on-surface-variant flex items-center justify-between">
+                      <span>Edit the audio transcript if speech recognition missed any words</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsEditingTranscript(false);
+                          if (spokenTranscript.trim()) {
+                            triggerAiExtraction(spokenTranscript.trim(), activeSpeechLang);
+                          }
+                        }}
+                        className="text-primary font-bold hover:underline cursor-pointer flex items-center gap-1"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>Save & Extract</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs sm:text-sm text-on-surface leading-relaxed font-serif bg-surface p-3 rounded-lg border border-outline/10">
+                    <span>"{spokenTranscript}"</span>
+                    {interimText && (
+                      <span className="text-primary italic font-sans font-medium"> {interimText}...</span>
+                    )}
+                  </p>
+                )}
 
                 {/* Quick Action Bar beneath transcript */}
                 <div className="flex items-center justify-between pt-1">
