@@ -163,6 +163,11 @@ interface AppContextType {
     receiver_id: string;
     text: string;
     translated_text?: string;
+    attachment_url?: string;
+    attachment_type?: 'image' | 'file' | 'location';
+    attachment_name?: string;
+    attachment_size?: string;
+    location_data?: SellerMessageLocation;
   }) => void;
   activeChatRecipient: { id: string; name: string; avatar?: string } | null;
   openChatWith: (recipient: { id: string; name: string; avatar?: string }) => void;
@@ -1492,20 +1497,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     receiver_id: string;
     text: string;
     translated_text?: string;
+    attachment_url?: string;
+    attachment_type?: 'image' | 'file' | 'location';
+    attachment_name?: string;
+    attachment_size?: string;
+    location_data?: SellerMessageLocation;
   }) => {
+    const previewText =
+      msg.text ||
+      (msg.attachment_type === 'location'
+        ? `📍 ${msg.location_data?.title || 'Shared Location'}`
+        : msg.attachment_name
+        ? `📎 ${msg.attachment_name}`
+        : 'Shared an attachment');
+
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
       sender_id: user.id,
       sender_name: user.name,
       sender_role: msg.sender_role,
       receiver_id: msg.receiver_id,
-      text: msg.text,
-      translated_text: msg.translated_text || msg.text,
+      text: previewText,
+      translated_text: msg.translated_text || previewText,
       source_lang: language,
       target_lang: msg.sender_role === 'customer' ? 'te' : 'en', // auto target pairing
       timestamp: new Date().toISOString(),
+      attachment_url: msg.attachment_url,
+      attachment_type: msg.attachment_type,
+      attachment_name: msg.attachment_name,
+      attachment_size: msg.attachment_size,
+      location_data: msg.location_data,
     };
     setChatMessages((prev) => [...prev, newMsg]);
+    saveSupabaseChatMessage(newMsg).catch(console.warn);
   };
 
   const openChatWith = (recipient: { id: string; name: string; avatar?: string }) => {

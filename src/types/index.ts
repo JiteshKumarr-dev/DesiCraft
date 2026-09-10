@@ -284,6 +284,11 @@ export interface ChatMessage {
   target_lang: LanguageCode;
   timestamp: string;
   is_voice?: boolean;
+  attachment_url?: string;
+  attachment_type?: 'image' | 'file' | 'location';
+  attachment_name?: string;
+  attachment_size?: string;
+  location_data?: SellerMessageLocation;
 }
 
 export interface CustomOrderRequest {
