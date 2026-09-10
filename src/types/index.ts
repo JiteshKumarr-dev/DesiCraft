@@ -233,6 +233,14 @@ export interface SellerConversation {
   created_at: string;
 }
 
+export interface SellerMessageLocation {
+  title: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  map_url: string;
+}
+
 export interface SellerMessage {
   id: string;
   conversation_id: string;
@@ -243,6 +251,10 @@ export interface SellerMessage {
   created_at: string;
   is_read: boolean;
   attachment_url?: string;
+  attachment_type?: 'image' | 'file' | 'location';
+  attachment_name?: string;
+  attachment_size?: string;
+  location_data?: SellerMessageLocation;
 }
 
 export interface Opportunity {

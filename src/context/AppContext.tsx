@@ -17,6 +17,7 @@ import {
   Region,
   SellerConversation,
   SellerMessage,
+  SellerMessageLocation,
   CollaborationType,
 } from '../types';
 import { craftsData } from '../data/craftsData';
@@ -135,7 +136,17 @@ interface AppContextType {
   sellerMessages: SellerMessage[];
   activeSellerConversationId: string | null;
   setActiveSellerConversationId: (id: string | null) => void;
-  sendSellerMessage: (conversationId: string, content: string) => Promise<void>;
+  sendSellerMessage: (
+    conversationId: string,
+    content: string,
+    attachment?: {
+      url?: string;
+      type?: 'image' | 'file' | 'location';
+      name?: string;
+      size?: string;
+      location_data?: SellerMessageLocation;
+    }
+  ) => Promise<void>;
   markConversationAsRead: (conversationId: string) => void;
   openSellerChatWith: (artisanId: string, collaborationContext?: { id: string; title: string }) => void;
 
@@ -239,39 +250,39 @@ interface AppContextType {
 }
 
 const defaultUser: User = {
-  id: 'user-heirloom-001',
-  name: 'Devi Prasad Sharma',
-  email: 'deviprasad.crafts@bharat.in',
-  phone: '+91 98450 12345',
+  id: 'artisan-rajesh-varanasi',
+  name: 'Master Rajeshwar Ansari',
+  email: 'rajeshwar.kashi@crafts.in',
+  phone: '+91 98450 88492',
   preferred_language: 'en',
   active_mode: 'CUSTOMER',
   customer_profile: {
     id: 'cp-001',
-    user_id: 'user-heirloom-001',
-    location_state: 'Telangana',
-    location_district: 'Hyderabad',
+    user_id: 'artisan-rajesh-varanasi',
+    location_state: 'Uttar Pradesh',
+    location_district: 'Varanasi',
     interests: ['Handloom Sarees', 'Tribal Metalcraft', 'Organic Plant Dyes'],
     budget_preference: 15000,
   },
   artisan_profile: {
-    id: 'ap-001',
-    user_id: 'user-heirloom-001',
-    name: 'Devi Prasad Sharma',
+    id: 'artisan-rajesh-varanasi',
+    user_id: 'artisan-rajesh-varanasi',
+    name: 'Master Rajeshwar Ansari',
     craft_id: 'craft-varanasi-brocade',
     craft_name: 'Varanasi Zari & Brocade',
     state: 'Uttar Pradesh',
-    district: 'Varanasi',
-    experience_years: 24,
-    bio: 'Master brocade weaver and guild representative preserving authentic silver Zari pit-loom weaving.',
+    district: 'Varanasi (Kashi)',
+    experience_years: 34,
+    bio: '5th-generation master pit-loom weaver from Madanpura, Varanasi. Recipient of National Master Craftsperson Award for revival of antique Kadwa floral brocades.',
     craft_story: 'Carrying forward the loom traditions of my ancestors on the banks of the sacred Ganga.',
     learning_available: true,
     collaboration_available: true,
     verification_status: 'VERIFIED',
-    languages_spoken: ['Hindi', 'English', 'Bhojpuri'],
+    languages_spoken: ['Hindi', 'English', 'Bhojpuri', 'Urdu'],
     avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    guild_name: 'Kashi Bunakar Vankar Cooperative',
-    rating: 4.96,
-    reviews_count: 87,
+    guild_name: 'Kashi Bunakar Vankar Cooperative Society',
+    rating: 4.95,
+    reviews_count: 142,
   },
   created_at: '2025-10-01T00:00:00Z',
 };
@@ -448,8 +459,8 @@ const initialSellerConversations: SellerConversation[] = [
     },
     collaboration_id: 'collab-req-002',
     collaboration_title: 'Royal Kadwa x Pochampally Ikat Festive Stoles',
-    last_message: 'The natural indigo dyed warp samples arrived in Varanasi! The geometric alignment is superb.',
-    last_message_time: '2026-03-09T18:20:00Z',
+    last_message: 'Kadwa_Zari_Border_Draft.png',
+    last_message_time: '2026-03-09T19:00:00Z',
     unread_counts: {
       'artisan-rajesh-varanasi': 0,
       'artisan-lakshmi-pochampally': 0,
@@ -520,6 +531,38 @@ const initialSellerMessages: SellerMessage[] = [
   },
   {
     id: 'smsg-4',
+    conversation_id: 'conv-rajesh-lakshmi',
+    sender_id: 'artisan-lakshmi-pochampally',
+    sender_name: 'Gaddam Lakshmi Devi',
+    receiver_id: 'artisan-rajesh-varanasi',
+    content: 'Sharing the workshop address in Pochampally where our master weavers are preparing the warp frames.',
+    created_at: '2026-03-09T18:45:00Z',
+    is_read: true,
+    attachment_type: 'location',
+    location_data: {
+      title: 'Pochampally Ikat Weavers Colony',
+      address: 'Near Gandhi Bhavan, Bhoodan Pochampally, Yadadri Bhuvanagiri, Telangana 508284',
+      latitude: 17.3486,
+      longitude: 78.8184,
+      map_url: 'https://www.google.com/maps?q=17.3486,78.8184',
+    },
+  },
+  {
+    id: 'smsg-5',
+    conversation_id: 'conv-rajesh-lakshmi',
+    sender_id: 'artisan-rajesh-varanasi',
+    sender_name: 'Master Rajeshwar Ansari',
+    receiver_id: 'artisan-lakshmi-pochampally',
+    content: 'Here is our Kadwa Floral Zari border pattern draft for our festive stole collection.',
+    created_at: '2026-03-09T19:00:00Z',
+    is_read: true,
+    attachment_type: 'image',
+    attachment_url: '/images/banarasi-gold-saree.png',
+    attachment_name: 'Kadwa_Zari_Border_Draft.png',
+    attachment_size: '1.8 MB',
+  },
+  {
+    id: 'smsg-6',
     conversation_id: 'conv-rajesh-ismail',
     sender_id: 'artisan-rajesh-varanasi',
     sender_name: 'Master Rajeshwar Ansari',
@@ -529,7 +572,7 @@ const initialSellerMessages: SellerMessage[] = [
     is_read: true,
   },
   {
-    id: 'smsg-5',
+    id: 'smsg-7',
     conversation_id: 'conv-rajesh-ismail',
     sender_id: 'artisan-ismail-kutch',
     sender_name: 'Dr. Ismail Mohammed Khatri',
@@ -1287,13 +1330,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Seller Private Messaging
-  const sendSellerMessage = async (conversationId: string, content: string) => {
-    if (!content.trim()) return;
+  // Seller Private Messaging
+  const sendSellerMessage = async (
+    conversationId: string,
+    content: string,
+    attachment?: {
+      url?: string;
+      type?: 'image' | 'file' | 'location';
+      name?: string;
+      size?: string;
+      location_data?: SellerMessageLocation;
+    }
+  ) => {
+    if (!content.trim() && !attachment) return;
     const conv = sellerConversations.find((c) => c.id === conversationId);
     if (!conv) return;
 
-    const myId = user.artisan_profile?.id || user.id;
-    const receiverId = conv.participant_ids.find((id) => id !== myId) || conv.participant_ids[0];
+    const isMe = (id?: string) => {
+      if (!id) return false;
+      return (
+        id === user.id ||
+        id === user.artisan_profile?.id ||
+        id === 'artisan-rajesh-varanasi' ||
+        id === 'user-heirloom-001' ||
+        id === 'ap-001'
+      );
+    };
+
+    const myId = user.artisan_profile?.id === 'ap-001' || !user.artisan_profile?.id ? 'artisan-rajesh-varanasi' : user.artisan_profile.id;
+    const receiverId = conv.participant_ids.find((id) => !isMe(id)) || conv.participant_ids[0];
+
+    const messagePreview =
+      content.trim() ||
+      (attachment?.type === 'location'
+        ? `📍 ${attachment.location_data?.title || 'Shared Location'}`
+        : attachment?.name
+        ? `📎 ${attachment.name}`
+        : 'Shared an attachment');
 
     const newMsg: SellerMessage = {
       id: `smsg-${Date.now()}`,
@@ -1301,16 +1374,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       sender_id: myId,
       sender_name: user.artisan_profile?.name || user.name,
       receiver_id: receiverId,
-      content: content.trim(),
+      content: content.trim() || messagePreview,
       created_at: new Date().toISOString(),
       is_read: false,
+      attachment_url: attachment?.url,
+      attachment_type: attachment?.type,
+      attachment_name: attachment?.name,
+      attachment_size: attachment?.size,
+      location_data: attachment?.location_data,
     };
 
     setSellerMessages((prev) => [...prev, newMsg]);
 
     const updatedConv: SellerConversation = {
       ...conv,
-      last_message: content.trim(),
+      last_message: messagePreview,
       last_message_time: new Date().toISOString(),
       unread_counts: {
         ...conv.unread_counts,
@@ -1327,16 +1405,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const markConversationAsRead = (conversationId: string) => {
+    const isMe = (id?: string) => {
+      if (!id) return false;
+      return (
+        id === user.id ||
+        id === user.artisan_profile?.id ||
+        id === 'artisan-rajesh-varanasi' ||
+        id === 'user-heirloom-001' ||
+        id === 'ap-001'
+      );
+    };
     const myId = user.artisan_profile?.id || user.id;
     setSellerConversations((prev) =>
       prev.map((c) => {
         if (c.id === conversationId) {
+          const updatedCounts = { ...c.unread_counts };
+          updatedCounts[myId] = 0;
+          updatedCounts['artisan-rajesh-varanasi'] = 0;
           return {
             ...c,
-            unread_counts: {
-              ...c.unread_counts,
-              [myId]: 0,
-            },
+            unread_counts: updatedCounts,
           };
         }
         return c;
@@ -1345,7 +1433,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setSellerMessages((prev) =>
       prev.map((m) =>
-        m.conversation_id === conversationId && m.receiver_id === myId ? { ...m, is_read: true } : m
+        m.conversation_id === conversationId && (m.receiver_id === myId || isMe(m.receiver_id)) ? { ...m, is_read: true } : m
       )
     );
 
