@@ -539,7 +539,19 @@ export async function saveSupabaseChatMessage(msg: ChatMessage): Promise<boolean
   }
 }
 
-export function subscribeToSupabaseChat(onNewMessage: (msg: ChatMessage) => void) {
+export async function deleteSupabaseChatMessage(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('chat_messages').delete().eq('id', id);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+export function subscribeToSupabaseChat(
+  onNewMessage: (msg: ChatMessage) => void,
+  onDeleteMessage?: (id: string) => void
+) {
   try {
     const channel = supabase
       .channel('public:chat_messages')
@@ -549,6 +561,15 @@ export function subscribeToSupabaseChat(onNewMessage: (msg: ChatMessage) => void
         (payload) => {
           if (payload.new) {
             onNewMessage(payload.new as ChatMessage);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'chat_messages' },
+        (payload) => {
+          if (payload.old?.id && onDeleteMessage) {
+            onDeleteMessage(payload.old.id);
           }
         }
       )
@@ -617,6 +638,15 @@ export async function saveSupabaseSellerMessage(msg: SellerMessage): Promise<boo
   }
 }
 
+export async function deleteSupabaseSellerMessage(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('seller_messages').delete().eq('id', id);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
 export async function updateSupabaseSellerMessageRead(conversationId: string, currentUserId: string): Promise<boolean> {
   try {
     const { error } = await supabase
@@ -630,7 +660,10 @@ export async function updateSupabaseSellerMessageRead(conversationId: string, cu
   }
 }
 
-export function subscribeToSupabaseSellerMessages(onNewMessage: (msg: SellerMessage) => void) {
+export function subscribeToSupabaseSellerMessages(
+  onNewMessage: (msg: SellerMessage) => void,
+  onDeleteMessage?: (id: string) => void
+) {
   try {
     const channel = supabase
       .channel('public:seller_messages')
@@ -640,6 +673,15 @@ export function subscribeToSupabaseSellerMessages(onNewMessage: (msg: SellerMess
         (payload) => {
           if (payload.new) {
             onNewMessage(payload.new as SellerMessage);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'seller_messages' },
+        (payload) => {
+          if (payload.old?.id && onDeleteMessage) {
+            onDeleteMessage(payload.old.id);
           }
         }
       )

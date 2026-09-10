@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
-import { SellerConversation, ArtisanProfile, SellerMessageLocation } from '../../types';
+import { SellerConversation, ArtisanProfile, SellerMessageLocation, SellerMessage } from '../../types';
 import {
   Search,
   Send,
@@ -22,6 +22,7 @@ import {
   Maximize2,
   Compass,
   Loader2,
+  Trash2,
 } from 'lucide-react';
 
 interface SellerMessagesPageProps {
@@ -120,6 +121,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
     activeSellerConversationId,
     setActiveSellerConversationId,
     sendSellerMessage,
+    deleteSellerMessage,
     markConversationAsRead,
     setActiveProfileArtisan,
   } = useApp();
@@ -133,6 +135,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
   const [isLocatingUser, setIsLocatingUser] = useState(false);
   const [customAddressInput, setCustomAddressInput] = useState('');
   const [expandedImage, setExpandedImage] = useState<{ url: string; title: string } | null>(null);
+  const [messageToUnsend, setMessageToUnsend] = useState<SellerMessage | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -718,9 +721,9 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                             </div>
                           )}
 
-                          {/* Timestamp and Read Status */}
+                          {/* Timestamp, Read Status, and Delete/Unsend */}
                           <div
-                            className={`flex items-center justify-end gap-1 mt-1 text-[10px] ${
+                            className={`flex items-center justify-end gap-1.5 mt-1 text-[10px] ${
                               isMine ? 'text-white/80' : 'text-on-surface-variant'
                             }`}
                           >
@@ -734,6 +737,21 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                                 )}
                               </span>
                             )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMessageToUnsend(msg);
+                              }}
+                              className={`p-1 rounded transition cursor-pointer ml-1 ${
+                                isMine
+                                  ? 'hover:bg-white/15 text-white/75 hover:text-white'
+                                  : 'hover:bg-error/10 text-on-surface-variant/75 hover:text-error'
+                              }`}
+                              title={isMine ? 'Unsend message' : 'Delete message'}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1042,6 +1060,53 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
               alt={expandedImage.title}
               className="max-h-[82vh] w-auto object-contain"
             />
+          </div>
+        </div>
+      )}
+
+      {/* Unsend / Delete Message Confirmation Modal */}
+      {messageToUnsend && (
+        <div
+          className="fixed inset-0 z-70 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setMessageToUnsend(null)}
+        >
+          <div
+            className="bg-surface border border-outline/30 rounded-2xl p-5 max-w-xs w-full shadow-2xl space-y-4 animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <div className="text-center space-y-1.5">
+              <h4 className="font-serif font-bold text-base text-on-surface">
+                {isMe(messageToUnsend.sender_id) ? 'Unsend Message?' : 'Delete Message?'}
+              </h4>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                {isMe(messageToUnsend.sender_id)
+                  ? 'This will remove the message, file attachment, or shared location for all artisans in this collaboration chat.'
+                  : 'This will remove this message from your conversation view.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setMessageToUnsend(null)}
+                className="flex-1 py-2 px-3 rounded-xl border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteSellerMessage(messageToUnsend.id);
+                  setMessageToUnsend(null);
+                }}
+                className="flex-1 py-2 px-3 rounded-xl bg-error text-white text-xs font-semibold hover:bg-error/90 transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{isMe(messageToUnsend.sender_id) ? 'Unsend' : 'Delete'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

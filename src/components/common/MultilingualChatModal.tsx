@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { aiServices } from '../../services/aiServices';
-import { SellerMessageLocation } from '../../types';
+import { SellerMessageLocation, ChatMessage } from '../../types';
 import {
   X,
   Send,
@@ -18,6 +18,7 @@ import {
   Maximize2,
   Compass,
   Loader2,
+  Trash2,
 } from 'lucide-react';
 
 interface StagedAttachment {
@@ -107,6 +108,7 @@ export const MultilingualChatModal: React.FC = () => {
     closeChat,
     chatMessages,
     sendChatMessage,
+    deleteChatMessage,
     language,
     user,
     activeMode,
@@ -120,6 +122,7 @@ export const MultilingualChatModal: React.FC = () => {
   const [isLocatingUser, setIsLocatingUser] = useState(false);
   const [customAddressInput, setCustomAddressInput] = useState('');
   const [expandedImage, setExpandedImage] = useState<{ url: string; title: string } | null>(null);
+  const [messageToUnsend, setMessageToUnsend] = useState<ChatMessage | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -528,23 +531,42 @@ export const MultilingualChatModal: React.FC = () => {
                     )}
 
                     <div className="flex items-center justify-between gap-3 mt-1.5 pt-1 border-t border-black/10 text-[10px] opacity-80">
-                      <span>
-                        {new Date(msg.timestamp).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span>
+                          {new Date(msg.timestamp).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                        {isMe && <CheckCheck className="w-3 h-3 text-secondary" />}
+                      </div>
 
-                      {!isMe && (
+                      <div className="flex items-center gap-2">
+                        {!isMe && (
+                          <button
+                            type="button"
+                            onClick={() => toggleShowOriginal(msg.id)}
+                            className="underline hover:opacity-100 transition cursor-pointer"
+                          >
+                            {isOriginalToggled ? 'Show Translated' : 'View Original'}
+                          </button>
+                        )}
                         <button
-                          onClick={() => toggleShowOriginal(msg.id)}
-                          className="underline hover:opacity-100 transition cursor-pointer"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMessageToUnsend(msg);
+                          }}
+                          className={`p-1 rounded transition cursor-pointer ${
+                            isMe
+                              ? 'hover:bg-white/20 text-white/80 hover:text-white'
+                              : 'hover:bg-error/10 text-on-surface-variant/75 hover:text-error'
+                          }`}
+                          title={isMe ? 'Unsend message' : 'Delete message'}
                         >
-                          {isOriginalToggled ? 'Show Translated' : 'View Original'}
+                          <Trash2 className="w-3 h-3" />
                         </button>
-                      )}
-
-                      {isMe && <CheckCheck className="w-3 h-3 text-secondary" />}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -826,6 +848,53 @@ export const MultilingualChatModal: React.FC = () => {
               alt={expandedImage.title}
               className="max-h-[80vh] w-auto object-contain"
             />
+          </div>
+        </div>
+      )}
+
+      {/* Unsend / Delete Message Confirmation Modal */}
+      {messageToUnsend && (
+        <div
+          className="fixed inset-0 z-70 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setMessageToUnsend(null)}
+        >
+          <div
+            className="bg-surface border border-outline/30 rounded-2xl p-5 max-w-xs w-full shadow-2xl space-y-4 animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <div className="text-center space-y-1.5">
+              <h4 className="font-serif font-bold text-base text-on-surface">
+                {messageToUnsend.sender_id === user.id ? 'Unsend Message?' : 'Delete Message?'}
+              </h4>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                {messageToUnsend.sender_id === user.id
+                  ? 'This will remove the message, file attachment, or shared location for everyone in this chat.'
+                  : 'This will remove this message from your chat view.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setMessageToUnsend(null)}
+                className="flex-1 py-2 px-3 rounded-xl border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteChatMessage(messageToUnsend.id);
+                  setMessageToUnsend(null);
+                }}
+                className="flex-1 py-2 px-3 rounded-xl bg-error text-white text-xs font-semibold hover:bg-error/90 transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{messageToUnsend.sender_id === user.id ? 'Unsend' : 'Delete'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

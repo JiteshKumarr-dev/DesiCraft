@@ -52,11 +52,13 @@ import {
   updateSupabaseCollaborationStatus,
   fetchSupabaseChatMessages,
   saveSupabaseChatMessage,
+  deleteSupabaseChatMessage,
   subscribeToSupabaseChat,
   fetchSupabaseSellerConversations,
   saveSupabaseSellerConversation,
   fetchSupabaseSellerMessages,
   saveSupabaseSellerMessage,
+  deleteSupabaseSellerMessage,
   updateSupabaseSellerMessageRead,
   subscribeToSupabaseSellerMessages,
 } from '../services/supabaseClient';
@@ -149,6 +151,7 @@ interface AppContextType {
   ) => Promise<void>;
   markConversationAsRead: (conversationId: string) => void;
   openSellerChatWith: (artisanId: string, collaborationContext?: { id: string; title: string }) => void;
+  deleteSellerMessage: (messageId: string) => void;
 
   // Selected Artisan Modals
   activeProfileArtisan: ArtisanProfile | null;
@@ -169,6 +172,7 @@ interface AppContextType {
     attachment_size?: string;
     location_data?: SellerMessageLocation;
   }) => void;
+  deleteChatMessage: (messageId: string) => void;
   activeChatRecipient: { id: string; name: string; avatar?: string } | null;
   openChatWith: (recipient: { id: string; name: string; avatar?: string }) => void;
   closeChat: () => void;
@@ -936,29 +940,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     // Realtime chat subscription
-    const unsubscribeChat = subscribeToSupabaseChat((newMsg) => {
-      if (!isMounted) return;
-      setChatMessages((prev) => {
-        if (prev.some((m) => m.id === newMsg.id)) return prev;
-        return [...prev, newMsg];
-      });
-    });
+    const unsubscribeChat = subscribeToSupabaseChat(
+      (newMsg) => {
+        if (!isMounted) return;
+        setChatMessages((prev) => {
+          if (prev.some((m) => m.id === newMsg.id)) return prev;
+          return [...prev, newMsg];
+        });
+      },
+      (deletedId) => {
+        if (!isMounted) return;
+        setChatMessages((prev) => prev.filter((m) => m.id !== deletedId));
+      }
+    );
 
     // Realtime seller messaging subscription
-    const unsubscribeSellerChat = subscribeToSupabaseSellerMessages((newMsg) => {
-      if (!isMounted) return;
-      setSellerMessages((prev) => {
-        if (prev.some((m) => m.id === newMsg.id)) return prev;
-        return [...prev, newMsg];
-      });
-      setSellerConversations((prev) =>
-        prev.map((c) =>
-          c.id === newMsg.conversation_id
-            ? { ...c, last_message: newMsg.content, last_message_time: newMsg.created_at }
-            : c
-        )
-      );
-    });
+    const unsubscribeSellerChat = subscribeToSupabaseSellerMessages(
+      (newMsg) => {
+        if (!isMounted) return;
+        setSellerMessages((prev) => {
+          if (prev.some((m) => m.id === newMsg.id)) return prev;
+          return [...prev, newMsg];
+        });
+        setSellerConversations((prev) =>
+          prev.map((c) =>
+            c.id === newMsg.conversation_id
+              ? { ...c, last_message: newMsg.content, last_message_time: newMsg.created_at }
+              : c
+          )
+        );
+      },
+      (deletedId) => {
+        if (!isMounted) return;
+        setSellerMessages((prev) => prev.filter((m) => m.id !== deletedId));
+      }
+    );
 
     return () => {
       isMounted = false;
@@ -1491,6 +1507,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSellerTab('MESSAGES');
   };
 
+  const deleteSellerMessage = (messageId: string) => {
+    const targetMsg = sellerMessages.find((m) => m.id === messageId);
+    const updatedMessages = sellerMessages.filter((m) => m.id !== messageId);
+    setSellerMessages(updatedMessages);
+
+    if (targetMsg) {
+      const convId = targetMsg.conversation_id;
+      const remainingForConv = updatedMessages.filter((m) => m.conversation_id === convId);
+      const latest = remainingForConv[remainingForConv.length - 1];
+
+      setSellerConversations((prev) =>
+        prev.map((c) => {
+          if (c.id === convId) {
+            const updated: SellerConversation = {
+              ...c,
+              last_message: latest ? latest.content : 'No messages yet',
+              last_message_time: latest ? latest.created_at : c.created_at,
+            };
+            saveSupabaseSellerConversation(updated).catch(console.warn);
+            return updated;
+          }
+          return c;
+        })
+      );
+    }
+
+    deleteSupabaseSellerMessage(messageId).catch(console.warn);
+    showNotification('Message unsent.');
+  };
+
   // Chat
   const sendChatMessage = (msg: {
     sender_role: 'customer' | 'artisan';
@@ -1530,6 +1576,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setChatMessages((prev) => [...prev, newMsg]);
     saveSupabaseChatMessage(newMsg).catch(console.warn);
+  };
+
+  const deleteChatMessage = (messageId: string) => {
+    setChatMessages((prev) => prev.filter((m) => m.id !== messageId));
+    deleteSupabaseChatMessage(messageId).catch(console.warn);
+    showNotification('Message unsent.');
   };
 
   const openChatWith = (recipient: { id: string; name: string; avatar?: string }) => {
@@ -1703,12 +1755,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         sendSellerMessage,
         markConversationAsRead,
         openSellerChatWith,
+        deleteSellerMessage,
         activeProfileArtisan,
         setActiveProfileArtisan,
         activeCollabArtisan,
         setActiveCollabArtisan,
         chatMessages,
         sendChatMessage,
+        deleteChatMessage,
         activeChatRecipient,
         openChatWith,
         closeChat,
