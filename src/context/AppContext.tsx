@@ -21,6 +21,34 @@ import { artisansData } from '../data/artisansData';
 import { productsData, passportsData } from '../data/productsData';
 import { opportunitiesData } from '../data/opportunitiesData';
 import { translations, TranslationStrings, createTranslator, TranslateFn } from '../data/translations';
+import {
+  supabase,
+  testSupabaseConnection,
+  signUpWithSupabase,
+  signInWithSupabase,
+  signOutWithSupabase,
+  fetchUserProfile,
+  fetchSupabaseProducts,
+  saveSupabaseProduct,
+  deleteSupabaseProduct,
+  fetchSupabasePassports,
+  saveSupabasePassport,
+  fetchSupabaseOrders,
+  saveSupabaseOrder,
+  updateSupabaseOrderStatus,
+  fetchSupabaseLearningRequests,
+  saveSupabaseLearningRequest,
+  updateSupabaseLearningStatus,
+  fetchSupabaseCustomOrders,
+  saveSupabaseCustomOrder,
+  updateSupabaseCustomOrderStatus,
+  fetchSupabaseCollaborationRequests,
+  saveSupabaseCollaborationRequest,
+  updateSupabaseCollaborationStatus,
+  fetchSupabaseChatMessages,
+  saveSupabaseChatMessage,
+  subscribeToSupabaseChat,
+} from '../services/supabaseClient';
 
 interface CartItem {
   product: Product;
@@ -142,16 +170,20 @@ interface AppContextType {
   setIsSignupSuccessModalOpen: (open: boolean) => void;
   isVoiceArtisanSetupOpen: boolean;
   setIsVoiceArtisanSetupOpen: (open: boolean) => void;
+  // Supabase Backend Sync
+  supabaseStatus: 'connected' | 'offline' | 'checking';
+  isSupabaseConnected: boolean;
   signUpUser: (userData: {
     name: string;
     email: string;
     phone: string;
     preferred_language: LanguageCode;
+    password?: string;
     state?: string;
     district?: string;
-  }) => void;
-  loginUser: (identifier: string, password?: string) => void;
-  logoutUser: () => void;
+  }) => void | Promise<void>;
+  loginUser: (identifier: string, password?: string) => void | Promise<void>;
+  logoutUser: () => void | Promise<void>;
 }
 
 const defaultUser: User = {
@@ -400,6 +432,113 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isSignupSuccessModalOpen, setIsSignupSuccessModalOpen] = useState(false);
   const [isVoiceArtisanSetupOpen, setIsVoiceArtisanSetupOpen] = useState(false);
 
+  // Supabase Backend Status & Sync
+  const [supabaseStatus, setSupabaseStatus] = useState<'connected' | 'offline' | 'checking'>('checking');
+  const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean>(false);
+
+  // Supabase Initial Sync & Realtime Auth Listener
+  useEffect(() => {
+    let isMounted = true;
+
+    async function initSupabase() {
+      try {
+        const health = await testSupabaseConnection();
+        if (!isMounted) return;
+        setIsSupabaseConnected(health.connected);
+        setSupabaseStatus(health.connected ? 'connected' : 'offline');
+
+        if (health.connected) {
+          // Check existing session
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user && isMounted) {
+            const dbUser = await fetchUserProfile(session.user.id);
+            if (dbUser && isMounted) {
+              setUser(dbUser);
+              setIsLoggedIn(true);
+            }
+          }
+
+          // Fetch remote products if table exists
+          const remoteProducts = await fetchSupabaseProducts();
+          if (remoteProducts && remoteProducts.length > 0 && isMounted) {
+            setProducts(remoteProducts);
+          }
+
+          // Fetch remote passports
+          const remotePassports = await fetchSupabasePassports();
+          if (remotePassports && remotePassports.length > 0 && isMounted) {
+            setPassports(remotePassports);
+          }
+
+          // Fetch remote orders
+          const remoteOrders = await fetchSupabaseOrders();
+          if (remoteOrders && remoteOrders.length > 0 && isMounted) {
+            setOrders(remoteOrders);
+          }
+
+          // Fetch remote learning requests
+          const remoteLearning = await fetchSupabaseLearningRequests();
+          if (remoteLearning && remoteLearning.length > 0 && isMounted) {
+            setLearningRequests(remoteLearning);
+          }
+
+          // Fetch remote custom orders
+          const remoteCustom = await fetchSupabaseCustomOrders();
+          if (remoteCustom && remoteCustom.length > 0 && isMounted) {
+            setCustomOrders(remoteCustom);
+          }
+
+          // Fetch remote collaboration requests
+          const remoteCollab = await fetchSupabaseCollaborationRequests();
+          if (remoteCollab && remoteCollab.length > 0 && isMounted) {
+            setCollaborationRequests(remoteCollab);
+          }
+
+          // Fetch remote chat messages
+          const remoteChat = await fetchSupabaseChatMessages();
+          if (remoteChat && remoteChat.length > 0 && isMounted) {
+            setChatMessages(remoteChat);
+          }
+        }
+      } catch (err) {
+        console.warn('[Supabase Sync] Startup sync fallback:', err);
+        if (isMounted) {
+          setSupabaseStatus('offline');
+          setIsSupabaseConnected(false);
+        }
+      }
+    }
+
+    initSupabase();
+
+    // Listen to Supabase Auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMounted) return;
+      if (event === 'SIGNED_IN' && session?.user) {
+        const profile = await fetchUserProfile(session.user.id);
+        if (profile && isMounted) {
+          setUser(profile);
+          setIsLoggedIn(true);
+        }
+      }
+    });
+
+    // Realtime chat subscription
+    const unsubscribeChat = subscribeToSupabaseChat((newMsg) => {
+      if (!isMounted) return;
+      setChatMessages((prev) => {
+        if (prev.some((m) => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
+    });
+
+    return () => {
+      isMounted = false;
+      subscription?.unsubscribe();
+      unsubscribeChat();
+    };
+  }, []);
+
   // Sync to local storage
   useEffect(() => {
     localStorage.setItem('desi_craft_user', JSON.stringify(user));
@@ -471,16 +610,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setPassports((prev) => [passport, ...prev]);
     }
     showNotification(`Successfully published "${product.name}" with Digital Craft Passport!`);
+    // Supabase background sync with safe fallback
+    saveSupabaseProduct(product).catch((err) =>
+      console.warn('[Supabase] addProduct fallback:', err)
+    );
+    if (passport) {
+      saveSupabasePassport(passport).catch((err) =>
+        console.warn('[Supabase] addPassport fallback:', err)
+      );
+    }
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
-    setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    let updatedProduct: Product | undefined;
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === id) {
+          updatedProduct = { ...p, ...updates };
+          return updatedProduct;
+        }
+        return p;
+      })
+    );
     showNotification('Product updated successfully.');
+    if (updatedProduct) {
+      saveSupabaseProduct(updatedProduct).catch((err) =>
+        console.warn('[Supabase] updateProduct fallback:', err)
+      );
+    }
   };
 
   const deleteProduct = (id: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
     showNotification('Product removed from catalog.');
+    deleteSupabaseProduct(id).catch((err) =>
+      console.warn('[Supabase] deleteProduct fallback:', err)
+    );
   };
 
   // Cart actions
@@ -863,6 +1028,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         signUpUser,
         loginUser,
         logoutUser,
+        supabaseStatus,
+        isSupabaseConnected,
       }}
     >
       {children}

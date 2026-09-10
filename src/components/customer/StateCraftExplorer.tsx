@@ -10,7 +10,9 @@ import {
   ExternalLink,
   ChevronRight,
   Filter,
+  Compass,
 } from 'lucide-react';
+import { IndiaHeritageMap } from './IndiaHeritageMap';
 
 interface StateHeritageEntry {
   state: string;
@@ -131,6 +133,8 @@ export const StateCraftExplorer: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStateName, setSelectedStateName] = useState('Telangana');
 
+  const [viewMode, setViewMode] = useState<'MAP' | 'DIRECTORY'>('MAP');
+
   const filteredStates = STATE_HERITAGE_DATA.filter(
     (s) =>
       s.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -142,7 +146,7 @@ export const StateCraftExplorer: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      {/* Header */}
+      {/* Header with View Toggle */}
       <div className="p-6 sm:p-8 rounded-2xl bg-surface-container-low border border-outline/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="max-w-2xl space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
@@ -157,22 +161,53 @@ export const StateCraftExplorer: React.FC = () => {
           </p>
         </div>
 
-        {/* Search Input */}
-        <div className="relative w-full md:w-72">
-          <Search className="w-4 h-4 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder={t('Search state, craft or GI tag...')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs bg-surface border border-outline/30 rounded-full text-on-surface focus:ring-1 focus:ring-primary"
-          />
+        {/* View Mode Toggle and Search */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <div className="inline-flex p-1 rounded-full bg-surface-container border border-outline/20">
+            <button
+              onClick={() => setViewMode('MAP')}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                viewMode === 'MAP'
+                  ? 'bg-primary text-on-primary shadow-xs'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span>3D Heritage Map</span>
+            </button>
+            <button
+              onClick={() => setViewMode('DIRECTORY')}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+                viewMode === 'DIRECTORY'
+                  ? 'bg-primary text-on-primary shadow-xs'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <span>Directory List</span>
+            </button>
+          </div>
+
+          {viewMode === 'DIRECTORY' && (
+            <div className="relative w-full md:w-64">
+              <Search className="w-4 h-4 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder={t('Search state, craft or GI tag...')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-surface border border-outline/30 rounded-full text-on-surface focus:ring-1 focus:ring-primary"
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left List of States */}
-        <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+      {viewMode === 'MAP' ? (
+        <IndiaHeritageMap />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left List of States */}
+          <div className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
           {filteredStates.map((st) => (
             <button
               key={st.state}
@@ -314,6 +349,7 @@ export const StateCraftExplorer: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };

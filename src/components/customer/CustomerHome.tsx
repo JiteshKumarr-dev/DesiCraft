@@ -20,6 +20,7 @@ import {
 import { LearningView } from './LearningView';
 import { OpportunitiesView } from './OpportunitiesView';
 import { StateCraftExplorer } from './StateCraftExplorer';
+import { IndiaHeritageMap } from './IndiaHeritageMap';
 
 export const CustomerHome: React.FC = () => {
   const {
@@ -252,7 +253,10 @@ export const CustomerHome: React.FC = () => {
         <StateCraftExplorer />
       ) : (
         <>
-          {/* 3. GEOGRAPHIC REGIONAL CRAFT EXPLORER */}
+          {/* 3. INTERACTIVE 3D INDIA HERITAGE MAP */}
+          <IndiaHeritageMap />
+
+          {/* 3B. GEOGRAPHIC REGIONAL CRAFT EXPLORER */}
           <section className="space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
               <div>

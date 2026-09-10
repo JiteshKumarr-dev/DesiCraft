@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import { ProductReviewsSection } from './ProductReviewsSection';
+import { DemandPredictorWidget } from './DemandPredictorWidget';
 
 export const ProductDetailModal: React.FC = () => {
   const {
@@ -162,12 +163,15 @@ export const ProductDetailModal: React.FC = () => {
               </h1>
 
               {/* Price & Fair Wage Indicator */}
-              <div className="flex items-baseline gap-3">
+              <div className="flex items-baseline gap-2 sm:gap-3 flex-wrap">
                 <span className="font-serif text-3xl font-bold text-primary">
                   ₹{selectedProduct.price.toLocaleString('en-IN')}
                 </span>
                 <span className="text-xs text-green-700 bg-green-50 px-2.5 py-1 rounded-md font-semibold border border-green-200">
                   82% Direct Artisan Wage Guaranteed
+                </span>
+                <span className="text-[11px] font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-md border border-red-200 dark:border-red-800 flex items-center gap-1">
+                  🔥 High Demand
                 </span>
               </div>
 
@@ -196,6 +200,9 @@ export const ProductDetailModal: React.FC = () => {
                   </span>
                 </div>
               </div>
+
+              {/* AI Demand Predictor Widget */}
+              <DemandPredictorWidget product={selectedProduct} />
 
               {/* Indigenous Materials */}
               <div className="space-y-1.5">

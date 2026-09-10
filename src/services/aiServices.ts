@@ -11,6 +11,8 @@ export interface VoiceParsedListing {
   production_time: string;
   region: 'North' | 'South' | 'East' | 'West' | 'Northeast' | 'Central';
   confidence_score: number;
+  image_url?: string;
+  gi_tag?: string;
 }
 
 export interface PriceBreakdown {
@@ -43,46 +45,56 @@ export interface DemandInsight {
 }
 
 // Simulated Multilingual Speech Recognition Presets for testing
-export const VOICE_SAMPLE_PRESETS: Record<LanguageCode, { text: string; label: string }> = {
+export const VOICE_SAMPLE_PRESETS: Record<LanguageCode, { text: string; label: string; craft: string }> = {
   en: {
-    label: 'English (Voice Simulation)',
-    text: 'I have made a pure mulberry silk Banarasi saree with real silver zari embroidery using traditional Kadwa technique. It took 45 days of loom work. The base is deep crimson red and contains sacred peacock motifs.',
+    label: 'English (Kadwa Silk Brocade)',
+    craft: 'Varanasi Zari & Brocade',
+    text: 'I have handwoven a pure mulberry Katan silk Banarasi saree with pure silver zari embroidery using traditional Kadwa technique. It took 45 days of loom work. The base is deep crimson red with sacred Kalga peacock motifs.',
   },
   hi: {
-    label: 'हिन्दी (Voice Simulation)',
+    label: 'हिन्दी (बनारसी कड़वा जरी)',
+    craft: 'Varanasi Zari & Brocade',
     text: 'मैंने शुद्ध कतान सिल्क पर असली चांदी की जरी से काढ़वा तकनीक में यह बनारसी साड़ी बनाई है। इसे हथकरघे पर बुनने में 45 दिन लगे हैं। इसका रंग गहरा लाल है और इसमें पारंपरिक मोर के बूटे हैं।',
   },
   te: {
-    label: 'తెలుగు (Voice Simulation)',
+    label: 'తెలుగు (పోచంపల్లి డబుల్ ఇక్కత్)',
+    craft: 'Pochampally Ikat',
     text: 'నేను అసలైన మల్బరీ పట్టు దారాలతో, సహజమైన నీలిరంగుతో పోచంపల్లి డబుల్ ఇక్కత్ చీరను మగ్గంపై 35 రోజులు శ్రమించి నేశాను. ఇందులో సంప్రదాయ రేఖాగణిత నమూనాలు ఉన్నాయి.',
   },
   ta: {
-    label: 'தமிழ் (Voice Simulation)',
-    text: 'நான் தூய தேக்கு பலகையில் இயற்கை சுண்ணக்கட்டி மற்றும் 22 காரட் தங்க தகடு பதித்து தஞ்சாவூர் ஓவியம் வரைந்துள்ளேன். இதை முடிக்க 25 நாட்கள் ஆனது.',
+    label: 'தமிழ் (தஞ்சாவூர் தங்க ஓவியம்)',
+    craft: 'Thanjavur Painting',
+    text: 'நான் தூய தேக்கு பலகையில் இயற்கை சுண்ணக்கட்டி மற்றும் 22 காரட் தங்க தகடு பதித்து தஞ்சாவூர் ஓவியம் வரைந்துள்ளேன். இதில் விலைமதிப்பற்ற ரத்தினங்கள் பதிக்கப்பட்டுள்ளன. முடிக்க 25 நாட்கள் ஆனது.',
   },
   kn: {
-    label: 'ಕನ್ನಡ (Voice Simulation)',
-    text: 'ನಾನು ಆಲೆ ಮರದ ಮೇಲೆ ನೈಸರ್ಗಿಕ ಅರಗು ಮತ್ತು ಅರಿಶಿನ, ಕುಂಕುಮ ಬಣ್ಣಗಳಿಂದ ಚನ್ನಪಟ್ಟಣ ಮರದ ಆಟಿಕೆಗಳನ್ನು ಲೇತ್ ಯಂತ್ರದಲ್ಲಿ ನಯವಾಗಿ ತಿರುಗಿಸಿ ಮಾಡಿದ್ದೇನೆ.',
+    label: 'ಕನ್ನಡ (ಚನ್ನಪಟ್ಟಣ ಮರದ ಆಟಿಕೆ)',
+    craft: 'Channapatna Toys',
+    text: 'ನಾನು ಆಲೆ ಮರದ ಮೇಲೆ ನೈಸರ್ಗಿಕ ಅರಗು ಮತ್ತು ಅರಿಶಿನ, ಕುಂಕುಮ ಬಣ್ಣಗಳಿಂದ ಚನ್ನಪಟ್ಟಣ ಮರದ ರಾಕಿಂಗ್ ಕುದುರೆ ಆಟಿಕೆಯನ್ನು ಲೇತ್ ಯಂತ್ರದಲ್ಲಿ ನಯವಾಗಿ ತಿರುಗಿಸಿ ಮಾಡಿದ್ದೇನೆ. ಇದು ಸಂಪೂರ್ಣ ವಿಷರಹಿತ ನೈಸರ್ಗಿಕ ಕರಕುಶಲ.',
   },
   ml: {
-    label: 'മലയാളം (Voice Simulation)',
-    text: 'ഞാൻ പാരമ്പര്യ പിച്ചള ലോഹക്കൂട്ടിൽ മെഴുകുചരട് ചുറ്റി ലോസ്റ്റ് വാക്സ് രീതിയിൽ ധോക്ര ആന ശിൽപം നിർമ്മിച്ചു. ഇത് തയ്യാറാക്കാൻ 20 ദിവസമെടുത്തു.',
+    label: 'മലയാളം (ധോക്ര ലോസ്റ്റ്-വാക്സ്)',
+    craft: 'Bastar Dhokra Bell Metal',
+    text: 'ഞാൻ പാരമ്പര്യ പിച്ചള ലോഹക്കൂട്ടിൽ മെഴুকുചരട് ചുറ്റി ലോസ്റ്റ് വാക്സ് രീതിയിൽ ധോക്ര ആന ശിൽപം നിർമ്മിച്ചു. ഇത് തയ്യാറാക്കാൻ 20 ദിവസമെടുത്തു.',
   },
   mr: {
-    label: 'मराठी (Voice Simulation)',
-    text: 'मी अस्सल पैठणी सिल्कवर शुद्ध सोन्याच्या जरीने मोरपंखी पदर विणला आहे. हातमागावर हे तयार करायला मला ४० दिवस लागले आहेत.',
+    label: 'मराठी (येवला पैठणी साडी)',
+    craft: 'Yeola Paithani Silk',
+    text: 'मी अस्सल पैठणी सिल्कवर शुद्ध सोन्याच्या जरीने मोरपंखी पदर विणला आहे. हातमागावर हे तयार करायला मला ४० दिवस लागले आहेत. यात पारंपारिक पोपट आणि मोराचे नक्षीकाम आहे.',
   },
   bn: {
-    label: 'বাংলা (Voice Simulation)',
-    text: 'আমি বাঁকুড়ার নদীর লাল পলিমাটি দিয়ে নিখুঁত হাত ও চাকার সাহায্যে বিখ্যাত লম্বা কানের বাঁকুড়া টেরাকোটা ঘোড়া তৈরি করেছি। আগুনে পোড়াতে ১৫ দিন লেগেছে।',
+    label: 'বাংলা (বাঁকুড়া টেরাকোটা ঘোড়া)',
+    craft: 'Bankura Terracotta',
+    text: 'আমি বাঁকুড়ার নদীর লাল পলিমাটি দিয়ে নিখুঁত হাত ও চাকার সাহায্যে বিখ্যাত লম্বা কানের বাঁকুড়া টেরাকোটা ঘোড়া তৈরি করেছি। কাঠের আগুনে পোড়াতে ১৫ দিন লেগেছে।',
   },
   gu: {
-    label: 'ગુજરાતી (Voice Simulation)',
-    text: 'મેં શુદ્ધ સુતરાઉ કાપડ પર કુદરતી ગળી અને દાડમની છાલના રંગોથી 16 તબક્કામાં હાથથી લાકડાના બ્લોક વડે અજરખ દુપટ્ટો છાપ્યો છે.',
+    label: 'ગુજરાતી (કચ્છ અજરખ બ્લોક પ્રિન્ટ)',
+    craft: 'Kutch Ajrakh Block Print',
+    text: 'મેં શુદ્ધ સુતરાઉ કાપડ પર કુદરતી ગળી અને દાડમની છાલના રંગોથી 16 તબક્કામાં હાથથી લાકડાના બ્લોક વડે અજરખ દુપટ્ટો છાપ્યો છે. આમાં નક્ષત્ર અને તારાની પરંપરાગત ભાત છે.',
   },
   pa: {
-    label: 'ਪੰਜਾਬੀ (Voice Simulation)',
-    text: 'ਮੈਂ ਸ਼ੁੱਧ ਖੱਦਰ ਦੇ ਕੱਪੜੇ ਉੱਤੇ ਰੇਸ਼ਮ ਦੇ ਧਾਗਿਆਂ ਨਾਲ ਬਾਗ ਫੁਲਕਾਰੀ ਦੀ ਕਢਾਈ ਹੱਥਾਂ ਨਾਲ ਕੀਤੀ ਹੈ। ਇਸ ਵਿੱਚ 30 ਦਿਨਾਂ ਦੀ ਮਿਹਨਤ ਲੱਗੀ ਹੈ।',
+    label: 'ਪੰਜਾਬੀ (ਬਾਗ ਫੁਲਕਾਰੀ ਦੁਪੱਟਾ)',
+    craft: 'Bagh Phulkari',
+    text: 'ਮੈਂ ਸ਼ੁੱਧ ਖੱਦਰ ਦੇ ਕੱਪੜੇ ਉੱਤੇ ਰੇਸ਼ਮ ਦੇ ਧਾਗਿਆਂ ਨਾਲ ਬਾਗ ਫੁਲਕਾਰੀ ਦੀ ਕਢਾਈ ਹੱਥਾਂ ਨਾਲ ਕੀਤੀ ਹੈ। ਇਸ ਵਿੱਚ 30 ਦਿਨਾਂ ਦੀ ਮਿਹਨਤ ਲੱਗੀ ਹੈ ਅਤੇ ਪਿੱਛੋਂ ਗਿਣ ਕੇ ਕਢਾਈ ਕੀਤੀ ਗਈ ਹੈ।',
   },
 };
 
@@ -91,72 +103,258 @@ export const aiServices = {
    * Voice-to-Structured Listing AI parser
    */
   parseVoiceListing: async (spokenText: string, language: LanguageCode = 'en'): Promise<VoiceParsedListing> => {
-    // Simulate AI latency
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    // Realistic AI inference latency
+    await new Promise((resolve) => setTimeout(resolve, 600));
 
     const lower = spokenText.toLowerCase();
 
-    if (lower.includes('banarasi') || lower.includes('zari') || lower.includes('kadwa') || lower.includes('बनारसी') || lower.includes('साड़ी')) {
+    // 1. Varanasi Brocade / Kadwa Silk
+    if (
+      lower.includes('banarasi') ||
+      lower.includes('zari') ||
+      lower.includes('kadwa') ||
+      lower.includes('katan') ||
+      lower.includes('बनारसी') ||
+      lower.includes('साड़ी') ||
+      lower.includes('काढ़वा')
+    ) {
       return {
         craft_id: 'craft-varanasi-brocade',
         craft_name: 'Varanasi Zari & Brocade',
         name: 'Pure Katan Silk Handwoven Kadwa Zari Saree',
-        description: `Masterfully handwoven on traditional wooden pit-loom over 45 days. Features Kadwa embroidery technique with pure silver electroplated Zari thread and auspicious peacock motifs. Transcribed via voice listing AI (${language}).`,
-        materials: ['Pure Mulberry Katan Silk', 'Pure Silver Zari (Kalabattun)', 'Botanical Dyes'],
-        technique: 'Kadwa Pit-Loom Tapestry Brocade',
+        description: `Masterfully handwoven on traditional wooden pit-loom over 45 days. Features authentic Kadwa embroidery technique with pure silver electroplated Zari thread and auspicious peacock motifs. Certified GI heritage craft of Varanasi.`,
+        materials: ['Pure Mulberry Katan Silk', 'Pure Silver Zari (Kalabattun)', 'Botanical Madder Dye'],
+        technique: 'Kadwa Pit-Loom Tapestry Brocade Weaving',
         suggested_price: 24500,
         production_time: '45 Days',
         region: 'North',
         confidence_score: 0.98,
+        image_url: '/images/kadwa-saree-portrait.jpg',
+        gi_tag: 'GI-2009-UP-0044',
       };
     }
 
-    if (lower.includes('pochampally') || lower.includes('ikat') || lower.includes('ఇక్కత్') || lower.includes('పోచంపల్లి')) {
+    // 2. Pochampally Double Ikat
+    if (
+      lower.includes('pochampally') ||
+      lower.includes('ikat') ||
+      lower.includes('ఇక్కత్') ||
+      lower.includes('పోచంపల్లి') ||
+      lower.includes('chitiki')
+    ) {
       return {
         craft_id: 'craft-pochampally-ikat',
         craft_name: 'Pochampally Ikat',
-        name: 'Handloom Pure Silk Double Ikat Heritage Saree',
-        description: `Mathematical double ikat tie-and-dye handwoven on pit-looms. Dyed with authentic indigofera and alizarin madder dyes before weaving. Transcribed via voice listing AI (${language}).`,
+        name: 'Telia Rumal Double Ikat Royal Silk Saree',
+        description: `Mathematical double ikat tie-and-dye handwoven on manual tension pit-looms. Yarns are pre-calculated and dyed with authentic indigofera and alizarin madder before weaving. Certified GI craft of Telangana.`,
         materials: ['Pure Mulberry Silk', 'Natural Indigofera Indigo', 'Alizarin Madder Dye'],
-        technique: 'Double Ikat Chitiki Weaving',
+        technique: 'Double Ikat Chitiki Tie-and-Dye Weaving',
         suggested_price: 18900,
         production_time: '35 Days',
         region: 'South',
-        confidence_score: 0.96,
+        confidence_score: 0.97,
+        image_url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2005-TS-0004',
       };
     }
 
-    if (lower.includes('blue pottery') || lower.includes('pottery') || lower.includes('quartz') || lower.includes('पॉटरी')) {
+    // 3. Thanjavur Gold Foil Painting
+    if (
+      lower.includes('thanjavur') ||
+      lower.includes('tanjore') ||
+      lower.includes('தஞ்சாவூர்') ||
+      lower.includes('ஓவியம்') ||
+      lower.includes('தங்கம்') ||
+      lower.includes('gold foil')
+    ) {
       return {
-        craft_id: 'craft-jaipur-blue-pottery',
-        craft_name: 'Jaipur Blue Pottery',
-        name: 'Hand-painted Cobalt Turquoise Glazed Quartz Vessel',
-        description: `Authentic non-clay ceramic hand-moulded with ground quartz and glass, decorated freehand with cobalt oxide floral arabesques and fired at 800°C. Transcribed via voice listing AI (${language}).`,
-        materials: ['Ground Quartz Stone', 'Recycled Glass', 'Katira Gum', 'Cobalt Oxide'],
-        technique: 'Freehand Cobalt Hand-Painting and Single-Fire Glaze',
-        suggested_price: 5200,
-        production_time: '12 Days',
-        region: 'North',
-        confidence_score: 0.95,
+        craft_id: 'craft-thanjavur-painting',
+        craft_name: 'Thanjavur Sacred Painting',
+        name: 'Sacred 22K Gold Foil Hand-Embossed Thanjavur Relief Painting',
+        description: `Traditional gesso relief artwork crafted on seasoned teakwood board with Arabic gum and unboiled limestone paste. Embellished with 22-karat pure gold leaf foil and Jaipur semi-precious stones. Certified GI craft of Tamil Nadu.`,
+        materials: ['Seasoned Teakwood', '22K Pure Gold Foil', 'Semi-Precious Gemstones', 'Natural Chalk Paste'],
+        technique: 'Traditional Tanjore Gesso & Gold Leaf Embossing',
+        suggested_price: 16500,
+        production_time: '25 Days',
+        region: 'South',
+        confidence_score: 0.97,
+        image_url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2007-TN-0082',
       };
     }
 
-    if (lower.includes('dhokra') || lower.includes('metal') || lower.includes('wax') || lower.includes('ढोकरा') || lower.includes('ശിൽപം')) {
+    // 4. Channapatna Lacquer Toys
+    if (
+      lower.includes('channapatna') ||
+      lower.includes('toy') ||
+      lower.includes('ಆಟಿಕೆ') ||
+      lower.includes('ಚನ್ನಪಟ್ಟಣ') ||
+      lower.includes('lacquer') ||
+      lower.includes('aale mara')
+    ) {
+      return {
+        craft_id: 'craft-channapatna-toys',
+        craft_name: 'Channapatna Lacquer Woodcraft',
+        name: 'Handmade Non-Toxic Lacquer Turned Wood Rocking Toy Set',
+        description: `Handcrafted from soft ivory-wood (Wrightia tinctoria) turned manually on a lathe and buffed with organic shellac infused with natural turmeric, kumkum, and indigo pigments. Completely child-safe and eco-friendly. Certified GI craft of Karnataka.`,
+        materials: ['Wrightia Tinctoria (Aale Mara) Wood', 'Natural Shellac Lacquer', 'Organic Turmeric & Indigo Pigments'],
+        technique: 'Manual Lathe Turning and Organic Lac-Buffing',
+        suggested_price: 3400,
+        production_time: '7 Days',
+        region: 'South',
+        confidence_score: 0.96,
+        image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2006-KA-0012',
+      };
+    }
+
+    // 5. Bankura Terracotta Horse
+    if (
+      lower.includes('bankura') ||
+      lower.includes('terracotta') ||
+      lower.includes('ঘোড়া') ||
+      lower.includes('বাঁকুড়া') ||
+      lower.includes('টেবাকোটা') ||
+      lower.includes('horse')
+    ) {
+      return {
+        craft_id: 'craft-bankura-terracotta',
+        craft_name: 'Bankura Terracotta',
+        name: 'Panchmura Long-Eared Sacred Terracotta Heritage Horse',
+        description: `Hand-thrown on manual potter wheel and coil-moulded with alluvial river clay from Gandheswari. Features iconic elongated ears, symmetrical neck rings, and ceremonial devotion styling fired in traditional wood kilns. Certified GI craft of West Bengal.`,
+        materials: ['Gandheswari Alluvial Clay', 'Natural River Silt', 'Organic Husk Temper'],
+        technique: 'Hollow Coil Hand-Modelling & Closed Kiln Wood Firing',
+        suggested_price: 4200,
+        production_time: '15 Days',
+        region: 'East',
+        confidence_score: 0.96,
+        image_url: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2018-WB-0582',
+      };
+    }
+
+    // 6. Kutch Ajrakh Block Print
+    if (
+      lower.includes('ajrakh') ||
+      lower.includes('kutch') ||
+      lower.includes('અજરખ') ||
+      lower.includes('બ્લોક') ||
+      lower.includes('block print')
+    ) {
+      return {
+        craft_id: 'craft-kutch-ajrakh',
+        craft_name: 'Kutch Ajrakh Block Print',
+        name: '16-Stage Natural Indigo & Madder Hand-Block Printed Ajrakh Stole',
+        description: `Authentic 16-stage resist block-printed textile on lustrous handwoven cotton. Dyed in natural indigo vats and pomegranate rind mordants, stamped with precision hand-carved Teakwood blocks in ancient star geometry. Certified GI craft of Gujarat.`,
+        materials: ['Pure Desi Cotton', 'Fermented Indigofera Indigo', 'Pomegranate Rind', 'Rubia Cordifolia Madder'],
+        technique: '16-Stage Mud-Resist Hand Block Printing',
+        suggested_price: 6800,
+        production_time: '21 Days',
+        region: 'West',
+        confidence_score: 0.98,
+        image_url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2011-GJ-0220',
+      };
+    }
+
+    // 7. Bagh Phulkari
+    if (
+      lower.includes('phulkari') ||
+      lower.includes('bagh') ||
+      lower.includes('ਫੁਲਕਾਰੀ') ||
+      lower.includes('ਖੱਦਰ') ||
+      lower.includes('punjab')
+    ) {
+      return {
+        craft_id: 'craft-punjab-phulkari',
+        craft_name: 'Bagh Phulkari Embroidery',
+        name: 'Hand-Embroidered Silk Floss Bagh Phulkari Ceremonial Dupatta',
+        description: `Ancestral dense geometric counted thread embroidery done purely from the reverse side of handspun Khaddar using untwisted pure silk Pat threads. Forms an unbroken golden garden of floral motifs. Certified GI craft of Punjab.`,
+        materials: ['Handspun Khaddar Cotton', 'Untwisted Pat Silk Floss', 'Organic Turmeric & Madder Dyes'],
+        technique: 'Counted Reverse Darning Stitch (Bagh)',
+        suggested_price: 12800,
+        production_time: '30 Days',
+        region: 'North',
+        confidence_score: 0.97,
+        image_url: 'https://images.unsplash.com/photo-1610030469668-93510cb2866c?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2011-PB-0239',
+      };
+    }
+
+    // 8. Yeola Paithani
+    if (
+      lower.includes('paithani') ||
+      lower.includes('पैठणी') ||
+      lower.includes('yeola') ||
+      lower.includes('मोरपंखी') ||
+      lower.includes('पदर')
+    ) {
+      return {
+        craft_id: 'craft-yeola-paithani',
+        craft_name: 'Yeola Paithani Silk',
+        name: 'Pure Silk Yeola Paithani Saree with Pure Zari Royal Peacock Pallu',
+        description: `Regal Maharashtrian handloom masterpiece woven from charkha mulberry silk. Features a dazzling gold tapestry pallu with mor-bangadi (peacock in bangle) motifs woven by interlocking weft without float threads. Certified GI craft of Maharashtra.`,
+        materials: ['Charkha Mulberry Silk', 'Pure Silver-Gold Alloy Zari', 'Organic Plant Pigments'],
+        technique: 'Interlocking Tapestry Weft Weaving (Dhaap & Padar)',
+        suggested_price: 28500,
+        production_time: '40 Days',
+        region: 'West',
+        confidence_score: 0.97,
+        image_url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2010-MH-0172',
+      };
+    }
+
+    // 9. Bastar Dhokra Bell Metal
+    if (
+      lower.includes('dhokra') ||
+      lower.includes('metal') ||
+      lower.includes('wax') ||
+      lower.includes('ढोकरा') ||
+      lower.includes('ശിൽപം') ||
+      lower.includes('bastar')
+    ) {
       return {
         craft_id: 'craft-bastar-dhokra',
         craft_name: 'Bastar Dhokra Bell Metal',
-        name: 'Tribal Lost-Wax Cast Bell Metal Figurine',
-        description: `Ancestral 4500-year-old Cire Perdue lost-wax brass casting hand-coiled with wild forest beeswax threads and cast in single unrepeatable clay moulds. Transcribed via voice listing AI (${language}).`,
-        materials: ['Recycled Brass Alloy', 'Forest Beeswax', 'Termite Hill Clay'],
-        technique: 'Lost-Wax (Cire Perdue) Single Casting',
+        name: 'Ancestral Lost-Wax Cast Bell Metal Elephant Figurine',
+        description: `Ancestral 4500-year-old Cire Perdue lost-wax brass casting hand-coiled with wild forest beeswax threads and cast in single unrepeatable clay moulds. Certified GI craft of Central India.`,
+        materials: ['Recycled Brass Bell Metal', 'Wild Forest Beeswax', 'Termite Mound Alluvial Clay'],
+        technique: 'Cire Perdue (Lost-Wax) Single Mould Casting',
         suggested_price: 11500,
         production_time: '20 Days',
         region: 'Central',
         confidence_score: 0.97,
+        image_url: 'https://images.unsplash.com/photo-1590736969955-71cc94801759?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2008-CT-0104',
       };
     }
 
-    // Default Fallback intelligent parse
+    // 10. Jaipur Blue Pottery
+    if (
+      lower.includes('blue pottery') ||
+      lower.includes('pottery') ||
+      lower.includes('quartz') ||
+      lower.includes('पॉटरी') ||
+      lower.includes('jaipur')
+    ) {
+      return {
+        craft_id: 'craft-jaipur-blue-pottery',
+        craft_name: 'Jaipur Blue Pottery',
+        name: 'Hand-Painted Cobalt Turquoise Glazed Quartz Ceramic Vessel',
+        description: `Authentic non-clay ceramic hand-moulded with ground quartz stone and glass powder, decorated freehand with cobalt oxide floral arabesques and fired at 800°C. Certified GI craft of Rajasthan.`,
+        materials: ['Ground Quartz Stone', 'Recycled Glass Powder', 'Katira Natural Gum', 'Cobalt Oxide'],
+        technique: 'Non-Clay Hand Moulding and Single-Fire Cobalt Glazing',
+        suggested_price: 5200,
+        production_time: '12 Days',
+        region: 'North',
+        confidence_score: 0.95,
+        image_url: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1000&q=80',
+        gi_tag: 'GI-2008-RJ-0091',
+      };
+    }
+
+    // Default Fallback
     return {
       craft_id: 'craft-kutch-ajrakh',
       craft_name: 'Kutch Ajrakh Block Print',
@@ -168,6 +366,8 @@ export const aiServices = {
       production_time: '21 Days',
       region: 'West',
       confidence_score: 0.92,
+      image_url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1000&q=80',
+      gi_tag: 'GI-2011-GJ-0220',
     };
   },
 

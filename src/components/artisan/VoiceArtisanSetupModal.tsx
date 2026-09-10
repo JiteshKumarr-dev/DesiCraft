@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ArtisanProfile, LanguageCode } from '../../types';
+import {
+  RealtimeVoiceSession,
+  speakAssistantFeedback,
+  SPEECH_LANG_MAP,
+} from '../../services/realtimeVoiceAssistant';
 import {
   Mic,
   MicOff,
@@ -14,6 +19,8 @@ import {
   Clock,
   ArrowRight,
   RefreshCw,
+  Globe,
+  Radio,
 } from 'lucide-react';
 
 const ARTISAN_VOICE_PRESETS: Record<string, { label: string; text: string; craft: string; years: number; guild: string; state: string; district: string; bio: string }> = {
@@ -72,7 +79,10 @@ export const VoiceArtisanSetupModal: React.FC = () => {
 
   const [isRecording, setIsRecording] = useState(false);
   const [spokenTranscript, setSpokenTranscript] = useState('');
+  const [interimText, setInterimText] = useState('');
+  const [audioLevel, setAudioLevel] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [activeSpeechLang, setActiveSpeechLang] = useState<LanguageCode>(language);
 
   // Extracted structured fields
   const [craftName, setCraftName] = useState('Varanasi Zari & Brocade');
@@ -84,12 +94,122 @@ export const VoiceArtisanSetupModal: React.FC = () => {
   const [learningAvailable, setLearningAvailable] = useState(true);
   const [collaborationAvailable, setCollaborationAvailable] = useState(true);
 
+  const sessionRef = useRef<RealtimeVoiceSession | null>(null);
+
+  useEffect(() => {
+    setActiveSpeechLang(language);
+  }, [language]);
+
+  useEffect(() => {
+    return () => {
+      if (sessionRef.current) {
+        sessionRef.current.stop();
+        sessionRef.current = null;
+      }
+    };
+  }, [isVoiceArtisanSetupOpen]);
+
   if (!isVoiceArtisanSetupOpen) return null;
+
+  // Real-time microphone toggle
+  const handleToggleRecord = async () => {
+    if (isRecording) {
+      if (sessionRef.current) {
+        const fullText = sessionRef.current.stop();
+        sessionRef.current = null;
+        setIsRecording(false);
+        setAudioLevel(0);
+        setInterimText('');
+        parseAndApplyArtisanProfile(fullText || spokenTranscript);
+      }
+    } else {
+      setSpokenTranscript('');
+      setInterimText('');
+
+      const session = new RealtimeVoiceSession(activeSpeechLang, {
+        onStart: () => {
+          setIsRecording(true);
+        },
+        onInterim: (interim, fullDisplay) => {
+          setInterimText(interim);
+          setSpokenTranscript(fullDisplay);
+          quickExtractArtisanDetails(fullDisplay);
+        },
+        onFinal: (final, fullDisplay) => {
+          setSpokenTranscript(fullDisplay);
+          setInterimText('');
+          quickExtractArtisanDetails(fullDisplay);
+        },
+        onError: (err) => {
+          showNotification(err);
+          setIsRecording(false);
+          setAudioLevel(0);
+        },
+        onAudioLevel: (lvl) => setAudioLevel(lvl),
+        onEnd: () => {
+          setIsRecording(false);
+          setAudioLevel(0);
+        },
+      });
+
+      sessionRef.current = session;
+      await session.start();
+    }
+  };
+
+  const quickExtractArtisanDetails = (text: string) => {
+    const lower = text.toLowerCase();
+
+    // Years of experience extraction (e.g. "24 years" or "20 saal")
+    const yearsMatch = lower.match(/(\d+)\s*(?:years?|yrs?|saal|sal|సంవత్సరాలు|ஆண்டுகள்|ವರ್ಷ)/i);
+    if (yearsMatch && yearsMatch[1]) {
+      const y = parseInt(yearsMatch[1], 10);
+      if (y > 0 && y < 80) setExperienceYears(y);
+    }
+
+    // Craft matching
+    if (lower.includes('ikat') || lower.includes('pochampally') || lower.includes('ఇక్కత్')) {
+      setCraftName('Pochampally Ikat');
+      setStateName('Telangana');
+      setDistrictName('Yadadri Bhuvanagiri');
+    } else if (lower.includes('banarasi') || lower.includes('varanasi') || lower.includes('kashi') || lower.includes('बनारसी')) {
+      setCraftName('Varanasi Zari & Brocade');
+      setStateName('Uttar Pradesh');
+      setDistrictName('Varanasi');
+    } else if (lower.includes('kanchipuram') || lower.includes('காஞ்சிபுரம்')) {
+      setCraftName('Kanchipuram Silk');
+      setStateName('Tamil Nadu');
+      setDistrictName('Kanchipuram');
+    } else if (lower.includes('blue pottery') || lower.includes('jaipur')) {
+      setCraftName('Jaipur Blue Pottery');
+      setStateName('Rajasthan');
+      setDistrictName('Jaipur');
+    } else if (lower.includes('channapatna') || lower.includes('ಚನ್ನಪಟ್ಟಣ')) {
+      setCraftName('Channapatna Lacquer Toys');
+      setStateName('Karnataka');
+      setDistrictName('Ramanagara');
+    }
+  };
+
+  const parseAndApplyArtisanProfile = (fullText: string) => {
+    if (!fullText.trim()) return;
+    setIsAnalyzing(true);
+
+    quickExtractArtisanDetails(fullText);
+    setBioStory(fullText);
+
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      showNotification('✨ AI analyzed voice transcript and populated your artisan credentials in real time!');
+      speakAssistantFeedback(`Artisan credentials recorded for ${craftName}. Lineage extracted with ${experienceYears} years experience.`, activeSpeechLang);
+    }, 600);
+  };
 
   // Handle Preset Voice Trigger for simulation
   const handleTriggerPreset = (presetKey: string) => {
     const preset = ARTISAN_VOICE_PRESETS[presetKey] || ARTISAN_VOICE_PRESETS.hi;
     setSpokenTranscript(preset.text);
+    setInterimText('');
     setIsAnalyzing(true);
 
     setTimeout(() => {
@@ -101,33 +221,7 @@ export const VoiceArtisanSetupModal: React.FC = () => {
       setBioStory(preset.bio);
       setIsAnalyzing(false);
       showNotification('AI analyzed voice transcript and populated artisan credentials!');
-    }, 700);
-  };
-
-  // Live microphone simulation / Web Speech API
-  const handleToggleRecord = () => {
-    if (isRecording) {
-      setIsRecording(false);
-      setIsAnalyzing(true);
-      setTimeout(() => {
-        setIsAnalyzing(false);
-        showNotification('AI structured your craft profile successfully!');
-      }, 800);
-    } else {
-      setIsRecording(true);
-      const activePreset = ARTISAN_VOICE_PRESETS[language] || ARTISAN_VOICE_PRESETS.hi;
-      setSpokenTranscript(activePreset.text);
-
-      setTimeout(() => {
-        setCraftName(activePreset.craft);
-        setExperienceYears(activePreset.years);
-        setGuildName(activePreset.guild);
-        setStateName(activePreset.state);
-        setDistrictName(activePreset.district);
-        setBioStory(activePreset.bio);
-        setIsRecording(false);
-      }, 2500);
-    }
+    }, 600);
   };
 
   const handleSaveArtisanProfile = (e: React.FormEvent) => {
@@ -169,11 +263,12 @@ export const VoiceArtisanSetupModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-2xl bg-surface rounded-3xl shadow-2xl border border-outline/30 max-h-[92vh] overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-2xl bg-surface rounded-3xl shadow-2xl border border-outline/30 max-h-[92vh] overflow-hidden flex flex-col text-on-surface">
         {/* Header */}
         <div className="bg-surface-container-high p-6 border-b border-outline/20 relative">
           <button
             onClick={() => setIsVoiceArtisanSetupOpen(false)}
+            aria-label="Close modal"
             className="absolute top-4 right-4 p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface transition cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -184,14 +279,15 @@ export const VoiceArtisanSetupModal: React.FC = () => {
               <Mic className="w-6 h-6 animate-pulse" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                LOW-TYPING ONBOARDING
+              <span className="text-[10px] font-bold text-primary uppercase tracking-wider flex items-center gap-1">
+                <Radio className="w-3 h-3 animate-pulse" />
+                REAL-TIME VOICE ONBOARDING
               </span>
               <h2 className="font-serif text-2xl font-bold text-on-surface">
                 Voice-First Artisan Studio Setup
               </h2>
               <p className="text-xs text-on-surface-variant">
-                No complex paperwork. Speak in your mother tongue; AI extracts your craft lineage.
+                No complex paperwork. Speak in your mother tongue; AI extracts your craft lineage live.
               </p>
             </div>
           </div>
@@ -210,31 +306,66 @@ export const VoiceArtisanSetupModal: React.FC = () => {
               </p>
             </div>
 
-            {/* Pulsing Mic Button */}
-            <button
-              type="button"
-              onClick={handleToggleRecord}
-              className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto transition-all shadow-lg cursor-pointer ${
-                isRecording
-                  ? 'bg-red-600 text-white animate-ping'
-                  : 'bg-primary text-on-primary hover:scale-105 ring-4 ring-primary/20'
-              }`}
-            >
-              {isRecording ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
-            </button>
-
-            {/* Soundwaves visualization */}
-            <div className="flex items-center justify-center gap-1 h-6">
-              {[12, 28, 16, 36, 22, 30, 14, 38, 20, 32, 18].map((h, i) => (
-                <span
-                  key={i}
-                  style={{ height: isRecording ? `${h}px` : '4px' }}
-                  className={`w-1 rounded-full transition-all duration-200 ${
-                    isRecording ? 'bg-primary' : 'bg-outline/40'
-                  }`}
-                />
-              ))}
+            {/* Dialect selector */}
+            <div className="flex items-center justify-center gap-2">
+              <Globe className="w-3.5 h-3.5 text-primary" />
+              <select
+                value={activeSpeechLang}
+                onChange={(e) => {
+                  const l = e.target.value as LanguageCode;
+                  setActiveSpeechLang(l);
+                  if (sessionRef.current) sessionRef.current.setLanguage(l);
+                }}
+                className="text-xs font-semibold bg-surface border border-outline/30 rounded-lg px-2.5 py-1 text-primary focus:outline-none cursor-pointer"
+              >
+                <option value="hi">हिन्दी (Hindi)</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                <option value="en">English (India)</option>
+              </select>
             </div>
+
+            {/* Pulsing Mic Button */}
+            <div className="relative flex items-center justify-center">
+              {isRecording && (
+                <div
+                  className="absolute w-24 h-24 rounded-full bg-red-500/30 animate-ping"
+                  style={{ transform: `scale(${1 + audioLevel / 50})` }}
+                />
+              )}
+              <button
+                type="button"
+                onClick={handleToggleRecord}
+                className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center mx-auto transition-all shadow-lg cursor-pointer ${
+                  isRecording
+                    ? 'bg-red-600 text-white ring-8 ring-red-200 dark:ring-red-900/60 shadow-red-500/50'
+                    : 'bg-primary text-on-primary hover:scale-105 ring-4 ring-primary/20 shadow-primary/30'
+                }`}
+              >
+                {isRecording ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
+              </button>
+            </div>
+
+            {/* Soundwaves frequency visualization */}
+            {isRecording && (
+              <div className="flex items-center justify-center gap-1 h-6">
+                {[12, 28, 16, 36, 22, 30, 14, 38, 20, 32, 18].map((h, i) => {
+                  const dynamicH = Math.max(4, Math.min(24, (h * (audioLevel || 20)) / 40));
+                  return (
+                    <span
+                      key={i}
+                      style={{ height: `${dynamicH}px` }}
+                      className="w-1 bg-red-500 rounded-full transition-all duration-75"
+                    />
+                  );
+                })}
+              </div>
+            )}
+
+            <span className="text-xs font-bold text-on-surface block">
+              {isRecording ? `🔴 Live Recording in ${activeSpeechLang.toUpperCase()}...` : 'Tap Mic to Start Speaking'}
+            </span>
 
             {/* Preset Language Voice Samples */}
             <div className="pt-2 border-t border-outline/10">
@@ -257,148 +388,162 @@ export const VoiceArtisanSetupModal: React.FC = () => {
           </div>
 
           {/* Spoken Transcript Preview */}
-          {spokenTranscript && (
-            <div className="p-4 rounded-xl bg-surface-container border border-outline/20 space-y-1">
-              <span className="text-[10px] uppercase font-bold text-primary tracking-wider flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" />
-                Spoken Voice Transcript
-              </span>
-              <p className="text-xs italic text-on-surface font-serif">
-                "{spokenTranscript}"
+          {(spokenTranscript || interimText) && (
+            <div className="p-4 rounded-2xl bg-surface-container border border-outline/20 space-y-2 animate-fadeIn">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-primary flex items-center gap-1">
+                  <Volume2 className="w-3.5 h-3.5" />
+                  {isRecording ? 'Listening in Real Time:' : 'Spoken Voice Lineage:'}
+                </span>
+                {isAnalyzing ? (
+                  <span className="text-primary font-semibold flex items-center gap-1 text-[11px]">
+                    <Sparkles className="w-3.5 h-3.5 animate-spin" /> Structuring Credentials...
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-semibold text-green-700 dark:text-green-400 flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5" /> Verified
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-on-surface leading-relaxed">
+                <span>"{spokenTranscript}"</span>
+                {interimText && <span className="text-primary italic"> {interimText}...</span>}
               </p>
             </div>
           )}
 
-          {/* AI Structured Profile Form (Review & Edit) */}
-          <form id="artisan-setup-form" onSubmit={handleSaveArtisanProfile} className="space-y-4 text-xs">
-            <div className="flex items-center justify-between border-b border-outline/10 pb-2">
-              <h3 className="font-serif font-bold text-sm text-on-surface flex items-center gap-1.5">
-                <CheckCircle className="w-4 h-4 text-green-700" />
-                <span>AI-Extracted Artisan Credentials (Review & Edit)</span>
+          {/* Extracted Structured Credentials Form */}
+          <form onSubmit={handleSaveArtisanProfile} className="space-y-4 pt-2 border-t border-outline/10">
+            <div className="flex items-center justify-between">
+              <h3 className="font-serif text-sm font-bold text-on-surface">
+                Extracted Artisan Credentials (Review & Edit)
               </h3>
-              {isAnalyzing && (
-                <span className="text-[11px] text-primary flex items-center gap-1 animate-pulse font-semibold">
-                  <RefreshCw className="w-3 h-3 animate-spin" /> Structuring...
-                </span>
-              )}
+              <span className="text-[10px] uppercase font-bold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 px-2 py-0.5 rounded-full">
+                AI Extracted Live
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="font-semibold text-on-surface">Craft Specialty / Name</label>
+                <label className="text-xs font-semibold text-on-surface flex items-center gap-1">
+                  <Award className="w-3.5 h-3.5 text-primary" /> Primary Craft Tradition
+                </label>
                 <input
                   type="text"
                   required
                   value={craftName}
                   onChange={(e) => setCraftName(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline/30 rounded-xl"
+                  className="w-full px-3 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-xl text-on-surface focus:ring-1 focus:ring-primary"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-on-surface">Years of Mastery</label>
+                <label className="text-xs font-semibold text-on-surface flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-primary" /> Years of Master Experience
+                </label>
                 <input
                   type="number"
                   required
                   min={1}
+                  max={70}
                   value={experienceYears}
                   onChange={(e) => setExperienceYears(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline/30 rounded-xl"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-on-surface">State of Heritage Origin</label>
-                <input
-                  type="text"
-                  required
-                  value={stateName}
-                  onChange={(e) => setStateName(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline/30 rounded-xl"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-on-surface">District / Cluster</label>
-                <input
-                  type="text"
-                  required
-                  value={districtName}
-                  onChange={(e) => setDistrictName(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-container-low border border-outline/30 rounded-xl"
+                  className="w-full px-3 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-xl text-on-surface focus:ring-1 focus:ring-primary"
                 />
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="font-semibold text-on-surface">Affiliated Guild / Cooperative</label>
-              <input
-                type="text"
-                required
-                value={guildName}
-                onChange={(e) => setGuildName(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-container-low border border-outline/30 rounded-xl"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-on-surface flex items-center gap-1">
+                  <Layers className="w-3.5 h-3.5 text-primary" /> Cooperative / Guild Affiliation
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={guildName}
+                  onChange={(e) => setGuildName(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-xl text-on-surface focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-on-surface flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-primary" /> District & State
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    required
+                    placeholder="District"
+                    value={districtName}
+                    onChange={(e) => setDistrictName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-xl text-on-surface focus:ring-1 focus:ring-primary"
+                  />
+                  <input
+                    type="text"
+                    required
+                    placeholder="State"
+                    value={stateName}
+                    onChange={(e) => setStateName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-xl text-on-surface focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-on-surface">Artisan Studio Narrative</label>
+              <label className="text-xs font-semibold text-on-surface">Artisan Biography & Craft Story</label>
               <textarea
                 rows={2}
                 required
                 value={bioStory}
                 onChange={(e) => setBioStory(e.target.value)}
-                className="w-full p-2.5 bg-surface-container-low border border-outline/30 rounded-xl"
+                className="w-full p-2.5 text-xs bg-surface-container-low border border-outline/30 rounded-xl text-on-surface focus:ring-1 focus:ring-primary"
               />
             </div>
 
-            {/* Availability toggles */}
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <label className="p-3 rounded-xl bg-surface-container-low border border-outline/20 flex items-center gap-2 cursor-pointer">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <label className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-outline/20 text-xs font-semibold cursor-pointer">
                 <input
                   type="checkbox"
                   checked={learningAvailable}
                   onChange={(e) => setLearningAvailable(e.target.checked)}
-                  className="rounded text-primary focus:ring-primary/40"
+                  className="rounded text-primary focus:ring-primary"
                 />
-                <span className="font-semibold text-on-surface text-[11px]">
-                  🎓 Offer Masterclasses & Apprenticeships
-                </span>
+                <span>Open for Apprenticeship Workshops</span>
               </label>
 
-              <label className="p-3 rounded-xl bg-surface-container-low border border-outline/20 flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-outline/20 text-xs font-semibold cursor-pointer">
                 <input
                   type="checkbox"
                   checked={collaborationAvailable}
                   onChange={(e) => setCollaborationAvailable(e.target.checked)}
-                  className="rounded text-primary focus:ring-primary/40"
+                  className="rounded text-primary focus:ring-primary"
                 />
-                <span className="font-semibold text-on-surface text-[11px]">
-                  🤝 Open to Artisan Collaborations
-                </span>
+                <span>Open for Inter-Craft Collaborations</span>
               </label>
             </div>
+
+            {/* Footer Actions */}
+            <div className="flex justify-end gap-3 pt-4 border-t border-outline/10">
+              <button
+                type="button"
+                onClick={() => setIsVoiceArtisanSetupOpen(false)}
+                className="px-5 py-2.5 rounded-full border border-outline/30 text-xs font-bold hover:bg-surface-container transition cursor-pointer"
+              >
+                Skip For Now
+              </button>
+
+              <button
+                type="submit"
+                className="px-6 py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-md cursor-pointer flex items-center gap-2"
+              >
+                <span>Save Artisan Profile & Enter Studio</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </form>
-        </div>
-
-        {/* Footer */}
-        <div className="bg-surface-container-high p-4 sm:p-5 border-t border-outline/20 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => setIsVoiceArtisanSetupOpen(false)}
-            className="px-4 py-2 text-xs font-semibold text-on-surface-variant hover:text-on-surface cursor-pointer"
-          >
-            Skip for now
-          </button>
-
-          <button
-            type="submit"
-            form="artisan-setup-form"
-            className="px-6 py-2.5 rounded-full bg-primary text-on-primary text-xs sm:text-sm font-bold hover:bg-primary/90 transition shadow-md flex items-center gap-2 cursor-pointer"
-          >
-            <span>Save Artisan Profile & Enter Studio</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
         </div>
       </div>
     </div>
