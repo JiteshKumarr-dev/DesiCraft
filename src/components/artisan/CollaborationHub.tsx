@@ -40,9 +40,13 @@ export const CollaborationHub: React.FC = () => {
         sender_artisan_id: user.id,
         sender_name: user.name,
         sender_craft: user.artisan_profile?.craft_name || 'Varanasi Brocade',
+        sender_avatar: user.artisan_profile?.avatar_url,
         receiver_artisan_id: partner.id,
         receiver_name: partner.name,
         receiver_craft: partner.craft_name,
+        receiver_avatar: partner.avatar_url,
+        collaboration_type: 'Craft Fusion',
+        title: jointProductIdea,
         message: proposalMessage,
         joint_product_idea: jointProductIdea,
       });

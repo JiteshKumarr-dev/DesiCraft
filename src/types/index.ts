@@ -41,6 +41,18 @@ export interface ArtisanProfile {
   guild_name: string;
   rating: number;
   reviews_count: number;
+  skills?: string[];
+  collaboration_interests?: string[];
+  traditional_techniques?: string[];
+  materials?: string[];
+  previous_collaborations?: Array<{
+    title: string;
+    partner_name: string;
+    partner_craft: string;
+    year: string;
+    image_url?: string;
+    description?: string;
+  }>;
 }
 
 export interface User {
@@ -173,18 +185,64 @@ export interface LearningRequest {
   created_at: string;
 }
 
+export type CollaborationType = 
+  | 'Product Collaboration' 
+  | 'Craft Fusion' 
+  | 'Joint Collection' 
+  | 'Custom Project' 
+  | 'Exhibition' 
+  | 'Workshop' 
+  | 'Skill Exchange';
+
 export interface CollaborationRequest {
   id: string;
   sender_artisan_id: string;
   sender_name: string;
   sender_craft: string;
+  sender_avatar?: string;
   receiver_artisan_id: string;
   receiver_name: string;
   receiver_craft: string;
+  receiver_avatar?: string;
+  collaboration_type: CollaborationType;
+  title: string;
   message: string;
-  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'COMPLETED';
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED' | 'COMPLETED';
   joint_product_idea?: string;
   created_at: string;
+  updated_at?: string;
+}
+
+export interface SellerConversationParticipant {
+  artisan_id: string;
+  name: string;
+  craft: string;
+  avatar: string;
+  region: string;
+}
+
+export interface SellerConversation {
+  id: string;
+  participant_ids: string[];
+  participants: Record<string, SellerConversationParticipant>;
+  collaboration_id?: string;
+  collaboration_title?: string;
+  last_message: string;
+  last_message_time: string;
+  unread_counts: Record<string, number>;
+  created_at: string;
+}
+
+export interface SellerMessage {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  sender_name: string;
+  receiver_id: string;
+  content: string;
+  created_at: string;
+  is_read: boolean;
+  attachment_url?: string;
 }
 
 export interface Opportunity {

@@ -153,13 +153,18 @@ CREATE TABLE IF NOT EXISTS public.collaboration_requests (
   sender_artisan_id TEXT,
   sender_name TEXT,
   sender_craft TEXT,
+  sender_avatar TEXT,
   receiver_artisan_id TEXT,
   receiver_name TEXT,
   receiver_craft TEXT,
+  receiver_avatar TEXT,
+  collaboration_type TEXT DEFAULT 'Craft Fusion',
+  title TEXT,
   message TEXT,
   status TEXT DEFAULT 'PENDING',
   joint_product_idea TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 10. Multilingual Chat Messages
@@ -177,6 +182,32 @@ CREATE TABLE IF NOT EXISTS public.chat_messages (
   is_voice BOOLEAN DEFAULT FALSE
 );
 
+-- 11. Seller-to-Seller Conversations
+CREATE TABLE IF NOT EXISTS public.seller_conversations (
+  id TEXT PRIMARY KEY,
+  participant_ids TEXT[],
+  participants JSONB DEFAULT '{}'::jsonb,
+  collaboration_id TEXT,
+  collaboration_title TEXT,
+  last_message TEXT DEFAULT '',
+  last_message_time TIMESTAMPTZ DEFAULT NOW(),
+  unread_counts JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 12. Seller-to-Seller Messages
+CREATE TABLE IF NOT EXISTS public.seller_messages (
+  id TEXT PRIMARY KEY,
+  conversation_id TEXT NOT NULL,
+  sender_id TEXT NOT NULL,
+  sender_name TEXT,
+  receiver_id TEXT NOT NULL,
+  content TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT FALSE,
+  attachment_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- =====================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- Enables anonymous + authenticated reads and writes for live demo app
@@ -192,6 +223,8 @@ ALTER TABLE public.learning_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.custom_orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.collaboration_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.seller_conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.seller_messages ENABLE ROW LEVEL SECURITY;
 
 -- Permissive policies for Desi Craft client operations
 CREATE POLICY "Public Read Profiles" ON public.profiles FOR SELECT USING (true);
@@ -233,6 +266,17 @@ CREATE POLICY "Public Update Collaborations" ON public.collaboration_requests FO
 CREATE POLICY "Public Read Chat" ON public.chat_messages FOR SELECT USING (true);
 CREATE POLICY "Public Insert Chat" ON public.chat_messages FOR INSERT WITH CHECK (true);
 
--- Enable Realtime for Chat Messages and Orders
+CREATE POLICY "Public Read Seller Conversations" ON public.seller_conversations FOR SELECT USING (true);
+CREATE POLICY "Public Insert Seller Conversations" ON public.seller_conversations FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update Seller Conversations" ON public.seller_conversations FOR UPDATE USING (true);
+
+CREATE POLICY "Public Read Seller Messages" ON public.seller_messages FOR SELECT USING (true);
+CREATE POLICY "Public Insert Seller Messages" ON public.seller_messages FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public Update Seller Messages" ON public.seller_messages FOR UPDATE USING (true);
+
+-- Enable Realtime for Chat Messages, Orders, and Seller Messaging
 ALTER PUBLICATION supabase_realtime ADD TABLE public.chat_messages;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.seller_conversations;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.seller_messages;
+

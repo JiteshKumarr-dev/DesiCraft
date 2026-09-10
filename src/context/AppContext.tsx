@@ -15,6 +15,9 @@ import {
   ChatMessage,
   CustomOrderRequest,
   Region,
+  SellerConversation,
+  SellerMessage,
+  CollaborationType,
 } from '../types';
 import { craftsData } from '../data/craftsData';
 import { artisansData } from '../data/artisansData';
@@ -49,6 +52,12 @@ import {
   fetchSupabaseChatMessages,
   saveSupabaseChatMessage,
   subscribeToSupabaseChat,
+  fetchSupabaseSellerConversations,
+  saveSupabaseSellerConversation,
+  fetchSupabaseSellerMessages,
+  saveSupabaseSellerMessage,
+  updateSupabaseSellerMessageRead,
+  subscribeToSupabaseSellerMessages,
 } from '../services/supabaseClient';
 
 interface CartItem {
@@ -110,12 +119,33 @@ interface AppContextType {
   createCustomOrder: (request: Omit<CustomOrderRequest, 'id' | 'created_at' | 'status'>) => void;
   updateCustomOrderStatus: (id: string, status: CustomOrderRequest['status']) => void;
 
+  // Seller Mode Navigation & Collaborative Hub
+  sellerTab: 'DASHBOARD' | 'CATALOG' | 'ORDERS' | 'AISTUDIO' | 'OPPORTUNITIES' | 'COLLABORATE' | 'MESSAGES' | 'PROFILE';
+  setSellerTab: (tab: 'DASHBOARD' | 'CATALOG' | 'ORDERS' | 'AISTUDIO' | 'OPPORTUNITIES' | 'COLLABORATE' | 'MESSAGES' | 'PROFILE') => void;
+
   // Collaborations (Artisan to Artisan)
   collaborationRequests: CollaborationRequest[];
   sendCollaborationRequest: (req: Omit<CollaborationRequest, 'id' | 'created_at' | 'status'>) => void;
   updateCollaborationStatus: (id: string, status: CollaborationRequest['status']) => void;
+  acceptCollaborationRequest: (requestId: string) => void;
+  declineCollaborationRequest: (requestId: string) => void;
 
-  // Chat & Communication
+  // Seller-to-Seller Private Messaging
+  sellerConversations: SellerConversation[];
+  sellerMessages: SellerMessage[];
+  activeSellerConversationId: string | null;
+  setActiveSellerConversationId: (id: string | null) => void;
+  sendSellerMessage: (conversationId: string, content: string) => Promise<void>;
+  markConversationAsRead: (conversationId: string) => void;
+  openSellerChatWith: (artisanId: string, collaborationContext?: { id: string; title: string }) => void;
+
+  // Selected Artisan Modals
+  activeProfileArtisan: ArtisanProfile | null;
+  setActiveProfileArtisan: (artisan: ArtisanProfile | null) => void;
+  activeCollabArtisan: ArtisanProfile | null;
+  setActiveCollabArtisan: (artisan: ArtisanProfile | null) => void;
+
+  // Chat & Communication (Customer to Artisan)
   chatMessages: ChatMessage[];
   sendChatMessage: (msg: {
     sender_role: 'customer' | 'artisan';
@@ -339,6 +369,177 @@ const initialCustomOrders: CustomOrderRequest[] = [
   },
 ];
 
+const initialCollaborationRequests: CollaborationRequest[] = [
+  {
+    id: 'collab-req-001',
+    sender_artisan_id: 'artisan-somnath-bastar',
+    sender_name: 'Somnath Ghadwa',
+    sender_craft: 'Bastar Dhokra Bell Metal',
+    sender_avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
+    receiver_artisan_id: 'artisan-rajesh-varanasi',
+    receiver_name: 'Master Rajeshwar Ansari',
+    receiver_craft: 'Varanasi Zari & Brocade',
+    receiver_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    collaboration_type: 'Craft Fusion',
+    title: 'Kadwa Silk & Cast Bell Metal Minaudière Clutches',
+    message: 'Namaste Master Rajeshwar ji! We would love to collaborate by creating antique brass lost-wax clasps and frames designed specifically to fit your signature Kadwa brocade evening clutches.',
+    joint_product_idea: 'Hand-cast tribal brass clasps encasing pure Katan silk Kadwa weave',
+    status: 'PENDING',
+    created_at: '2026-03-09T10:15:00Z',
+    updated_at: '2026-03-09T10:15:00Z',
+  },
+  {
+    id: 'collab-req-002',
+    sender_artisan_id: 'artisan-rajesh-varanasi',
+    sender_name: 'Master Rajeshwar Ansari',
+    sender_craft: 'Varanasi Zari & Brocade',
+    sender_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    receiver_artisan_id: 'artisan-lakshmi-pochampally',
+    receiver_name: 'Gaddam Lakshmi Devi',
+    receiver_craft: 'Pochampally Ikat',
+    receiver_avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+    collaboration_type: 'Joint Collection',
+    title: 'Royal Kadwa x Pochampally Ikat Festive Stoles',
+    message: 'Lakshmi ji, let us combine your geometric double ikat borders with our Varanasi gold kalabattun silk body for a limited festive capsule collection.',
+    joint_product_idea: 'Double Ikat geometric pallu joined to pure zari Kadwa floral field',
+    status: 'ACCEPTED',
+    created_at: '2026-03-04T12:00:00Z',
+    updated_at: '2026-03-05T09:30:00Z',
+  },
+  {
+    id: 'collab-req-003',
+    sender_artisan_id: 'artisan-rajesh-varanasi',
+    sender_name: 'Master Rajeshwar Ansari',
+    sender_craft: 'Varanasi Zari & Brocade',
+    sender_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    receiver_artisan_id: 'artisan-ismail-kutch',
+    receiver_name: 'Dr. Ismail Mohammed Khatri',
+    receiver_craft: 'Kutch Ajrakh Block Print',
+    receiver_avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    collaboration_type: 'Product Collaboration',
+    title: 'Ajrakh Natural Indigo Dyed Brocade Yardage',
+    message: 'Proposal to test printing resist Ajrakh celestial stars directly onto handloom unbleached Katan silk yardage before weaving supplementary zari borders.',
+    joint_product_idea: 'Natural indigo Ajrakh hand-block print on handspun Katan mulberry silk',
+    status: 'PENDING',
+    created_at: '2026-03-08T15:45:00Z',
+    updated_at: '2026-03-08T15:45:00Z',
+  },
+];
+
+const initialSellerConversations: SellerConversation[] = [
+  {
+    id: 'conv-rajesh-lakshmi',
+    participant_ids: ['artisan-rajesh-varanasi', 'artisan-lakshmi-pochampally'],
+    participants: {
+      'artisan-rajesh-varanasi': {
+        artisan_id: 'artisan-rajesh-varanasi',
+        name: 'Master Rajeshwar Ansari',
+        craft: 'Varanasi Zari & Brocade',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+        region: 'Uttar Pradesh',
+      },
+      'artisan-lakshmi-pochampally': {
+        artisan_id: 'artisan-lakshmi-pochampally',
+        name: 'Gaddam Lakshmi Devi',
+        craft: 'Pochampally Ikat',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+        region: 'Telangana',
+      }
+    },
+    collaboration_id: 'collab-req-002',
+    collaboration_title: 'Royal Kadwa x Pochampally Ikat Festive Stoles',
+    last_message: 'The natural indigo dyed warp samples arrived in Varanasi! The geometric alignment is superb.',
+    last_message_time: '2026-03-09T18:20:00Z',
+    unread_counts: {
+      'artisan-rajesh-varanasi': 0,
+      'artisan-lakshmi-pochampally': 0,
+    },
+    created_at: '2026-03-05T09:30:00Z',
+  },
+  {
+    id: 'conv-rajesh-ismail',
+    participant_ids: ['artisan-rajesh-varanasi', 'artisan-ismail-kutch'],
+    participants: {
+      'artisan-rajesh-varanasi': {
+        artisan_id: 'artisan-rajesh-varanasi',
+        name: 'Master Rajeshwar Ansari',
+        craft: 'Varanasi Zari & Brocade',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+        region: 'Uttar Pradesh',
+      },
+      'artisan-ismail-kutch': {
+        artisan_id: 'artisan-ismail-kutch',
+        name: 'Dr. Ismail Mohammed Khatri',
+        craft: 'Kutch Ajrakh Block Print',
+        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+        region: 'Gujarat',
+      }
+    },
+    collaboration_id: 'collab-req-003',
+    collaboration_title: 'Ajrakh Natural Indigo Dyed Brocade Yardage',
+    last_message: 'Namaste Rajeshwar ji, I received your silk swatches. I will prepare the pomegranate mordant vat tomorrow.',
+    last_message_time: '2026-03-08T16:10:00Z',
+    unread_counts: {
+      'artisan-rajesh-varanasi': 1,
+      'artisan-ismail-kutch': 0,
+    },
+    created_at: '2026-03-08T15:50:00Z',
+  }
+];
+
+const initialSellerMessages: SellerMessage[] = [
+  {
+    id: 'smsg-1',
+    conversation_id: 'conv-rajesh-lakshmi',
+    sender_id: 'artisan-rajesh-varanasi',
+    sender_name: 'Master Rajeshwar Ansari',
+    receiver_id: 'artisan-lakshmi-pochampally',
+    content: 'Namaste Lakshmi ji! Looking forward to creating our joint collection combining your Pochampally double ikat with our Kadwa zari weaving.',
+    created_at: '2026-03-05T09:35:00Z',
+    is_read: true,
+  },
+  {
+    id: 'smsg-2',
+    conversation_id: 'conv-rajesh-lakshmi',
+    sender_id: 'artisan-lakshmi-pochampally',
+    sender_name: 'Gaddam Lakshmi Devi',
+    receiver_id: 'artisan-rajesh-varanasi',
+    content: 'Namaskaram Rajeshwar ji! It is an honor. I have tied the warp clusters for the chevron borders with natural indigo and madder root.',
+    created_at: '2026-03-06T11:15:00Z',
+    is_read: true,
+  },
+  {
+    id: 'smsg-3',
+    conversation_id: 'conv-rajesh-lakshmi',
+    sender_id: 'artisan-rajesh-varanasi',
+    sender_name: 'Master Rajeshwar Ansari',
+    receiver_id: 'artisan-lakshmi-pochampally',
+    content: 'The natural indigo dyed warp samples arrived in Varanasi! The geometric alignment is superb.',
+    created_at: '2026-03-09T18:20:00Z',
+    is_read: true,
+  },
+  {
+    id: 'smsg-4',
+    conversation_id: 'conv-rajesh-ismail',
+    sender_id: 'artisan-rajesh-varanasi',
+    sender_name: 'Master Rajeshwar Ansari',
+    receiver_id: 'artisan-ismail-kutch',
+    content: 'Dr. Khatri ji, I dispatched two meters of handspun Katan silk for the pilot Ajrakh block printing test.',
+    created_at: '2026-03-08T15:55:00Z',
+    is_read: true,
+  },
+  {
+    id: 'smsg-5',
+    conversation_id: 'conv-rajesh-ismail',
+    sender_id: 'artisan-ismail-kutch',
+    sender_name: 'Dr. Ismail Mohammed Khatri',
+    receiver_id: 'artisan-rajesh-varanasi',
+    content: 'Namaste Rajeshwar ji, I received your silk swatches. I will prepare the pomegranate mordant vat tomorrow.',
+    created_at: '2026-03-08T16:10:00Z',
+    is_read: false,
+  }
+];
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -414,10 +615,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : initialCustomOrders;
   });
 
+  const [sellerTab, setSellerTab] = useState<'DASHBOARD' | 'CATALOG' | 'ORDERS' | 'AISTUDIO' | 'OPPORTUNITIES' | 'COLLABORATE' | 'MESSAGES' | 'PROFILE'>('DASHBOARD');
+
   const [collaborationRequests, setCollaborationRequests] = useState<CollaborationRequest[]>(() => {
     const saved = localStorage.getItem('desi_craft_collaborations');
-    return saved ? JSON.parse(saved) : [];
+    return saved ? JSON.parse(saved) : initialCollaborationRequests;
   });
+
+  const [sellerConversations, setSellerConversations] = useState<SellerConversation[]>(() => {
+    const saved = localStorage.getItem('desi_craft_seller_conversations');
+    return saved ? JSON.parse(saved) : initialSellerConversations;
+  });
+
+  const [sellerMessages, setSellerMessages] = useState<SellerMessage[]>(() => {
+    const saved = localStorage.getItem('desi_craft_seller_messages');
+    return saved ? JSON.parse(saved) : initialSellerMessages;
+  });
+
+  const [activeSellerConversationId, setActiveSellerConversationId] = useState<string | null>('conv-rajesh-lakshmi');
+  const [activeProfileArtisan, setActiveProfileArtisan] = useState<ArtisanProfile | null>(null);
+  const [activeCollabArtisan, setActiveCollabArtisan] = useState<ArtisanProfile | null>(null);
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
     const saved = localStorage.getItem('desi_craft_chat');
@@ -634,6 +851,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (remoteChat && remoteChat.length > 0 && isMounted) {
             setChatMessages(remoteChat);
           }
+
+          // Fetch remote seller conversations
+          const remoteSellerConvs = await fetchSupabaseSellerConversations();
+          if (remoteSellerConvs && remoteSellerConvs.length > 0 && isMounted) {
+            setSellerConversations(remoteSellerConvs);
+          }
+
+          // Fetch remote seller messages
+          const remoteSellerMsgs = await fetchSupabaseSellerMessages();
+          if (remoteSellerMsgs && remoteSellerMsgs.length > 0 && isMounted) {
+            setSellerMessages(remoteSellerMsgs);
+          }
         }
       } catch (err) {
         console.warn('[Supabase Sync] Startup sync fallback:', err);
@@ -667,10 +896,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       });
     });
 
+    // Realtime seller messaging subscription
+    const unsubscribeSellerChat = subscribeToSupabaseSellerMessages((newMsg) => {
+      if (!isMounted) return;
+      setSellerMessages((prev) => {
+        if (prev.some((m) => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
+      setSellerConversations((prev) =>
+        prev.map((c) =>
+          c.id === newMsg.conversation_id
+            ? { ...c, last_message: newMsg.content, last_message_time: newMsg.created_at }
+            : c
+        )
+      );
+    });
+
     return () => {
       isMounted = false;
       subscription?.unsubscribe();
       unsubscribeChat();
+      unsubscribeSellerChat();
     };
   }, []);
 
@@ -706,6 +952,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('desi_craft_chat', JSON.stringify(chatMessages));
   }, [chatMessages]);
+
+  useEffect(() => {
+    localStorage.setItem('desi_craft_collaborations', JSON.stringify(collaborationRequests));
+  }, [collaborationRequests]);
+
+  useEffect(() => {
+    localStorage.setItem('desi_craft_seller_conversations', JSON.stringify(sellerConversations));
+  }, [sellerConversations]);
+
+  useEffect(() => {
+    localStorage.setItem('desi_craft_seller_messages', JSON.stringify(sellerMessages));
+  }, [sellerMessages]);
 
   const showNotification = (msg: string) => {
     setNotification(msg);
@@ -927,22 +1185,217 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showNotification(`Commission ${id} marked as ${status}!`);
   };
 
-  // Collaboration
+  // Collaboration (Artisan-to-Artisan)
   const sendCollaborationRequest = (req: Omit<CollaborationRequest, 'id' | 'created_at' | 'status'>) => {
     const newCollab: CollaborationRequest = {
       ...req,
       id: `collab-${Date.now()}`,
       status: 'PENDING',
       created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     setCollaborationRequests((prev) => [newCollab, ...prev]);
-    showNotification(`Collaboration proposal sent to ${req.receiver_name}!`);
+    saveSupabaseCollaborationRequest(newCollab).catch(console.warn);
+    showNotification(`Collaboration proposal "${req.title}" sent to ${req.receiver_name}!`);
   };
 
   const updateCollaborationStatus = (id: string, status: CollaborationRequest['status']) => {
     setCollaborationRequests((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status } : c))
+      prev.map((c) => (c.id === id ? { ...c, status, updated_at: new Date().toISOString() } : c))
     );
+    updateSupabaseCollaborationStatus(id, status).catch(console.warn);
+  };
+
+  const acceptCollaborationRequest = (requestId: string) => {
+    const req = collaborationRequests.find((r) => r.id === requestId);
+    if (!req) return;
+
+    const updatedCollab: CollaborationRequest = {
+      ...req,
+      status: 'ACCEPTED',
+      updated_at: new Date().toISOString(),
+    };
+
+    setCollaborationRequests((prev) =>
+      prev.map((r) => (r.id === requestId ? updatedCollab : r))
+    );
+    saveSupabaseCollaborationRequest(updatedCollab).catch(console.warn);
+
+    const myArtisanId = user.artisan_profile?.id || user.id;
+    const otherArtisanId = req.sender_artisan_id === myArtisanId ? req.receiver_artisan_id : req.sender_artisan_id;
+    const otherArtisan = artisansData.find((a) => a.id === otherArtisanId || a.user_id === otherArtisanId);
+
+    // Check if conversation already exists
+    let conv = sellerConversations.find(
+      (c) => c.collaboration_id === req.id || (c.participant_ids.includes(otherArtisanId) && c.participant_ids.includes(myArtisanId))
+    );
+
+    if (!conv) {
+      const newConvId = `conv-${Date.now()}`;
+      conv = {
+        id: newConvId,
+        participant_ids: [myArtisanId, otherArtisanId],
+        participants: {
+          [myArtisanId]: {
+            artisan_id: myArtisanId,
+            name: user.artisan_profile?.name || user.name,
+            craft: user.artisan_profile?.craft_name || 'Master Artisan',
+            avatar: user.artisan_profile?.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+            region: user.artisan_profile?.state || 'India',
+          },
+          [otherArtisanId]: {
+            artisan_id: otherArtisanId,
+            name: req.sender_artisan_id === myArtisanId ? req.receiver_name : req.sender_name,
+            craft: req.sender_artisan_id === myArtisanId ? req.receiver_craft : req.sender_craft,
+            avatar: (req.sender_artisan_id === myArtisanId ? req.receiver_avatar : req.sender_avatar) || otherArtisan?.avatar_url || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+            region: otherArtisan?.state || 'India',
+          },
+        },
+        collaboration_id: req.id,
+        collaboration_title: req.title,
+        last_message: `Collaboration proposal "${req.title}" accepted!`,
+        last_message_time: new Date().toISOString(),
+        unread_counts: { [otherArtisanId]: 1, [myArtisanId]: 0 },
+        created_at: new Date().toISOString(),
+      };
+
+      setSellerConversations((prev) => [conv!, ...prev]);
+      saveSupabaseSellerConversation(conv).catch(console.warn);
+
+      const welcomeMsg: SellerMessage = {
+        id: `smsg-${Date.now()}`,
+        conversation_id: newConvId,
+        sender_id: myArtisanId,
+        sender_name: user.artisan_profile?.name || user.name,
+        receiver_id: otherArtisanId,
+        content: `Namaste ${req.sender_name}! I am delighted to accept your collaboration proposal for "${req.title}". Let us discuss how to combine our crafts!`,
+        created_at: new Date().toISOString(),
+        is_read: false,
+      };
+      setSellerMessages((prev) => [...prev, welcomeMsg]);
+      saveSupabaseSellerMessage(welcomeMsg).catch(console.warn);
+    }
+
+    setActiveSellerConversationId(conv.id);
+    setSellerTab('MESSAGES');
+    showNotification(`Collaboration accepted! Conversation initiated with ${req.sender_name}.`);
+  };
+
+  const declineCollaborationRequest = (requestId: string) => {
+    updateCollaborationStatus(requestId, 'DECLINED');
+    showNotification('Collaboration proposal declined.');
+  };
+
+  // Seller Private Messaging
+  const sendSellerMessage = async (conversationId: string, content: string) => {
+    if (!content.trim()) return;
+    const conv = sellerConversations.find((c) => c.id === conversationId);
+    if (!conv) return;
+
+    const myId = user.artisan_profile?.id || user.id;
+    const receiverId = conv.participant_ids.find((id) => id !== myId) || conv.participant_ids[0];
+
+    const newMsg: SellerMessage = {
+      id: `smsg-${Date.now()}`,
+      conversation_id: conversationId,
+      sender_id: myId,
+      sender_name: user.artisan_profile?.name || user.name,
+      receiver_id: receiverId,
+      content: content.trim(),
+      created_at: new Date().toISOString(),
+      is_read: false,
+    };
+
+    setSellerMessages((prev) => [...prev, newMsg]);
+
+    const updatedConv: SellerConversation = {
+      ...conv,
+      last_message: content.trim(),
+      last_message_time: new Date().toISOString(),
+      unread_counts: {
+        ...conv.unread_counts,
+        [receiverId]: (conv.unread_counts[receiverId] || 0) + 1,
+      },
+    };
+
+    setSellerConversations((prev) =>
+      prev.map((c) => (c.id === conversationId ? updatedConv : c))
+    );
+
+    saveSupabaseSellerMessage(newMsg).catch(console.warn);
+    saveSupabaseSellerConversation(updatedConv).catch(console.warn);
+  };
+
+  const markConversationAsRead = (conversationId: string) => {
+    const myId = user.artisan_profile?.id || user.id;
+    setSellerConversations((prev) =>
+      prev.map((c) => {
+        if (c.id === conversationId) {
+          return {
+            ...c,
+            unread_counts: {
+              ...c.unread_counts,
+              [myId]: 0,
+            },
+          };
+        }
+        return c;
+      })
+    );
+
+    setSellerMessages((prev) =>
+      prev.map((m) =>
+        m.conversation_id === conversationId && m.receiver_id === myId ? { ...m, is_read: true } : m
+      )
+    );
+
+    updateSupabaseSellerMessageRead(conversationId, myId).catch(console.warn);
+  };
+
+  const openSellerChatWith = (artisanId: string, collaborationContext?: { id: string; title: string }) => {
+    const targetArtisan = artisansData.find((a) => a.id === artisanId || a.user_id === artisanId);
+    if (!targetArtisan) return;
+
+    const myArtisanId = user.artisan_profile?.id || user.id;
+
+    let conv = sellerConversations.find((c) =>
+      c.participant_ids.includes(targetArtisan.id) && c.participant_ids.includes(myArtisanId)
+    );
+
+    if (!conv) {
+      const newConvId = `conv-${Date.now()}`;
+      conv = {
+        id: newConvId,
+        participant_ids: [myArtisanId, targetArtisan.id],
+        participants: {
+          [myArtisanId]: {
+            artisan_id: myArtisanId,
+            name: user.artisan_profile?.name || user.name,
+            craft: user.artisan_profile?.craft_name || 'Master Artisan',
+            avatar: user.artisan_profile?.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+            region: user.artisan_profile?.state || 'India',
+          },
+          [targetArtisan.id]: {
+            artisan_id: targetArtisan.id,
+            name: targetArtisan.name,
+            craft: targetArtisan.craft_name,
+            avatar: targetArtisan.avatar_url,
+            region: targetArtisan.state,
+          },
+        },
+        collaboration_id: collaborationContext?.id,
+        collaboration_title: collaborationContext?.title,
+        last_message: 'Conversation started',
+        last_message_time: new Date().toISOString(),
+        unread_counts: { [targetArtisan.id]: 0, [myArtisanId]: 0 },
+        created_at: new Date().toISOString(),
+      };
+      setSellerConversations((prev) => [conv!, ...prev]);
+      saveSupabaseSellerConversation(conv).catch(console.warn);
+    }
+
+    setActiveSellerConversationId(conv.id);
+    setSellerTab('MESSAGES');
   };
 
   // Chat
@@ -1124,9 +1577,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         customOrders,
         createCustomOrder,
         updateCustomOrderStatus,
+        sellerTab,
+        setSellerTab,
         collaborationRequests,
         sendCollaborationRequest,
         updateCollaborationStatus,
+        acceptCollaborationRequest,
+        declineCollaborationRequest,
+        sellerConversations,
+        sellerMessages,
+        activeSellerConversationId,
+        setActiveSellerConversationId,
+        sendSellerMessage,
+        markConversationAsRead,
+        openSellerChatWith,
+        activeProfileArtisan,
+        setActiveProfileArtisan,
+        activeCollabArtisan,
+        setActiveCollabArtisan,
         chatMessages,
         sendChatMessage,
         activeChatRecipient,

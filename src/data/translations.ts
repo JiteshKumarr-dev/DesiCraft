@@ -60,6 +60,15 @@ export interface TranslationStrings {
   impactMetrics: string;
   livingHeritageNotice: string;
   languageSelect: string;
+  collaborateWithArtisans?: string;
+  collaborateSubtitle?: string;
+  collaborationRequests?: string;
+  activeCollaborations?: string;
+  messages?: string;
+  writeMessage?: string;
+  viewProfile?: string;
+  startConversation?: string;
+  sendCollaborationRequest?: string;
 }
 
 export const translations: Record<LanguageCode, TranslationStrings> = {

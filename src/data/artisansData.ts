@@ -21,6 +21,20 @@ export const artisansData: ArtisanProfile[] = [
     guild_name: 'Kashi Bunakar Vankar Cooperative Society',
     rating: 4.95,
     reviews_count: 142,
+    skills: ['Kadwa Weaving', 'Jaala Naksha Drafting', 'Gold & Silver Zari Inlay', 'Pit-Loom Setup', 'Silk Warp Dyeing'],
+    collaboration_interests: ['Craft Fusion', 'Joint Collection', 'Product Collaboration', 'Custom Project'],
+    traditional_techniques: ['Supplementary Weft Tapestry', 'Double Weaver Shuttle Interlock', 'Hand-Punched Card Patterning'],
+    materials: ['Pure Mulberry Katan Silk', 'Real Silver Zari Kalabattun', 'Gold-plated Wire', 'Natural Ghee Loom Conditioning'],
+    previous_collaborations: [
+      {
+        title: 'Brocade x Dhokra Minaudière Clutch',
+        partner_name: 'Somnath Ghadwa',
+        partner_craft: 'Bastar Dhokra Bell Metal',
+        year: '2023',
+        image_url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80',
+        description: 'Hand-cast brass tribal clasp on Kadwa silk brocade minaudière box bag.'
+      }
+    ]
   },
   {
     id: 'artisan-lakshmi-pochampally',
@@ -42,6 +56,20 @@ export const artisansData: ArtisanProfile[] = [
     guild_name: 'Pochampally Handloom Weavers Cooperative',
     rating: 4.98,
     reviews_count: 189,
+    skills: ['Double Ikat Math Grid Calculation', 'Rubber-Tying & Resist Bundling', 'Natural Indigo Vat Fermentation', 'Fly-Shuttle Framing'],
+    collaboration_interests: ['Joint Collection', 'Craft Fusion', 'Workshop', 'Skill Exchange'],
+    traditional_techniques: ['Pagdu Bandhu Tie-Dye', 'Asu Wheel Yarn Winding', 'Resist Alignment on Loom'],
+    materials: ['Mercerized Organic Cotton', 'Mulberry Silk', 'Plant-based Natural Indigo', 'Madder Root (Manjistha)'],
+    previous_collaborations: [
+      {
+        title: 'Ikat & Ajrakh Heritage Reversible Stole',
+        partner_name: 'Dr. Ismail Mohammed Khatri',
+        partner_craft: 'Kutch Ajrakh Block Print',
+        year: '2024',
+        image_url: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=400&q=80',
+        description: 'Pochampally warp tied with Ajrakh block-printed borders on organic handloom yardage.'
+      }
+    ]
   },
   {
     id: 'artisan-meenakshi-madhubani',
@@ -63,6 +91,20 @@ export const artisansData: ArtisanProfile[] = [
     guild_name: 'Mithila Mahila Kala Samiti',
     rating: 4.92,
     reviews_count: 98,
+    skills: ['Kachni Fine Hatching', 'Bharni Pigment Filling', 'Organic Botanical Pigment Extraction', 'Bamboo Pen Drawing'],
+    collaboration_interests: ['Product Collaboration', 'Craft Fusion', 'Exhibition', 'Custom Project'],
+    traditional_techniques: ['Nib Drawing with Cowdung-Wash Paper', 'Natural Resin Fixation', 'Freehand Folk Iconography'],
+    materials: ['Handmade Bamboo Paper', 'Lampblack Soot', 'Turmeric Rhizome Extract', 'Aparajita Flower Indigo', 'Neem Gum'],
+    previous_collaborations: [
+      {
+        title: 'Mithila Art on Jaipur Ceramic Platters',
+        partner_name: 'Mahaveer Prasad Sharma',
+        partner_craft: 'Jaipur Blue Pottery',
+        year: '2023',
+        image_url: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=400&q=80',
+        description: 'Underglaze Madhubani Kohbar motifs hand-painted on artisan quartz ceramic platters.'
+      }
+    ]
   },
   {
     id: 'artisan-ismail-kutch',
@@ -84,6 +126,20 @@ export const artisansData: ArtisanProfile[] = [
     guild_name: 'Khamir Craft Collective & Khatri Guild',
     rating: 4.99,
     reviews_count: 220,
+    skills: ['16-Step Ajrakh Block Printing', 'Ancient Indigo Vat Fermentation', 'Carved Teak Block Registration', 'Alum & Harda Mordanting'],
+    collaboration_interests: ['Joint Collection', 'Product Collaboration', 'Workshop', 'Skill Exchange'],
+    traditional_techniques: ['Saaj Camel Dung Scouring', 'Pith Resist Printing', 'Kariyan Black Iron-Jaggery Etching'],
+    materials: ['Kala Cotton Handspun Fabric', 'Natural Fermented Indigo', 'Pomegranate Rind (Dhavadi)', 'Tamarind Seed Resist Paste'],
+    previous_collaborations: [
+      {
+        title: 'Ajrakh Indigo Linen & Pashmina Wraps',
+        partner_name: 'Syed Ghulam Rasool',
+        partner_craft: 'Kashmir Pashmina & Kani Weaving',
+        year: '2023',
+        image_url: 'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?auto=format&fit=crop&w=400&q=80',
+        description: 'Resist block-printed borders on hand-spun Changthangi pashmina shawls.'
+      }
+    ]
   },
   {
     id: 'artisan-kripal-jaipur',
@@ -105,6 +161,20 @@ export const artisansData: ArtisanProfile[] = [
     guild_name: 'Jaipur Traditional Blue Pottery Guild',
     rating: 4.88,
     reviews_count: 115,
+    skills: ['Clayless Quartz Dough Kneading', 'Squirrel Hair Brush Painting', 'Cobalt & Copper Oxide Formulation', 'Wood-fired Kiln Glazing'],
+    collaboration_interests: ['Product Collaboration', 'Custom Project', 'Craft Fusion', 'Exhibition'],
+    traditional_techniques: ['Open Mold Hand Pressing', 'Natural Sajji Alkaline Glaze', 'Traditional Arabesque Islimi Motifs'],
+    materials: ['Powdered Quartz Rock', 'Recycled Cullet Glass', 'Multani Mitti (Fullers Earth)', 'Natural Katira Gum', 'Cobalt Oxide'],
+    previous_collaborations: [
+      {
+        title: 'Mithila Ceramic Tableware Collection',
+        partner_name: 'Meenakshi Kumari Jha',
+        partner_craft: 'Mithila / Madhubani Painting',
+        year: '2023',
+        image_url: 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=400&q=80',
+        description: 'Bespoke Blue Pottery dinner sets decorated with hand-rendered Mithila folklore.'
+      }
+    ]
   },
   {
     id: 'artisan-somnath-bastar',
@@ -126,6 +196,20 @@ export const artisansData: ArtisanProfile[] = [
     guild_name: 'Bastar Ghadwa Shilp Sangh',
     rating: 4.96,
     reviews_count: 167,
+    skills: ['Cire Perdue Lost-Wax Modeling', 'Beeswax Wire Extrusion', 'Clay Core Molding', 'Bellows Charcoal Pit Smelting'],
+    collaboration_interests: ['Product Collaboration', 'Craft Fusion', 'Custom Project', 'Exhibition'],
+    traditional_techniques: ['Natural Resin Coil Wrapping', 'Lost Wax Clay Encasement', 'Pit Hearth Scrap Brass Pouring'],
+    materials: ['Wild Forest Beeswax', 'Dammar Resin (Ral)', 'Mahanadi River Silt', 'Recycled Bell Metal & Brass'],
+    previous_collaborations: [
+      {
+        title: 'Kadwa Silk & Cast Brass Evening Clutches',
+        partner_name: 'Master Rajeshwar Ansari',
+        partner_craft: 'Varanasi Zari & Brocade',
+        year: '2023',
+        image_url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80',
+        description: 'Lost-wax sculpted tribal brass frames mounted on Varanasi brocade silk.'
+      }
+    ]
   },
   {
     id: 'artisan-syed-kashmir',
@@ -140,12 +224,26 @@ export const artisansData: ArtisanProfile[] = [
     craft_story: 'When winter snow blankets Srinagar, we sit beside the Kangri heater and our fingers dance with tiny wooden Kani sticks. A coded verse called "Talim" is chanted aloud by the master, guiding which colored spool goes where. A single Kani Jamawar shawl can require two craftsmen weaving six hours a day for nine whole months. You are not buying fabric; you are wearing someone’s lifetime of devotion.',
     story_audio_url: 'https://cdn.freesound.org/previews/518/518882_11861866-lq.mp3',
     learning_available: true,
-    collaboration_available: false,
+    collaboration_available: true,
     verification_status: 'VERIFIED',
     languages_spoken: ['Kashmiri', 'Urdu', 'Hindi', 'English'],
     avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80',
     guild_name: 'Kashmir Artisans Welfare Guild',
     rating: 4.97,
     reviews_count: 134,
+    skills: ['Kani Eyeless Bobbin Interlocking', 'Talim Coded Script Transcription', 'Pashmina Charkha Hand-Spinning', 'Sozni Needle Embroidery'],
+    collaboration_interests: ['Joint Collection', 'Craft Fusion', 'Custom Project', 'Skill Exchange'],
+    traditional_techniques: ['Hand-Chanted Talim Weaving', 'Natural Saffron & Walnut Husk Dyeing', 'River Jhelum Washing Finish'],
+    materials: ['Changthangi Mountain Goat Cashmere (12-14 Micron)', 'Natural Walnut Rind Dye', 'Saffron Stigma Extracts'],
+    previous_collaborations: [
+      {
+        title: 'Ajrakh Bordered Changthangi Shawls',
+        partner_name: 'Dr. Ismail Mohammed Khatri',
+        partner_craft: 'Kutch Ajrakh Block Print',
+        year: '2023',
+        image_url: 'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?auto=format&fit=crop&w=400&q=80',
+        description: 'Zero-chemical block printed borders hand-applied onto pure Kani Pashmina shawls.'
+      }
+    ]
   },
 ];

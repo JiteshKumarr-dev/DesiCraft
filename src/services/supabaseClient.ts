@@ -11,6 +11,8 @@ import {
   ChatMessage,
   LanguageCode,
   UserMode,
+  SellerConversation,
+  SellerMessage,
 } from '../types';
 
 // Supabase Project Credentials
@@ -560,3 +562,95 @@ export function subscribeToSupabaseChat(onNewMessage: (msg: ChatMessage) => void
     return () => {};
   }
 }
+
+/**
+ * Seller-to-Seller Conversations Persistence & Realtime
+ */
+export async function fetchSupabaseSellerConversations(): Promise<SellerConversation[] | null> {
+  try {
+    const { data, error } = await supabase
+      .from('seller_conversations')
+      .select('*')
+      .order('last_message_time', { ascending: false });
+    if (error) return null;
+    return data as SellerConversation[];
+  } catch {
+    return null;
+  }
+}
+
+export async function saveSupabaseSellerConversation(conv: SellerConversation): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('seller_conversations').upsert(conv);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Seller-to-Seller Messages Persistence & Realtime
+ */
+export async function fetchSupabaseSellerMessages(conversationId?: string): Promise<SellerMessage[] | null> {
+  try {
+    let query = supabase
+      .from('seller_messages')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (conversationId) {
+      query = query.eq('conversation_id', conversationId);
+    }
+    const { data, error } = await query;
+    if (error) return null;
+    return data as SellerMessage[];
+  } catch {
+    return null;
+  }
+}
+
+export async function saveSupabaseSellerMessage(msg: SellerMessage): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('seller_messages').insert(msg);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+export async function updateSupabaseSellerMessageRead(conversationId: string, currentUserId: string): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('seller_messages')
+      .update({ is_read: true })
+      .eq('conversation_id', conversationId)
+      .eq('receiver_id', currentUserId);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+export function subscribeToSupabaseSellerMessages(onNewMessage: (msg: SellerMessage) => void) {
+  try {
+    const channel = supabase
+      .channel('public:seller_messages')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'seller_messages' },
+        (payload) => {
+          if (payload.new) {
+            onNewMessage(payload.new as SellerMessage);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  } catch (err) {
+    console.warn('[Supabase Realtime] Seller messages subscription fallback:', err);
+    return () => {};
+  }
+}
+

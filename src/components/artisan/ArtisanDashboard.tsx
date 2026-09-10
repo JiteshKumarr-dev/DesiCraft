@@ -19,8 +19,14 @@ import {
   Truck,
   Trash2,
   ExternalLink,
+  LayoutDashboard,
+  ShoppingBag,
+  Sparkles,
+  MessageSquare,
+  UserCheck,
 } from 'lucide-react';
-import { CollaborationHub } from './CollaborationHub';
+import { CollaborationDiscoveryPage } from './CollaborationDiscoveryPage';
+import { SellerMessagesPage } from './SellerMessagesPage';
 import { DemandPulse } from './DemandPulse';
 import { GovernmentNavigator } from './GovernmentNavigator';
 import { EditArtisanProfileModal } from './EditArtisanProfileModal';
@@ -41,10 +47,13 @@ export const ArtisanDashboard: React.FC = () => {
     customOrders,
     updateCustomOrderStatus,
     openChatWith,
+    sellerTab,
+    setSellerTab,
+    collaborationRequests,
+    sellerConversations,
     t,
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'ORDERS' | 'COMMISSIONS' | 'CATALOG' | 'ANALYTICS' | 'COLLAB' | 'DEMAND' | 'GOVT'>('ORDERS');
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   // Filter products by artisan user
@@ -53,8 +62,45 @@ export const ArtisanDashboard: React.FC = () => {
   );
 
   const totalEarnings = orders.reduce((sum, o) => sum + o.total_price, 0);
-
   const orderStatuses: OrderStatus[] = ['ORDERED', 'ACCEPTED', 'PREPARING', 'SHIPPED', 'DELIVERED'];
+
+  // Summary Counters for Collaboration
+  const myId = user.artisan_profile?.id || user.id;
+  const pendingRequestsCount = collaborationRequests.filter(
+    (r) => r.receiver_artisan_id === myId && r.status === 'PENDING'
+  ).length;
+
+  const activeCollaborationsCount = collaborationRequests.filter(
+    (r) => r.status === 'ACCEPTED' && (r.sender_artisan_id === myId || r.receiver_artisan_id === myId)
+  ).length;
+
+  const unreadMessagesCount = sellerConversations.reduce(
+    (sum, c) => sum + (c.unread_counts[myId] || 0),
+    0
+  );
+
+  const SELLER_NAV_ITEMS = [
+    { id: 'DASHBOARD' as const, label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'CATALOG' as const, label: 'My Products', icon: Package },
+    { id: 'ORDERS' as const, label: 'Orders', icon: ShoppingBag, badge: orders.length },
+    { id: 'AISTUDIO' as const, label: 'AI Studio', icon: Sparkles },
+    { id: 'OPPORTUNITIES' as const, label: 'Opportunities', icon: Building2 },
+    {
+      id: 'COLLABORATE' as const,
+      label: 'Collaborate',
+      icon: Handshake,
+      badge: pendingRequestsCount > 0 ? pendingRequestsCount : undefined,
+      guide: 'seller-collaborate-tab',
+    },
+    {
+      id: 'MESSAGES' as const,
+      label: 'Messages',
+      icon: MessageSquare,
+      badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined,
+      guide: 'seller-messages-tab',
+    },
+    { id: 'PROFILE' as const, label: 'Profile', icon: ShieldCheck },
+  ];
 
   return (
     <div className="space-y-8 pb-16 animate-fadeIn">
@@ -75,7 +121,7 @@ export const ArtisanDashboard: React.FC = () => {
           </h1>
 
           <p className="text-xs sm:text-sm text-on-surface-variant max-w-xl">
-            Guild: <strong>{user.artisan_profile?.guild_name || 'Kashi Bunakar Vankar Cooperative'}</strong> • Manage looms, verify digital craft passports, and create listings with your voice.
+            Guild: <strong>{user.artisan_profile?.guild_name || 'Kashi Bunakar Vankar Cooperative'}</strong> • Manage looms, verify digital craft passports, collaborate with fellow artisans, and create listings with your voice.
           </p>
         </div>
 
@@ -100,246 +146,306 @@ export const ArtisanDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-on-surface-variant uppercase">
-              {t.activeOrders}
-            </span>
-            <Package className="w-4 h-4 text-primary" />
-          </div>
-          <p className="font-serif text-2xl font-bold text-on-surface">{orders.length}</p>
-          <span className="text-[11px] text-green-700 font-medium">100% on-time fulfillment</span>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-on-surface-variant uppercase">
-              {t.totalEarnings}
-            </span>
-            <DollarSign className="w-4 h-4 text-green-700" />
-          </div>
-          <p className="font-serif text-2xl font-bold text-primary">
-            ₹{totalEarnings.toLocaleString('en-IN')}
-          </p>
-          <span className="text-[11px] text-on-surface-variant">Direct to Bank / UPI</span>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-on-surface-variant uppercase">
-              GI Passports Minted
-            </span>
-            <Award className="w-4 h-4 text-secondary" />
-          </div>
-          <p className="font-serif text-2xl font-bold text-secondary">{passports.length}</p>
-          <span className="text-[11px] text-secondary font-medium">Cryptographically Verified</span>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-on-surface-variant uppercase">
-              Heritage Impact Score
-            </span>
-            <ShieldCheck className="w-4 h-4 text-primary" />
-          </div>
-          <p className="font-serif text-2xl font-bold text-on-surface">99.4 / 100</p>
-          <span className="text-[11px] text-primary font-medium">Master Artisan Tier</span>
-        </div>
-      </div>
-
-      {/* Studio Tool Action Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <button
-          onClick={() => setIsVoiceCreatorOpen(true)}
-          className="p-5 rounded-2xl bg-surface border border-primary/30 hover:border-primary transition shadow-xs text-left space-y-2 cursor-pointer group"
-        >
-          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition">
-            <Mic className="w-5 h-5" />
-          </div>
-          <h3 className="font-serif font-bold text-sm text-on-surface">
-            Voice Product Creator
-          </h3>
-          <p className="text-xs text-on-surface-variant leading-relaxed">
-            Speak in any Indian language. AI creates listing specs, materials, and fair pricing.
-          </p>
-        </button>
-
-        <button
-          data-guide="fair-price-advisor-trigger"
-          onClick={() => setIsPriceAdvisorOpen(true)}
-          className="p-5 rounded-2xl bg-surface border border-outline/20 hover:border-primary transition shadow-xs text-left space-y-2 cursor-pointer group"
-        >
-          <div className="w-10 h-10 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center group-hover:scale-105 transition">
-            <DollarSign className="w-5 h-5" />
-          </div>
-          <h3 className="font-serif font-bold text-sm text-on-surface">
-            AI Fair Price Advisor
-          </h3>
-          <p className="text-xs text-on-surface-variant leading-relaxed">
-            Calculate equitable prices covering labor hours, living wages, and GI lineage.
-          </p>
-        </button>
-
-        <button
-          data-guide="ai-enhancer-trigger"
-          onClick={() => setIsPhotoEnhancerOpen(true)}
-          className="p-5 rounded-2xl bg-surface border border-outline/20 hover:border-primary transition shadow-xs text-left space-y-2 cursor-pointer group"
-        >
-          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition">
-            <SunMedium className="w-5 h-5" />
-          </div>
-          <h3 className="font-serif font-bold text-sm text-on-surface">
-            Studio Lighting Enhancer
-          </h3>
-          <p className="text-xs text-on-surface-variant leading-relaxed">
-            Transform raw loom workshop photos into diffused studio-grade gallery shots.
-          </p>
-        </button>
-      </div>
-
-      {/* Tabs Navigation */}
+      {/* Unified Seller Mode Navigation Bar */}
       <div className="flex gap-2 overflow-x-auto border-b border-outline/20 pb-3 no-scrollbar">
-        {[
-          { id: 'ORDERS', label: 'Active Loom Orders' },
-          { id: 'COMMISSIONS', label: `Bespoke Commissions (${customOrders.length})` },
-          { id: 'CATALOG', label: 'Loom Inventory & GI Passports' },
-          { id: 'ANALYTICS', label: 'Analytics & DBT Payouts' },
-          { id: 'COLLAB', label: 'Artisan Synergy Hub' },
-          { id: 'DEMAND', label: 'Demand Pulse Intelligence' },
-          { id: 'GOVT', label: 'PM Vishwakarma & Grants' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            {...(tab.id === 'DEMAND' ? { 'data-guide': 'demand-predictor-card' } : {})}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition whitespace-nowrap cursor-pointer ${
-              activeTab === tab.id
-                ? 'bg-primary text-on-primary shadow-xs'
-                : 'bg-surface border border-outline/20 text-on-surface hover:bg-surface-container'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {SELLER_NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive = sellerTab === item.id;
+
+          return (
+            <button
+              key={item.id}
+              {...(item.guide ? { 'data-guide': item.guide } : {})}
+              onClick={() => {
+                if (item.id === 'PROFILE') {
+                  setIsEditProfileOpen(true);
+                } else {
+                  setSellerTab(item.id);
+                }
+              }}
+              className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                isActive
+                  ? 'bg-primary text-on-primary shadow-sm'
+                  : 'bg-surface border border-outline/20 text-on-surface hover:bg-surface-container'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{item.label}</span>
+              {item.badge !== undefined && item.badge > 0 && (
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    isActive ? 'bg-white text-primary' : 'bg-primary text-white'
+                  }`}
+                >
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Tab Panels */}
-      {activeTab === 'COLLAB' ? (
-        <CollaborationHub />
-      ) : activeTab === 'DEMAND' ? (
-        <DemandPulse />
-      ) : activeTab === 'GOVT' ? (
-        <GovernmentNavigator />
-      ) : activeTab === 'COMMISSIONS' ? (
-        /* Bespoke Customer Commissions */
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-serif text-lg font-bold text-on-surface">
-                Incoming Bespoke Patron Commissions ({customOrders.length})
-              </h3>
-              <p className="text-xs text-on-surface-variant">
-                Direct commission requests from patrons seeking custom handwoven or handcrafted masterpieces.
+      {/* TAB PANEL 1: DASHBOARD */}
+      {sellerTab === 'DASHBOARD' && (
+        <div className="space-y-8 animate-fadeIn">
+          {/* Metrics Row */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-on-surface-variant uppercase">
+                  {t.activeOrders}
+                </span>
+                <Package className="w-4 h-4 text-primary" />
+              </div>
+              <p className="font-serif text-2xl font-bold text-on-surface">{orders.length}</p>
+              <span className="text-[11px] text-green-700 font-medium">100% on-time fulfillment</span>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-on-surface-variant uppercase">
+                  {t.totalEarnings}
+                </span>
+                <DollarSign className="w-4 h-4 text-green-700" />
+              </div>
+              <p className="font-serif text-2xl font-bold text-primary">
+                ₹{totalEarnings.toLocaleString('en-IN')}
               </p>
+              <span className="text-[11px] text-on-surface-variant">Direct to Bank / UPI</span>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-on-surface-variant uppercase">
+                  GI Passports Minted
+                </span>
+                <Award className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="font-serif text-2xl font-bold text-secondary">{passports.length}</p>
+              <span className="text-[11px] text-secondary font-medium">Cryptographically Verified</span>
+            </div>
+
+            <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-on-surface-variant uppercase">
+                  Heritage Impact Score
+                </span>
+                <ShieldCheck className="w-4 h-4 text-primary" />
+              </div>
+              <p className="font-serif text-2xl font-bold text-on-surface">99.4 / 100</p>
+              <span className="text-[11px] text-primary font-medium">Master Artisan Tier</span>
             </div>
           </div>
 
-          <div className="space-y-4">
-            {customOrders.map((order) => (
-              <div
-                key={order.id}
-                className="p-6 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-4"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/10 pb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-serif font-bold text-sm text-on-surface">
-                        {order.customer_name}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
-                        {order.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-primary font-semibold mt-0.5">
-                      Target Craft: {order.craft_name}
-                    </p>
-                  </div>
-
-                  <div className="text-left sm:text-right">
-                    <span className="text-xs text-on-surface-variant">Patron Budget Range</span>
-                    <p className="font-serif text-base font-bold text-primary">
-                      ₹{order.budget_min.toLocaleString('en-IN')} – ₹{order.budget_max.toLocaleString('en-IN')}
-                    </p>
-                  </div>
+          {/* SELLER DASHBOARD SUMMARY CARD: COLLABORATION */}
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-surface to-surface-container border border-amber-500/30 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-800 dark:text-amber-200 border border-amber-500/30">
+                  <Handshake className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                 </div>
-
-                <p className="text-xs sm:text-sm text-on-surface leading-relaxed italic bg-surface-container-low p-3.5 rounded-xl border border-outline/10">
-                  "{order.description}"
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-2.5 rounded-lg bg-surface-container-low border border-outline/10">
-                    <span className="text-[10px] uppercase font-semibold text-on-surface-variant block">
-                      Preferred Indigenous Materials:
-                    </span>
-                    <span className="font-medium text-on-surface mt-0.5 block">
-                      {order.material_preference}
-                    </span>
-                  </div>
-
-                  <div className="p-2.5 rounded-lg bg-surface-container-low border border-outline/10">
-                    <span className="text-[10px] uppercase font-semibold text-on-surface-variant block">
-                      Required Delivery Deadline:
-                    </span>
-                    <span className="font-medium text-on-surface mt-0.5 block flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-primary" />
-                      {new Date(order.deadline).toLocaleDateString('en-IN', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-outline/10 flex items-center justify-between gap-3">
-                  <button
-                    onClick={() =>
-                      openChatWith({
-                        id: order.customer_id,
-                        name: order.customer_name,
-                      })
-                    }
-                    className="text-xs font-semibold text-primary hover:underline cursor-pointer"
-                  >
-                    Chat with Patron in Mother Tongue
-                  </button>
-
-                  <div className="flex items-center gap-2">
-                    {order.status === 'OPEN' && (
-                      <button
-                        onClick={() => updateCustomOrderStatus(order.id, 'ACCEPTED')}
-                        className="px-4 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs cursor-pointer"
-                      >
-                        Accept & Commit to Loom
-                      </button>
-                    )}
-                    {order.status === 'ACCEPTED' && (
-                      <span className="text-green-700 font-bold text-xs flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4" /> Commission Active on Loom
-                      </span>
-                    )}
-                  </div>
+                <div>
+                  <h3 className="text-lg font-bold font-serif text-on-surface">Collaboration</h3>
+                  <p className="text-xs text-on-surface-variant">
+                    Inter-craft partnerships, joint collections & direct messaging with creators
+                  </p>
                 </div>
               </div>
-            ))}
+
+              <button
+                onClick={() => setSellerTab('COLLABORATE')}
+                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-primary text-white text-xs font-bold shadow hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <span>Open Collaborations</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-outline/10">
+              <button
+                onClick={() => setSellerTab('COLLABORATE')}
+                className="p-4 rounded-2xl bg-surface border border-outline/15 hover:border-amber-500/40 text-left transition-colors cursor-pointer group"
+              >
+                <span className="text-xs font-medium text-on-surface-variant block">Pending Requests</span>
+                <p className="text-2xl font-bold font-serif text-amber-600 dark:text-amber-400 mt-1">
+                  {pendingRequestsCount}
+                </p>
+                <span className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold group-hover:underline inline-block mt-0.5">
+                  Review proposals →
+                </span>
+              </button>
+
+              <button
+                onClick={() => setSellerTab('COLLABORATE')}
+                className="p-4 rounded-2xl bg-surface border border-outline/15 hover:border-emerald-500/40 text-left transition-colors cursor-pointer group"
+              >
+                <span className="text-xs font-medium text-on-surface-variant block">Active Collaborations</span>
+                <p className="text-2xl font-bold font-serif text-emerald-600 dark:text-emerald-400 mt-1">
+                  {activeCollaborationsCount}
+                </p>
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold group-hover:underline inline-block mt-0.5">
+                  View active work →
+                </span>
+              </button>
+
+              <button
+                onClick={() => setSellerTab('MESSAGES')}
+                className="p-4 rounded-2xl bg-surface border border-outline/15 hover:border-primary/40 text-left transition-colors cursor-pointer group"
+              >
+                <span className="text-xs font-medium text-on-surface-variant block">Unread Messages</span>
+                <p className="text-2xl font-bold font-serif text-primary mt-1">
+                  {unreadMessagesCount}
+                </p>
+                <span className="text-[10px] text-primary font-semibold group-hover:underline inline-block mt-0.5">
+                  Open chat inbox →
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Studio Tool Action Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button
+              onClick={() => setIsVoiceCreatorOpen(true)}
+              className="p-5 rounded-2xl bg-surface border border-primary/30 hover:border-primary transition shadow-xs text-left space-y-2 cursor-pointer group"
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition">
+                <Mic className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif font-bold text-sm text-on-surface">
+                Voice Product Creator
+              </h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Speak in any Indian language. AI creates listing specs, materials, and fair pricing.
+              </p>
+            </button>
+
+            <button
+              data-guide="fair-price-advisor-trigger"
+              onClick={() => setIsPriceAdvisorOpen(true)}
+              className="p-5 rounded-2xl bg-surface border border-outline/20 hover:border-primary transition shadow-xs text-left space-y-2 cursor-pointer group"
+            >
+              <div className="w-10 h-10 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center group-hover:scale-105 transition">
+                <DollarSign className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif font-bold text-sm text-on-surface">
+                AI Fair Price Advisor
+              </h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Calculate equitable prices covering labor hours, living wages, and GI lineage.
+              </p>
+            </button>
+
+            <button
+              data-guide="ai-enhancer-trigger"
+              onClick={() => setIsPhotoEnhancerOpen(true)}
+              className="p-5 rounded-2xl bg-surface border border-outline/20 hover:border-primary transition shadow-xs text-left space-y-2 cursor-pointer group"
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition">
+                <SunMedium className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif font-bold text-sm text-on-surface">
+                Studio Lighting Enhancer
+              </h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Transform raw loom workshop photos into diffused studio-grade gallery shots.
+              </p>
+            </button>
+          </div>
+
+          {/* Active Orders & Loom Fulfillment Preview */}
+          <div className="space-y-4" data-guide="orders-management-section">
+            <div className="flex items-center justify-between">
+              <h3 className="font-serif text-lg font-bold text-on-surface">
+                Active Loom Fulfillment ({orders.length})
+              </h3>
+              <button
+                onClick={() => setSellerTab('ORDERS')}
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                View all orders <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {orders.slice(0, 3).map((order) => (
+                <div
+                  key={order.id}
+                  className="p-6 rounded-2xl bg-surface border border-outline/20 space-y-4 shadow-xs"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/10 pb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-sm text-on-surface">
+                          {order.id}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
+                          {order.order_status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-on-surface-variant mt-0.5">
+                        Customer: <strong>{order.customer_name}</strong> ({order.shipping_address.city}, {order.shipping_address.state})
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-xs text-on-surface-variant">Order Value</span>
+                      <p className="font-serif text-lg font-bold text-primary">
+                        ₹{order.total_price.toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Status Stepper */}
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-semibold text-on-surface-variant uppercase">
+                      Loom Stage Progress:
+                    </span>
+                    <div className="grid grid-cols-5 gap-1.5 sm:gap-3 text-center">
+                      {orderStatuses.map((st, idx) => {
+                        const currentIdx = orderStatuses.indexOf(order.order_status);
+                        const isComplete = idx <= currentIdx;
+                        const isCurrent = idx === currentIdx;
+
+                        return (
+                          <button
+                            key={st}
+                            onClick={() => updateOrderStatus(order.id, st)}
+                            className={`p-2 rounded-xl text-[10px] sm:text-xs font-semibold border transition cursor-pointer ${
+                              isCurrent
+                                ? 'bg-primary text-on-primary border-primary shadow-xs'
+                                : isComplete
+                                ? 'bg-green-50 text-green-800 border-green-300'
+                                : 'bg-surface-container-low text-on-surface-variant border-outline/20 hover:bg-surface-container'
+                            }`}
+                          >
+                            {isComplete && !isCurrent ? '✓ ' : ''}
+                            {st}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Items & Shipping */}
+                  <div className="p-3 rounded-xl bg-surface-container-low border border-outline/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <span className="text-on-surface-variant">
+                      Item: <strong>{order.items[0]?.product_name}</strong>
+                    </span>
+                    <span className="font-mono text-primary">
+                      Tracking: {order.tracking_id}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      ) : activeTab === 'CATALOG' ? (
-        /* Inventory and Passports */
-        <div className="space-y-4">
+      )}
+
+      {/* TAB PANEL 2: MY PRODUCTS (CATALOG) */}
+      {sellerTab === 'CATALOG' && (
+        <div className="space-y-4 animate-fadeIn">
           <div className="flex items-center justify-between">
             <h3 className="font-serif text-lg font-bold text-on-surface">
               Active Handcrafted Inventory ({myProducts.length})
@@ -406,87 +512,238 @@ export const ArtisanDashboard: React.FC = () => {
             })}
           </div>
         </div>
-      ) : activeTab === 'ANALYTICS' ? (
-        <StudioAnalytics />
-      ) : (
-        /* Orders & Fulfillment Stepper */
-        <div className="space-y-4" data-guide="orders-management-section">
-          <h3 className="font-serif text-lg font-bold text-on-surface">
-            Active Loom Fulfillment ({orders.length})
-          </h3>
+      )}
 
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <div
-                key={order.id}
-                className="p-6 rounded-2xl bg-surface border border-outline/20 space-y-4 shadow-xs"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/10 pb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-sm text-on-surface">
-                        {order.id}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
-                        {order.order_status}
-                      </span>
+      {/* TAB PANEL 3: ORDERS & COMMISSIONS */}
+      {sellerTab === 'ORDERS' && (
+        <div className="space-y-8 animate-fadeIn">
+          {/* Loom Orders */}
+          <div className="space-y-4" data-guide="orders-management-section">
+            <h3 className="font-serif text-lg font-bold text-on-surface">
+              Active Loom Fulfillment ({orders.length})
+            </h3>
+
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <div
+                  key={order.id}
+                  className="p-6 rounded-2xl bg-surface border border-outline/20 space-y-4 shadow-xs"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/10 pb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-sm text-on-surface">
+                          {order.id}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
+                          {order.order_status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-on-surface-variant mt-0.5">
+                        Customer: <strong>{order.customer_name}</strong> ({order.shipping_address.city}, {order.shipping_address.state})
+                      </p>
                     </div>
-                    <p className="text-xs text-on-surface-variant mt-0.5">
-                      Customer: <strong>{order.customer_name}</strong> ({order.shipping_address.city}, {order.shipping_address.state})
-                    </p>
+
+                    <div className="text-right">
+                      <span className="text-xs text-on-surface-variant">Order Value</span>
+                      <p className="font-serif text-lg font-bold text-primary">
+                        ₹{order.total_price.toLocaleString('en-IN')}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="text-right">
-                    <span className="text-xs text-on-surface-variant">Order Value</span>
-                    <p className="font-serif text-lg font-bold text-primary">
-                      ₹{order.total_price.toLocaleString('en-IN')}
-                    </p>
+                  {/* Status Stepper */}
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-semibold text-on-surface-variant uppercase">
+                      Loom Stage Progress:
+                    </span>
+                    <div className="grid grid-cols-5 gap-1.5 sm:gap-3 text-center">
+                      {orderStatuses.map((st, idx) => {
+                        const currentIdx = orderStatuses.indexOf(order.order_status);
+                        const isComplete = idx <= currentIdx;
+                        const isCurrent = idx === currentIdx;
+
+                        return (
+                          <button
+                            key={st}
+                            onClick={() => updateOrderStatus(order.id, st)}
+                            className={`p-2 rounded-xl text-[10px] sm:text-xs font-semibold border transition cursor-pointer ${
+                              isCurrent
+                                ? 'bg-primary text-on-primary border-primary shadow-xs'
+                                : isComplete
+                                ? 'bg-green-50 text-green-800 border-green-300'
+                                : 'bg-surface-container-low text-on-surface-variant border-outline/20 hover:bg-surface-container'
+                            }`}
+                          >
+                            {isComplete && !isCurrent ? '✓ ' : ''}
+                            {st}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Items & Shipping */}
+                  <div className="p-3 rounded-xl bg-surface-container-low border border-outline/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                    <span className="text-on-surface-variant">
+                      Item: <strong>{order.items[0]?.product_name}</strong>
+                    </span>
+                    <span className="font-mono text-primary">
+                      Tracking: {order.tracking_id}
+                    </span>
                   </div>
                 </div>
-
-                {/* Status Stepper */}
-                <div className="space-y-2">
-                  <span className="text-[11px] font-semibold text-on-surface-variant uppercase">
-                    Loom Stage Progress:
-                  </span>
-                  <div className="grid grid-cols-5 gap-1.5 sm:gap-3 text-center">
-                    {orderStatuses.map((st, idx) => {
-                      const currentIdx = orderStatuses.indexOf(order.order_status);
-                      const isComplete = idx <= currentIdx;
-                      const isCurrent = idx === currentIdx;
-
-                      return (
-                        <button
-                          key={st}
-                          onClick={() => updateOrderStatus(order.id, st)}
-                          className={`p-2 rounded-xl text-[10px] sm:text-xs font-semibold border transition cursor-pointer ${
-                            isCurrent
-                              ? 'bg-primary text-on-primary border-primary shadow-xs'
-                              : isComplete
-                              ? 'bg-green-50 text-green-800 border-green-300'
-                              : 'bg-surface-container-low text-on-surface-variant border-outline/20 hover:bg-surface-container'
-                          }`}
-                        >
-                          {isComplete && !isCurrent ? '✓ ' : ''}
-                          {st}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Items & Shipping */}
-                <div className="p-3 rounded-xl bg-surface-container-low border border-outline/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                  <span className="text-on-surface-variant">
-                    Item: <strong>{order.items[0]?.product_name}</strong>
-                  </span>
-                  <span className="font-mono text-primary">
-                    Tracking: {order.tracking_id}
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          {/* Bespoke Customer Commissions */}
+          <div className="space-y-4 pt-6 border-t border-outline/15">
+            <h3 className="font-serif text-lg font-bold text-on-surface">
+              Incoming Bespoke Patron Commissions ({customOrders.length})
+            </h3>
+            <div className="space-y-4">
+              {customOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="p-6 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-4"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/10 pb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-serif font-bold text-sm text-on-surface">
+                          {order.customer_name}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
+                          {order.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-primary font-semibold mt-0.5">
+                        Target Craft: {order.craft_name}
+                      </p>
+                    </div>
+
+                    <div className="text-left sm:text-right">
+                      <span className="text-xs text-on-surface-variant">Patron Budget Range</span>
+                      <p className="font-serif text-base font-bold text-primary">
+                        ₹{order.budget_min.toLocaleString('en-IN')} – ₹{order.budget_max.toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-on-surface leading-relaxed italic bg-surface-container-low p-3.5 rounded-xl border border-outline/10">
+                    "{order.description}"
+                  </p>
+
+                  <div className="pt-2 border-t border-outline/10 flex items-center justify-between gap-3">
+                    <button
+                      onClick={() =>
+                        openChatWith({
+                          id: order.customer_id,
+                          name: order.customer_name,
+                        })
+                      }
+                      className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+                    >
+                      Chat with Patron in Mother Tongue
+                    </button>
+
+                    <div className="flex items-center gap-2">
+                      {order.status === 'OPEN' && (
+                        <button
+                          onClick={() => updateCustomOrderStatus(order.id, 'ACCEPTED')}
+                          className="px-4 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs cursor-pointer"
+                        >
+                          Accept & Commit to Loom
+                        </button>
+                      )}
+                      {order.status === 'ACCEPTED' && (
+                        <span className="text-green-700 font-bold text-xs flex items-center gap-1">
+                          <CheckCircle2 className="w-4 h-4" /> Commission Active on Loom
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB PANEL 4: AI STUDIO */}
+      {sellerTab === 'AISTUDIO' && (
+        <div className="space-y-8 animate-fadeIn">
+          {/* Studio Tool Action Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button
+              onClick={() => setIsVoiceCreatorOpen(true)}
+              className="p-6 rounded-3xl bg-surface border border-primary/30 hover:border-primary transition shadow-xs text-left space-y-3 cursor-pointer group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition">
+                <Mic className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif font-bold text-base text-on-surface">
+                Voice Product Creator
+              </h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Speak in any Indian language. AI creates listing specs, materials, and fair pricing.
+              </p>
+            </button>
+
+            <button
+              onClick={() => setIsPriceAdvisorOpen(true)}
+              className="p-6 rounded-3xl bg-surface border border-outline/20 hover:border-primary transition shadow-xs text-left space-y-3 cursor-pointer group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-secondary/15 text-secondary flex items-center justify-center group-hover:scale-105 transition">
+                <DollarSign className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif font-bold text-base text-on-surface">
+                AI Fair Price Advisor
+              </h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Calculate equitable prices covering labor hours, living wages, and GI lineage.
+              </p>
+            </button>
+
+            <button
+              onClick={() => setIsPhotoEnhancerOpen(true)}
+              className="p-6 rounded-3xl bg-surface border border-outline/20 hover:border-primary transition shadow-xs text-left space-y-3 cursor-pointer group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-105 transition">
+                <SunMedium className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif font-bold text-base text-on-surface">
+                Studio Lighting Enhancer
+              </h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                Transform raw loom workshop photos into diffused studio-grade gallery shots.
+              </p>
+            </button>
+          </div>
+
+          <DemandPulse />
+        </div>
+      )}
+
+      {/* TAB PANEL 5: OPPORTUNITIES & GOVERNMENT SCHEMES */}
+      {sellerTab === 'OPPORTUNITIES' && (
+        <div className="animate-fadeIn">
+          <GovernmentNavigator />
+        </div>
+      )}
+
+      {/* TAB PANEL 6: COLLABORATE WITH ARTISANS (NEW) */}
+      {sellerTab === 'COLLABORATE' && (
+        <div className="animate-fadeIn">
+          <CollaborationDiscoveryPage />
+        </div>
+      )}
+
+      {/* TAB PANEL 7: SELLER MESSAGES PAGE (NEW) */}
+      {sellerTab === 'MESSAGES' && (
+        <div className="animate-fadeIn">
+          <SellerMessagesPage />
         </div>
       )}
 
