@@ -1,5 +1,6 @@
 // Desi Craft - Guided Help Overlay Component
-// Visual element spotlight, synchronized Web Speech Synthesis, responsive layout, and accessible controls across 10 languages
+// Implements strict top-to-bottom step progression, synchronized fixed spotlight positioning,
+// controlled target retry mechanism, decoupled scrolling (zero infinite loops), and multilingual speech synthesis.
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
@@ -14,17 +15,15 @@ import {
   VolumeX,
   Pause,
   Play,
-  RotateCcw,
   ChevronLeft,
   ChevronRight,
   Check,
   X,
   Sparkles,
   Info,
-  HelpCircle,
 } from 'lucide-react';
 
-interface ElementRect {
+interface ElementViewportRect {
   top: number;
   left: number;
   width: number;
@@ -43,16 +42,26 @@ export const GuidedHelpOverlay: React.FC = () => {
     skipTour,
     finishTour,
     closeTour,
+    activeMode,
+    t,
   } = useApp();
 
-  const [targetRect, setTargetRect] = useState<ElementRect | null>(null);
+  const [targetRect, setTargetRect] = useState<ElementViewportRect | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [hasVoiceFallback, setHasVoiceFallback] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const hasSpokenStepRef = useRef<string | null>(null);
+
+  // Refs for stable lifecycle, timer cleanup, and element references
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const retryCountRef = useRef<number>(0);
+  const rafIdRef = useRef<number | null>(null);
+  const lastScrolledStepKeyRef = useRef<string | null>(null);
+  const lastSpokenStepKeyRef = useRef<string | null>(null);
+  const triggerElementRef = useRef<HTMLElement | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef<boolean>(true);
 
   const tour = activeTourId ? TOURS[activeTourId] : null;
   const currentStep = tour && tour.steps[activeStepIndex] ? tour.steps[activeStepIndex] : null;
@@ -60,9 +69,26 @@ export const GuidedHelpOverlay: React.FC = () => {
   const isFirstStep = activeStepIndex === 0;
   const isLastStep = activeStepIndex === totalSteps - 1;
 
-  // Check reduced motion and screen size
+  // Track initial trigger element for restoring focus when guide closes
   useEffect(() => {
+    if (activeTourId && !triggerElementRef.current && document.activeElement instanceof HTMLElement) {
+      triggerElementRef.current = document.activeElement;
+    }
+    if (!activeTourId && triggerElementRef.current) {
+      try {
+        triggerElementRef.current.focus();
+      } catch (_) {
+        // Ignore if element is no longer in DOM
+      }
+      triggerElementRef.current = null;
+    }
+  }, [activeTourId]);
+
+  // Screen size and reduced motion detection
+  useEffect(() => {
+    isMountedRef.current = true;
     if (typeof window === 'undefined') return;
+
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(motionQuery.matches);
     const motionHandler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
@@ -73,94 +99,219 @@ export const GuidedHelpOverlay: React.FC = () => {
     window.addEventListener('resize', checkMobile);
 
     return () => {
+      isMountedRef.current = false;
       motionQuery.removeEventListener('change', motionHandler);
       window.removeEventListener('resize', checkMobile);
     };
   }, []);
 
-  // Listen to speech synthesis state changes
+  // Listen to speech controller status changes
   useEffect(() => {
     const unsubscribe = speechController.subscribe((speaking, paused) => {
-      setIsSpeaking(speaking);
-      setIsPaused(paused);
+      if (isMountedRef.current) {
+        setIsSpeaking(speaking);
+        setIsPaused(paused);
+      }
     });
     return unsubscribe;
   }, []);
 
-  // Locate and measure target element
-  const updateTargetRect = useCallback(() => {
-    if (!currentStep) {
-      setTargetRect(null);
-      return;
+  // Single unified cleanup function
+  const cleanupGuide = useCallback(() => {
+    // 1. Stop any speech synthesis immediately
+    speechController.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
+    // 2. Clear any pending retry timer
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+    // 3. Clear any pending animation frame
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    // 4. Remove active highlight rect
+    setTargetRect(null);
+    retryCountRef.current = 0;
+  }, []);
 
+  // Mode change safety: if mode changes while guide is running, cleanly stop
+  useEffect(() => {
+    if (activeTourId && tour) {
+      if (tour.mode !== 'ANY' && tour.mode !== activeMode) {
+        cleanupGuide();
+        closeTour();
+      }
+    }
+  }, [activeMode, activeTourId, tour, cleanupGuide, closeTour]);
+
+  // Locate and measure target element strictly in fixed viewport coordinates
+  // (Notice: This function NEVER triggers scrollIntoView to prevent infinite scroll loops)
+  const measureTargetInViewport = useCallback((): ElementViewportRect | null => {
+    if (!currentStep) return null;
     const element = document.querySelector(`[data-guide="${currentStep.target}"]`);
     if (element) {
       const rect = element.getBoundingClientRect();
-      setTargetRect({
-        top: rect.top + window.scrollY,
-        left: rect.left + window.scrollX,
+      return {
+        top: rect.top,
+        left: rect.left,
         width: rect.width,
         height: rect.height,
-      });
-
-      // Gently scroll into view if target is outside visible viewport
-      const inViewport =
-        rect.top >= 80 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) - 80;
-      if (!inViewport) {
-        element.scrollIntoView({
-          behavior: prefersReducedMotion ? 'auto' : 'smooth',
-          block: 'center',
-        });
-      }
-    } else {
-      // Graceful fallback if target element not yet in DOM: null center fallback
-      setTargetRect(null);
+      };
     }
-  }, [currentStep, prefersReducedMotion]);
+    return null;
+  }, [currentStep]);
 
+  // Controlled retry mechanism and smooth one-time scrolling per step change
   useEffect(() => {
-    updateTargetRect();
-    const handleScrollOrResize = () => updateTargetRect();
+    if (!guidedHelpEnabled || !activeTourId || !currentStep) {
+      cleanupGuide();
+      return;
+    }
+
+    // Step identifier for tracking scroll and voice executions
+    const currentStepKey = `${activeTourId}_step_${activeStepIndex}`;
+
+    // Clear any previous retry attempt
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+    retryCountRef.current = 0;
+
+    const findAndActivateTarget = () => {
+      const element = document.querySelector(`[data-guide="${currentStep.target}"]`);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        setTargetRect({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        });
+
+        // Smoothly scroll into view strictly ONCE when step changes
+        if (lastScrolledStepKeyRef.current !== currentStepKey) {
+          lastScrolledStepKeyRef.current = currentStepKey;
+          element.scrollIntoView({
+            behavior: prefersReducedMotion ? 'auto' : 'smooth',
+            block: 'center',
+            inline: 'nearest',
+          });
+        }
+      } else {
+        // Element not in DOM yet. Retry up to 6 times at 100ms intervals (600ms total)
+        if (retryCountRef.current < 6) {
+          retryCountRef.current += 1;
+          retryTimerRef.current = setTimeout(findAndActivateTarget, 100);
+        } else {
+          // If still unavailable after 6 retries, safely skip ONLY this step without crashing
+          console.warn(
+            `[GuidedHelp] Target [data-guide="${currentStep.target}"] not found after retries. Safely advancing step.`
+          );
+          setTargetRect(null);
+          if (!isLastStep) {
+            nextTourStep();
+          } else {
+            finishTour();
+          }
+        }
+      }
+    };
+
+    findAndActivateTarget();
+
+    return () => {
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+    };
+  }, [
+    activeTourId,
+    activeStepIndex,
+    currentStep,
+    guidedHelpEnabled,
+    isLastStep,
+    nextTourStep,
+    finishTour,
+    prefersReducedMotion,
+    cleanupGuide,
+  ]);
+
+  // Passive, throttled scroll and resize listener (NEVER scrolls, only updates rect)
+  useEffect(() => {
+    if (!guidedHelpEnabled || !activeTourId || !currentStep) return;
+
+    const handleScrollOrResize = () => {
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = requestAnimationFrame(() => {
+        const rect = measureTargetInViewport();
+        if (rect) {
+          setTargetRect(rect);
+        }
+      });
+    };
+
     window.addEventListener('scroll', handleScrollOrResize, { passive: true });
-    window.addEventListener('resize', handleScrollOrResize);
-    const timer = setTimeout(updateTargetRect, 200);
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScrollOrResize);
       window.removeEventListener('resize', handleScrollOrResize);
-      clearTimeout(timer);
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
     };
-  }, [updateTargetRect]);
+  }, [guidedHelpEnabled, activeTourId, currentStep, measureTargetInViewport]);
 
-  // Voice Guidance Trigger
+  // Synchronized voice guidance: cancels old speech before speaking new step
   useEffect(() => {
     if (!guidedHelpEnabled || !tour || !currentStep) {
       speechController.stop();
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
       return;
     }
 
-    const stepKey = `${activeTourId}_${activeStepIndex}_${language}`;
-    const isVoiceAvail = speechController.isVoiceAvailableForLanguage(language);
-    setHasVoiceFallback(!isVoiceAvail);
+    const voiceAvail = speechController.isVoiceAvailableForLanguage(language);
+    setHasVoiceFallback(!voiceAvail);
 
-    // Speak once per step if voiceGuidanceEnabled is active
-    if (voiceGuidanceEnabled && hasSpokenStepRef.current !== stepKey) {
-      hasSpokenStepRef.current = stepKey;
+    const stepVoiceKey = `${activeTourId}_${activeStepIndex}_${language}`;
+
+    if (voiceGuidanceEnabled && lastSpokenStepKeyRef.current !== stepVoiceKey) {
+      lastSpokenStepKeyRef.current = stepVoiceKey;
       const textToSpeak = currentStep.voiceScript[language] || currentStep.content[language];
       if (textToSpeak) {
+        // Immediate cancellation of previous utterance to prevent speech overlapping
+        speechController.stop();
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
         speechController.speak(textToSpeak, language);
       }
     }
-  }, [activeTourId, activeStepIndex, language, guidedHelpEnabled, voiceGuidanceEnabled, tour, currentStep]);
+  }, [
+    activeTourId,
+    activeStepIndex,
+    language,
+    guidedHelpEnabled,
+    voiceGuidanceEnabled,
+    tour,
+    currentStep,
+  ]);
 
-  // Keyboard accessibility
+  // Keyboard navigation & accessibility
   useEffect(() => {
     if (!activeTourId) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept when user is typing in form inputs
+      // Do not intercept if user is typing in form controls
       const activeTag = document.activeElement?.tagName?.toLowerCase();
       if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') {
         return;
@@ -168,10 +319,12 @@ export const GuidedHelpOverlay: React.FC = () => {
 
       if (e.key === 'Escape') {
         e.preventDefault();
+        cleanupGuide();
         closeTour();
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
-        nextTourStep();
+        if (!isLastStep) nextTourStep();
+        else finishTour();
       } else if (e.key === 'ArrowLeft' && !isFirstStep) {
         e.preventDefault();
         prevTourStep();
@@ -180,13 +333,13 @@ export const GuidedHelpOverlay: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeTourId, isFirstStep, closeTour, nextTourStep, prevTourStep]);
+  }, [activeTourId, isFirstStep, isLastStep, nextTourStep, prevTourStep, closeTour, finishTour, cleanupGuide]);
 
   if (!guidedHelpEnabled || !tour || !currentStep) {
     return null;
   }
 
-  // Voice Actions
+  // Voice playback actions
   const handlePlayOrReplay = () => {
     const textToSpeak = currentStep.voiceScript[language] || currentStep.content[language];
     if (textToSpeak) {
@@ -206,53 +359,71 @@ export const GuidedHelpOverlay: React.FC = () => {
     speechController.stop();
   };
 
+  const handleClose = () => {
+    cleanupGuide();
+    closeTour();
+  };
+
+  const handleSkip = () => {
+    cleanupGuide();
+    skipTour();
+  };
+
+  const handleFinish = () => {
+    cleanupGuide();
+    finishTour();
+  };
+
   const stepOfLabel = GUIDE_UI_LABELS.stepOf[language]
     ? GUIDE_UI_LABELS.stepOf[language]
         .replace('{current}', String(activeStepIndex + 1))
         .replace('{total}', String(totalSteps))
     : `Step ${activeStepIndex + 1} of ${totalSteps}`;
 
-  // Tooltip positioning logic (Desktop vs Mobile)
+  // Robust fixed viewport positioning for the tooltip card
   const getCardStyle = (): React.CSSProperties => {
+    const cardWidth = 360;
+    const cardEstimatedHeight = 240;
+    const padding = 16;
+
     if (isMobile || !targetRect) {
-      // Mobile: fixed near bottom
+      // Mobile or fallback: fixed near bottom of viewport
       return {
         position: 'fixed',
-        bottom: '24px',
+        bottom: '20px',
         left: '16px',
         right: '16px',
         margin: '0 auto',
-        maxWidth: '460px',
+        maxWidth: '440px',
         zIndex: 10000,
       };
     }
 
-    const cardWidth = 360;
-    const cardHeight = 240;
-    const padding = 16;
-    const target = targetRect;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
 
-    // Viewport coordinates
-    const targetViewportTop = target.top - window.scrollY;
-    const targetViewportLeft = target.left - window.scrollX;
+    let top = targetRect.top + targetRect.height + padding;
+    let left = targetRect.left;
 
-    let top = targetViewportTop + target.height + padding;
-    let left = targetViewportLeft;
-
-    // Default to bottom. If not enough space, place above
-    if (top + cardHeight > window.innerHeight && targetViewportTop - cardHeight - padding > 80) {
-      top = targetViewportTop - cardHeight - padding;
+    // Check if bottom placement overflows screen. If so, position above the target
+    if (top + cardEstimatedHeight > viewportH - 20 && targetRect.top - cardEstimatedHeight - padding > 70) {
+      top = targetRect.top - cardEstimatedHeight - padding;
     }
 
-    // Keep within horizontal bounds
-    if (left + cardWidth > window.innerWidth - 16) {
-      left = window.innerWidth - cardWidth - 16;
+    // Keep horizontal coordinates within safe viewport boundaries
+    if (left + cardWidth > viewportW - 16) {
+      left = viewportW - cardWidth - 16;
     }
-    if (left < 16) left = 16;
+    if (left < 16) {
+      left = 16;
+    }
+
+    // Clamp top within viewport boundaries
+    top = Math.max(76, Math.min(top, viewportH - cardEstimatedHeight - 16));
 
     return {
       position: 'fixed',
-      top: `${Math.max(80, top)}px`,
+      top: `${top}px`,
       left: `${left}px`,
       width: `${cardWidth}px`,
       zIndex: 10000,
@@ -260,17 +431,17 @@ export const GuidedHelpOverlay: React.FC = () => {
   };
 
   return (
-    <div className="desi-craft-guided-help-root" role="region" aria-label="Guided Help Tour">
-      {/* 1. Subtle Non-Oppressive Backdrop */}
+    <div className="desi-craft-guided-help-root" role="region" aria-label={t('Guided Help Tour')}>
+      {/* 1. Subtle Backdrop: Non-oppressive, allows reading page context */}
       <div
         className="fixed inset-0 z-[9990] bg-black/40 backdrop-blur-[1px] transition-opacity duration-300 pointer-events-none"
         aria-hidden="true"
       />
 
-      {/* 2. Target Spotlight Glow Ring (if target found) */}
+      {/* 2. Target Spotlight Glow Ring: Synchronized in fixed viewport coordinate space */}
       {targetRect && (
         <div
-          className={`absolute z-[9995] pointer-events-none rounded-2xl ring-4 ring-primary ring-offset-4 ring-offset-surface/80 shadow-[0_0_28px_rgba(217,119,6,0.55)] transition-all ${
+          className={`fixed z-[9995] pointer-events-none rounded-2xl ring-4 ring-primary ring-offset-4 ring-offset-surface/80 shadow-[0_0_32px_rgba(217,119,6,0.65)] transition-all ${
             prefersReducedMotion ? '' : 'duration-300 animate-pulse'
           }`}
           style={{
@@ -288,7 +459,7 @@ export const GuidedHelpOverlay: React.FC = () => {
         ref={cardRef}
         style={getCardStyle()}
         className={`bg-surface text-on-surface border-2 border-primary/50 rounded-2xl shadow-2xl p-4 sm:p-5 flex flex-col gap-3.5 z-[10000] animate-fadeIn ${
-          prefersReducedMotion ? '' : 'transition-transform'
+          prefersReducedMotion ? '' : 'transition-all duration-200'
         }`}
         role="dialog"
         aria-modal="false"
@@ -310,10 +481,10 @@ export const GuidedHelpOverlay: React.FC = () => {
           </div>
 
           <button
-            onClick={closeTour}
+            onClick={handleClose}
             className="p-1.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer"
-            aria-label="Close Guide"
-            title="Close Guide (Esc)"
+            aria-label={t('Close Guide')}
+            title={t('Close Guide (Esc)')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -342,11 +513,11 @@ export const GuidedHelpOverlay: React.FC = () => {
               <button
                 onClick={handlePlayOrReplay}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition text-xs font-bold cursor-pointer"
-                title="Hear instructions aloud"
+                title={t('Hear instructions aloud')}
               >
                 <Volume2 className="w-3.5 h-3.5" />
                 <span>
-                  {hasSpokenStepRef.current === `${activeTourId}_${activeStepIndex}_${language}`
+                  {lastSpokenStepKeyRef.current === `${activeTourId}_${activeStepIndex}_${language}`
                     ? GUIDE_UI_LABELS.replay[language] || 'Replay'
                     : GUIDE_UI_LABELS.listen[language] || 'Listen'}
                 </span>
@@ -355,7 +526,7 @@ export const GuidedHelpOverlay: React.FC = () => {
               <button
                 onClick={handleResume}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition text-xs font-bold cursor-pointer"
-                title="Resume Voice"
+                title={t('Resume Voice')}
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>{GUIDE_UI_LABELS.resume[language] || 'Resume'}</span>
@@ -365,7 +536,7 @@ export const GuidedHelpOverlay: React.FC = () => {
                 <button
                   onClick={handlePause}
                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 transition text-xs font-semibold cursor-pointer"
-                  title="Pause Voice"
+                  title={t('Pause Voice')}
                 >
                   <Pause className="w-3.5 h-3.5" />
                   <span>{GUIDE_UI_LABELS.pause[language] || 'Pause'}</span>
@@ -373,7 +544,7 @@ export const GuidedHelpOverlay: React.FC = () => {
                 <button
                   onClick={handleStop}
                   className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition cursor-pointer"
-                  title="Stop Voice"
+                  title={t('Stop Voice')}
                 >
                   <VolumeX className="w-3.5 h-3.5" />
                 </button>
@@ -384,7 +555,7 @@ export const GuidedHelpOverlay: React.FC = () => {
             {isSpeaking && !isPaused && (
               <div
                 className="flex items-center gap-0.5 px-2 py-1 rounded-md bg-primary/10"
-                aria-label="Voice reading aloud"
+                aria-label={t('Voice reading aloud')}
               >
                 <span className="w-1 h-3 bg-primary rounded-full animate-bounce" />
                 <span className="w-1 h-4 bg-primary rounded-full animate-bounce [animation-delay:0.15s]" />
@@ -394,7 +565,7 @@ export const GuidedHelpOverlay: React.FC = () => {
           </div>
 
           <button
-            onClick={skipTour}
+            onClick={handleSkip}
             className="text-[11px] font-semibold text-on-surface-variant hover:text-on-surface hover:underline cursor-pointer"
           >
             {GUIDE_UI_LABELS.skip[language] || 'Skip Tour'}
@@ -449,7 +620,7 @@ export const GuidedHelpOverlay: React.FC = () => {
             </button>
           ) : (
             <button
-              onClick={finishTour}
+              onClick={handleFinish}
               className="flex items-center gap-1 px-4 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition shadow-xs cursor-pointer"
             >
               <Check className="w-3.5 h-3.5" />
