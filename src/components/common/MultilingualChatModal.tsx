@@ -112,6 +112,7 @@ export const MultilingualChatModal: React.FC = () => {
     language,
     user,
     activeMode,
+    t,
   } = useApp();
 
   const [inputMessage, setInputMessage] = useState('');
@@ -326,7 +327,7 @@ export const MultilingualChatModal: React.FC = () => {
               </h3>
               <div className="flex items-center gap-1.5 text-[11px] text-primary">
                 <Globe className="w-3 h-3" />
-                <span>Real-Time AI Multilingual Translation Active</span>
+                <span>{t('Real-Time AI Multilingual Translation Active')}</span>
               </div>
             </div>
           </div>
@@ -418,7 +419,7 @@ export const MultilingualChatModal: React.FC = () => {
                           />
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-[11px] font-semibold">
                             <Maximize2 className="w-3.5 h-3.5" />
-                            <span>View Full Size</span>
+                            <span>{t('View Full Size')}</span>
                           </div>
                         </div>
                         <div
@@ -472,7 +473,7 @@ export const MultilingualChatModal: React.FC = () => {
                               ? 'bg-white/20 hover:bg-white/30 text-white'
                               : 'bg-primary/10 hover:bg-primary/20 text-primary'
                           }`}
-                          title="Download File"
+                          title={t('Download File')}
                         >
                           <Download className="w-3.5 h-3.5" />
                         </a>
@@ -524,7 +525,7 @@ export const MultilingualChatModal: React.FC = () => {
                             }`}
                           >
                             <ExternalLink className="w-3 h-3" />
-                            <span>Open in Google Maps</span>
+                            <span>{t('Open in Google Maps')}</span>
                           </a>
                         )}
                       </div>
@@ -604,7 +605,7 @@ export const MultilingualChatModal: React.FC = () => {
                 <div className="flex items-center gap-1.5 text-[10px] text-on-surface-variant">
                   <span>{stagedAttachment.size}</span>
                   <span>•</span>
-                  <span className="text-primary font-medium">Ready to send</span>
+                  <span className="text-primary font-medium">{t('Ready to send')}</span>
                 </div>
               </div>
             </div>
@@ -613,7 +614,7 @@ export const MultilingualChatModal: React.FC = () => {
               type="button"
               onClick={() => setStagedAttachment(null)}
               className="p-1 rounded-lg text-on-surface-variant hover:text-error hover:bg-surface-container-high transition"
-              title="Remove attachment"
+              title={t('Remove attachment')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -660,7 +661,7 @@ export const MultilingualChatModal: React.FC = () => {
                   ? 'bg-primary/20 text-primary'
                   : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
               }`}
-              title="Attach photo, design or document"
+              title={t('Attach photo, design or document')}
             >
               <Paperclip className="w-4 h-4" />
             </button>
@@ -670,7 +671,7 @@ export const MultilingualChatModal: React.FC = () => {
               type="button"
               onClick={() => setIsLocationModalOpen(true)}
               className="p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer"
-              title="Share live location or craft cluster"
+              title={t('Share live location or craft cluster')}
             >
               <MapPin className="w-4 h-4" />
             </button>
@@ -679,8 +680,8 @@ export const MultilingualChatModal: React.FC = () => {
               type="text"
               placeholder={
                 stagedAttachment
-                  ? 'Add a caption or note (optional)...'
-                  : 'Type your message in any Indian language...'
+                  ? t('Add a caption or note (optional)...')
+                  : t('Type your message in any Indian language...')
               }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
@@ -691,7 +692,7 @@ export const MultilingualChatModal: React.FC = () => {
               type="submit"
               disabled={(!inputMessage.trim() && !stagedAttachment) || isTranslating}
               className="p-2.5 rounded-full bg-primary text-on-primary hover:bg-primary/90 disabled:opacity-40 transition shadow-xs cursor-pointer flex-shrink-0"
-              aria-label="Send message"
+              aria-label={t('Send message')}
             >
               <Send className="w-4 h-4" />
             </button>
@@ -710,9 +711,9 @@ export const MultilingualChatModal: React.FC = () => {
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-on-surface">Share Location</h3>
+                  <h3 className="text-sm font-bold text-on-surface">{t('Share Location')}</h3>
                   <p className="text-[11px] text-on-surface-variant">
-                    Send GPS coordinates or an artisan cluster
+                    {t('Send GPS coordinates or an artisan cluster')}
                   </p>
                 </div>
               </div>
@@ -730,7 +731,7 @@ export const MultilingualChatModal: React.FC = () => {
               <div>
                 <h4 className="text-[11px] font-bold text-on-surface uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                   <Navigation className="w-3 h-3 text-primary" />
-                  Live Device GPS
+                  {t('Live Device GPS')}
                 </h4>
                 <button
                   onClick={handleShareCurrentGPS}
@@ -740,12 +741,12 @@ export const MultilingualChatModal: React.FC = () => {
                   {isLocatingUser ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Fetching live coordinates...</span>
+                      <span>{t('Fetching live coordinates...')}</span>
                     </>
                   ) : (
                     <>
                       <Navigation className="w-3.5 h-3.5" />
-                      <span>Share Current GPS Coordinates</span>
+                      <span>{t('Share Current GPS Coordinates')}</span>
                     </>
                   )}
                 </button>
@@ -783,14 +784,14 @@ export const MultilingualChatModal: React.FC = () => {
               {/* Option 3: Custom Address Input */}
               <div>
                 <h4 className="text-[11px] font-bold text-on-surface uppercase tracking-wider mb-1.5">
-                  Or Enter Address / Landmark
+                  {t('Or Enter Address / Landmark')}
                 </h4>
                 <form onSubmit={handleShareCustomAddress} className="flex gap-1.5">
                   <input
                     type="text"
                     value={customAddressInput}
                     onChange={(e) => setCustomAddressInput(e.target.value)}
-                    placeholder="e.g. Madanpura, Varanasi or Jubilee Hills, Hyderabad"
+                    placeholder={t('e.g. Madanpura, Varanasi or Jubilee Hills, Hyderabad')}
                     className="flex-1 px-3 py-1.5 rounded-lg bg-surface-container border border-outline/20 text-xs text-on-surface placeholder:text-on-surface-variant/60 focus:outline-hidden focus:ring-1 focus:ring-primary"
                   />
                   <button
@@ -798,7 +799,7 @@ export const MultilingualChatModal: React.FC = () => {
                     disabled={!customAddressInput.trim()}
                     className="px-3 py-1.5 rounded-lg bg-primary text-white font-semibold text-xs disabled:opacity-40 hover:bg-primary/90 transition flex-shrink-0"
                   >
-                    Share
+                    {t('Share')}
                   </button>
                 </form>
               </div>
@@ -825,10 +826,10 @@ export const MultilingualChatModal: React.FC = () => {
                 href={expandedImage.url}
                 download={expandedImage.title}
                 className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition flex items-center gap-1 text-[11px]"
-                title="Download Photo"
+                title={t('Download Photo')}
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download</span>
+                <span>{t('Download')}</span>
               </a>
               <button
                 onClick={() => setExpandedImage(null)}

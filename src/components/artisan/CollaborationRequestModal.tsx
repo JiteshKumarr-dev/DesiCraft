@@ -36,7 +36,7 @@ export const CollaborationRequestModal: React.FC<CollaborationRequestModalProps>
   initialType = 'Craft Fusion',
   onClose,
 }) => {
-  const { user, sendCollaborationRequest } = useApp();
+  const { user, sendCollaborationRequest, t } = useApp();
 
   const [collabType, setCollabType] = useState<CollaborationType>(initialType);
   const [title, setTitle] = useState(initialTitle);
@@ -80,10 +80,10 @@ export const CollaborationRequestModal: React.FC<CollaborationRequestModalProps>
             </div>
             <div>
               <h3 className="text-lg font-bold font-serif text-on-surface">
-                Propose Collaboration
+                {t('Propose Collaboration')}
               </h3>
               <p className="text-xs text-on-surface-variant">
-                Direct artisan-to-artisan partnership proposal
+                {t('Direct artisan-to-artisan partnership proposal')}
               </p>
             </div>
           </div>
@@ -104,20 +104,20 @@ export const CollaborationRequestModal: React.FC<CollaborationRequestModalProps>
           />
           <div className="min-w-0 flex-1">
             <h4 className="text-sm font-bold text-on-surface truncate">{artisan.name}</h4>
-            <p className="text-xs text-primary font-medium">{artisan.craft_name}</p>
+            <p className="text-xs text-primary font-medium">{t(artisan.craft_name)}</p>
             <p className="text-[11px] text-on-surface-variant">{artisan.district}, {artisan.state}</p>
           </div>
           <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-secondary/15 text-secondary border border-secondary/30">
-            Partner
+            {t('Partner')}
           </span>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
+        <form data-guide="collab-request-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
           {/* Collaboration Type */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              Collaboration Format <span className="text-primary">*</span>
+              {t('Collaboration Format')} <span className="text-primary">*</span>
             </label>
             <select
               value={collabType}
@@ -126,7 +126,7 @@ export const CollaborationRequestModal: React.FC<CollaborationRequestModalProps>
             >
               {COLLABORATION_TYPES.map(({ type, desc }) => (
                 <option key={type} value={type}>
-                  {type} — {desc}
+                  {t(type)} — {t(desc)}
                 </option>
               ))}
             </select>
@@ -135,14 +135,14 @@ export const CollaborationRequestModal: React.FC<CollaborationRequestModalProps>
           {/* Project Title */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              Proposal Title / Joint Concept <span className="text-primary">*</span>
+              {t('Proposal Title')} / {t('Joint Concept')} <span className="text-primary">*</span>
             </label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Kadwa Silk & Cast Bell Metal Minaudière Clutches"
+              placeholder={t('e.g. Kadwa Silk & Cast Bell Metal Minaudière Clutches')}
               className="w-full px-4 py-2.5 rounded-xl bg-surface border border-outline/25 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-primary/40 focus:outline-none font-medium"
             />
           </div>
@@ -151,16 +151,16 @@ export const CollaborationRequestModal: React.FC<CollaborationRequestModalProps>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                Message & Vision <span className="text-primary">*</span>
+                {t('Message & Vision')} <span className="text-primary">*</span>
               </label>
-              <span className="text-[11px] text-on-surface-variant">Be specific about materials & roles</span>
+              <span className="text-[11px] text-on-surface-variant">{t('Be specific about materials & roles')}</span>
             </div>
             <textarea
               required
               rows={4}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Describe what you would like to create together, how the crafts complement each other, and estimated timelines..."
+              placeholder={t('Describe what you would like to create together, how the crafts complement each other, and estimated timelines...')}
               className="w-full px-4 py-3 rounded-xl bg-surface border border-outline/25 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-primary/40 focus:outline-none resize-none leading-relaxed"
             />
           </div>
@@ -168,7 +168,7 @@ export const CollaborationRequestModal: React.FC<CollaborationRequestModalProps>
           <div className="p-3.5 rounded-xl bg-primary/5 border border-primary/15 text-xs text-on-surface-variant flex items-start gap-2.5">
             <Sparkles className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
             <p>
-              Once accepted, a private conversation thread will automatically be created between both master artisans on your Messages hub.
+              {t('Once accepted, a private conversation thread will automatically be created between both master artisans on your Messages hub.')}
             </p>
           </div>
 
@@ -179,15 +179,16 @@ export const CollaborationRequestModal: React.FC<CollaborationRequestModalProps>
               onClick={onClose}
               className="px-4 py-2 rounded-xl border border-outline/30 text-sm font-medium text-on-surface hover:bg-surface-container transition-colors"
             >
-              Cancel
+              {t('Cancel')}
             </button>
             <button
+              data-guide="collab-send-request-btn"
               type="submit"
               disabled={isSubmitting || !title.trim() || !message.trim()}
               className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-primary text-white text-sm font-bold shadow-md hover:shadow-lg disabled:opacity-50 transition-all flex items-center gap-1.5"
             >
               <Send className="w-4 h-4" />
-              {isSubmitting ? 'Sending...' : 'Send Request'}
+              {isSubmitting ? t('Sending...') : t('Send Request')}
             </button>
           </div>
         </form>

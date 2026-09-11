@@ -24,8 +24,16 @@ import { craftsData } from '../data/craftsData';
 import { artisansData } from '../data/artisansData';
 import { productsData, passportsData } from '../data/productsData';
 import { opportunitiesData } from '../data/opportunitiesData';
-import { translations, TranslationStrings, createTranslator, TranslateFn } from '../data/translations';
+import { createTranslator, TranslateFn } from '../data/translations';
 import { speechController, TOURS } from '../services/guidedHelpService';
+import {
+  AppRoute,
+  getCurrentRoute,
+  navigate,
+  setIntendedDestination,
+  getIntendedDestination,
+  clearIntendedDestination,
+} from '../services/router';
 import {
   supabase,
   testSupabaseConnection,
@@ -36,6 +44,10 @@ import {
   fetchSupabaseProducts,
   saveSupabaseProduct,
   deleteSupabaseProduct,
+  beginProductEdit,
+  updateProductSafely,
+  cancelProductEdit,
+  placeOrderSafely,
   fetchSupabasePassports,
   saveSupabasePassport,
   fetchSupabaseOrders,
@@ -90,6 +102,11 @@ interface AppContextType {
   addProduct: (product: Product, passport?: DigitalCraftPassport) => void;
   updateProduct: (id: string, updates: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
+  editingProduct: Product | null;
+  setEditingProduct: (product: Product | null) => void;
+  beginEditProduct: (productId: string) => Promise<{ success: boolean; error?: string }>;
+  saveProductEdit: (productId: string, newPrice: number, newDescription: string) => Promise<{ success: boolean; error?: string }>;
+  cancelProductEditSession: (productId: string) => Promise<{ success: boolean; error?: string }>;
 
   // Cart & Wishlist (Customer Marketplace)
   cart: CartItem[];
@@ -109,7 +126,7 @@ interface AppContextType {
     customer_email: string;
     payment_method: 'UPI' | 'Card' | 'NetBanking' | 'CashOnDelivery';
     shipping_address: Order['shipping_address'];
-  }) => Order;
+  }) => Promise<{ success: boolean; order?: Order; error?: string }>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
 
   // Learning & Workshops
@@ -228,6 +245,7 @@ interface AppContextType {
   setVoiceGuidanceEnabled: (enabled: boolean) => void;
   autoStartHelp: boolean;
   setAutoStartHelp: (enabled: boolean) => void;
+  isGuideActive: boolean;
   activeTourId: string | null;
   activeStepIndex: number;
   completedTours: string[];
@@ -242,6 +260,15 @@ interface AppContextType {
   setIsHelpMenuOpen: (open: boolean) => void;
   isFirstTimeWelcomeOpen: boolean;
   setIsFirstTimeWelcomeOpen: (open: boolean) => void;
+  // Routing & Mode-Entry Gate
+  currentRoute: AppRoute;
+  setCurrentRoute: (route: AppRoute) => void;
+  isAuthChecking: boolean;
+  modeGateStatus: UserMode | null;
+  intendedMode: UserMode | null;
+  setIntendedMode: (mode: UserMode | null) => void;
+  enterMode: (mode: UserMode) => void;
+  requestModeSwitch: (targetMode?: UserMode) => void;
   // Supabase Backend Sync
   supabaseStatus: 'connected' | 'offline' | 'checking';
   isSupabaseConnected: boolean;
@@ -254,8 +281,12 @@ interface AppContextType {
     state?: string;
     district?: string;
   }) => void | Promise<void>;
-  loginUser: (identifier: string, password?: string) => void | Promise<void>;
-  logoutUser: () => void | Promise<void>;
+  loginUser: (
+    identifier: string,
+    password?: string,
+    targetMode?: UserMode
+  ) => Promise<{ success: boolean; error?: string }>;
+  logoutUser: () => Promise<void>;
 }
 
 const defaultUser: User = {
@@ -712,10 +743,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeChatRecipient, setActiveChatRecipient] = useState<{ id: string; name: string; avatar?: string } | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
 
-  // Authentication & First-Visit Personalization
+  // Routing State
+  const [currentRoute, setCurrentRoute] = useState<AppRoute>(() => getCurrentRoute());
+
+  // Mode Gate State (Which mode has cleared authentication in the active session)
+  const [modeGateStatus, setModeGateStatus] = useState<UserMode | null>(() => {
+    const saved = sessionStorage.getItem('desi_craft_mode_gate');
+    return (saved === 'CUSTOMER' || saved === 'ARTISAN') ? saved : null;
+  });
+
+  const [intendedMode, setIntendedMode] = useState<UserMode | null>(() => {
+    return getIntendedDestination().mode;
+  });
+
+  // Authentication & Session Loading State
+  const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     const saved = localStorage.getItem('desi_craft_logged_in');
-    return saved ? JSON.parse(saved) : true;
+    return saved ? JSON.parse(saved) : false;
   });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'SIGNUP' | 'LOGIN'>('SIGNUP');
@@ -777,6 +822,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const startTour = (tourId: string, stepIndex = 0) => {
     if (!guidedHelpEnabled) return;
     speechController.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    // Prevent starting two tours or resetting identical active tour instance
+    if (activeTourId === tourId && activeStepIndex === stepIndex) {
+      return;
+    }
     setActiveTourId(tourId);
     setActiveStepIndex(stepIndex);
   };
@@ -786,29 +838,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const tour = TOURS[activeTourId];
     if (!tour) return;
     speechController.stop();
-    if (activeStepIndex + 1 < tour.steps.length) {
-      setActiveStepIndex((prev) => prev + 1);
-    } else {
-      finishTour();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
+    setActiveStepIndex((prev) => {
+      if (prev + 1 < tour.steps.length) {
+        return prev + 1;
+      } else {
+        finishTour();
+        return prev;
+      }
+    });
   };
 
   const prevTourStep = () => {
     if (!activeTourId) return;
     speechController.stop();
-    if (activeStepIndex > 0) {
-      setActiveStepIndex((prev) => prev - 1);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
+    setActiveStepIndex((prev) => Math.max(prev - 1, 0));
   };
 
   const skipTour = () => {
     speechController.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     setActiveTourId(null);
     setActiveStepIndex(0);
   };
 
   const finishTour = () => {
     speechController.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     if (activeTourId) {
       setCompletedTours((prev) => {
         const next = Array.from(new Set([...prev, activeTourId]));
@@ -822,6 +887,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const restartTour = (tourId: string) => {
     speechController.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     setCompletedTours((prev) => {
       const next = prev.filter((id) => id !== tourId);
       localStorage.setItem('desi_craft_completed_tours', JSON.stringify(next));
@@ -832,6 +900,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const closeTour = () => {
     speechController.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     setActiveTourId(null);
     setActiveStepIndex(0);
   };
@@ -859,6 +930,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             if (dbUser && isMounted) {
               setUser(dbUser);
               setIsLoggedIn(true);
+              localStorage.setItem('desi_craft_logged_in', 'true');
+              // Restore mode clearance if on protected route
+              const activePath = getCurrentRoute();
+              if (activePath === '/artisan-studio') {
+                setModeGateStatus('ARTISAN');
+                sessionStorage.setItem('desi_craft_mode_gate', 'ARTISAN');
+              } else if (activePath === '/marketplace') {
+                setModeGateStatus('CUSTOMER');
+                sessionStorage.setItem('desi_craft_mode_gate', 'CUSTOMER');
+              }
             }
           }
 
@@ -922,6 +1003,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setSupabaseStatus('offline');
           setIsSupabaseConnected(false);
         }
+      } finally {
+        if (isMounted) {
+          setIsAuthChecking(false);
+        }
       }
     }
 
@@ -935,7 +1020,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (profile && isMounted) {
           setUser(profile);
           setIsLoggedIn(true);
+          localStorage.setItem('desi_craft_logged_in', 'true');
         }
+      } else if (event === 'SIGNED_OUT') {
+        setIsLoggedIn(false);
+        setModeGateStatus(null);
+        localStorage.removeItem('desi_craft_logged_in');
+        sessionStorage.removeItem('desi_craft_mode_gate');
       }
     });
 
@@ -982,6 +1073,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubscribeChat();
       unsubscribeSellerChat();
     };
+  }, []);
+
+  // Router History & Route Listener
+  useEffect(() => {
+    const handlePopState = () => {
+      const next = getCurrentRoute();
+      setCurrentRoute(next);
+      const dest = getIntendedDestination();
+      if (dest.mode) {
+        setIntendedMode(dest.mode);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   // Sync to local storage
@@ -1038,37 +1143,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const activeMode = user.active_mode;
 
-  // Single Account Mode Switcher
-  const toggleMode = () => {
+  // Mode-Entry Boundary Handler (Used when choosing mode from Public Landing or direct entry)
+  const enterMode = (mode: UserMode) => {
     speechController.stop();
-    const newMode: UserMode = user.active_mode === 'CUSTOMER' ? 'ARTISAN' : 'CUSTOMER';
-    setUser((prev) => ({
-      ...prev,
-      active_mode: newMode,
-    }));
-    // If a tour was active, close it so mode-specific tour can start
-    if (activeTourId) {
-      setActiveTourId(null);
-      setActiveStepIndex(0);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
-    showNotification(
-      newMode === 'ARTISAN'
-        ? 'Switched to Artisan Studio Mode — Welcome to your digital loom workspace!'
-        : 'Switched to Heritage Marketplace Mode — Explore India’s authentic treasures!'
-    );
+    setActiveTourId(null);
+    setActiveStepIndex(0);
+
+    const isCleared = isLoggedIn && modeGateStatus === mode;
+    if (isCleared) {
+      setUser((prev) => ({ ...prev, active_mode: mode }));
+      navigate(mode === 'ARTISAN' ? '/artisan-studio' : '/marketplace');
+    } else {
+      setIntendedMode(mode);
+      setIntendedDestination(mode === 'ARTISAN' ? '/artisan-studio' : '/marketplace', mode);
+      navigate('/login');
+    }
+  };
+
+  // Secure Mode Switcher: Mode switch must NEVER directly open destination mode without passing through the authentication screen
+  const requestModeSwitch = (targetMode?: UserMode) => {
+    speechController.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setActiveTourId(null);
+    setActiveStepIndex(0);
+
+    const target: UserMode = targetMode || (user.active_mode === 'CUSTOMER' ? 'ARTISAN' : 'CUSTOMER');
+    setIntendedMode(target);
+    setIntendedDestination(target === 'ARTISAN' ? '/artisan-studio' : '/marketplace', target);
+    // Boundary lock: require authentication for the target mode
+    setModeGateStatus(null);
+    sessionStorage.removeItem('desi_craft_mode_gate');
+    navigate('/login');
+  };
+
+  // Toggle Mode delegates to the secure mode switch boundary
+  const toggleMode = () => {
+    const nextMode: UserMode = user.active_mode === 'CUSTOMER' ? 'ARTISAN' : 'CUSTOMER';
+    requestModeSwitch(nextMode);
   };
 
   const setMode = (mode: UserMode) => {
-    if (user.active_mode === mode) return;
-    speechController.stop();
-    if (activeTourId) {
-      setActiveTourId(null);
-      setActiveStepIndex(0);
-    }
-    setUser((prev) => ({
-      ...prev,
-      active_mode: mode,
-    }));
+    if (user.active_mode === mode && modeGateStatus === mode) return;
+    requestModeSwitch(mode);
   };
 
   // Product actions
@@ -1087,6 +1208,91 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         console.warn('[Supabase] addPassport fallback:', err)
       );
     }
+  };
+
+  // Product actions & Safe Editing Workflow
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const beginEditProduct = async (productId: string): Promise<{ success: boolean; error?: string }> => {
+    const prod = products.find((p) => p.id === productId);
+    if (!prod) {
+      return { success: false, error: t('Product not found') };
+    }
+
+    const sellerId = user.artisan_profile?.id || user.id || 'artisan-rajesh-varanasi';
+    const sessionId = `edit-session-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+    const res = await beginProductEdit(productId, sellerId, sessionId, prod);
+    if (!res.success || !res.product) {
+      showNotification(res.error || t('Product is currently being edited by another session.'));
+      return { success: false, error: res.error || t('Product is currently being edited by another session.') };
+    }
+
+    // Update state immediately: product is now EDITING (hidden from customers)
+    setProducts((prev) => prev.map((p) => (p.id === productId ? res.product! : p)));
+    setEditingProduct(res.product);
+
+    if (selectedProduct && selectedProduct.id === productId) {
+      setSelectedProduct(res.product);
+    }
+
+    showNotification(t('Editing mode active — Product is temporarily hidden from customers.'));
+    return { success: true };
+  };
+
+  const saveProductEdit = async (
+    productId: string,
+    newPrice: number,
+    newDescription: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    const prod = products.find((p) => p.id === productId);
+    if (!prod) {
+      return { success: false, error: t('Product not found') };
+    }
+
+    const sellerId = user.artisan_profile?.id || user.id || 'artisan-rajesh-varanasi';
+    const sessionId = prod.edit_session_id || `session-${Date.now()}`;
+
+    const res = await updateProductSafely(productId, sellerId, sessionId, newPrice, newDescription, prod);
+    if (!res.success || !res.product) {
+      showNotification(res.error || t('Unable to update product. Your product is still hidden from customers. Please try again.'));
+      return {
+        success: false,
+        error: res.error || t('Unable to update product. Your product is still hidden from customers. Please try again.'),
+      };
+    }
+
+    setProducts((prev) => prev.map((p) => (p.id === productId ? res.product! : p)));
+    setEditingProduct(null);
+
+    if (selectedProduct && selectedProduct.id === productId) {
+      setSelectedProduct(res.product);
+    }
+
+    showNotification(t('Product updated successfully.'));
+    return { success: true };
+  };
+
+  const cancelProductEditSession = async (productId: string): Promise<{ success: boolean; error?: string }> => {
+    const prod = products.find((p) => p.id === productId);
+    if (!prod) {
+      setEditingProduct(null);
+      return { success: true };
+    }
+
+    const sellerId = user.artisan_profile?.id || user.id || 'artisan-rajesh-varanasi';
+    const sessionId = prod.edit_session_id || '';
+
+    const res = await cancelProductEdit(productId, sellerId, sessionId, prod);
+    if (res.product) {
+      setProducts((prev) => prev.map((p) => (p.id === productId ? res.product! : p)));
+      if (selectedProduct && selectedProduct.id === productId) {
+        setSelectedProduct(res.product);
+      }
+    }
+    setEditingProduct(null);
+    showNotification(t('Editing cancelled. Product visibility restored.'));
+    return { success: true };
   };
 
   const updateProduct = (id: string, updates: Partial<Product>) => {
@@ -1164,13 +1370,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
-  // Checkout & Order creation
-  const createOrder = (orderData: {
+  // Checkout & Order creation with Database-Level Validation
+  const createOrder = async (orderData: {
     customer_name: string;
     customer_email: string;
     payment_method: 'UPI' | 'Card' | 'NetBanking' | 'CashOnDelivery';
     shipping_address: Order['shipping_address'];
-  }): Order => {
+  }): Promise<{ success: boolean; order?: Order; error?: string }> => {
+    // 1. In-memory check: reject if any item is not PUBLISHED
+    for (const c of cart) {
+      const liveProd = products.find((p) => p.id === c.product.id);
+      if (!liveProd || liveProd.status !== 'PUBLISHED') {
+        const errorMsg = t('Sorry, this product is temporarily unavailable.');
+        showNotification(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    }
+
     const orderItems = cart.map((c, index) => ({
       id: `item-${Date.now()}-${index}`,
       product_id: c.product.id,
@@ -1182,7 +1398,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       image: c.product.primary_image,
     }));
 
-    const newOrder: Order = {
+    const rawOrder: Order = {
       id: `ORD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
       customer_id: user.id,
       customer_name: orderData.customer_name,
@@ -1199,10 +1415,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updated_at: new Date().toISOString(),
     };
 
-    setOrders((prev) => [newOrder, ...prev]);
+    // 2. Authoritative Database-Level Check & Placement
+    const res = await placeOrderSafely(rawOrder, products);
+    if (!res.success || !res.order) {
+      showNotification(res.error || t('Sorry, this product is temporarily unavailable.'));
+      return { success: false, error: res.error || t('Sorry, this product is temporarily unavailable.') };
+    }
+
+    const confirmedOrder = res.order;
+    setOrders((prev) => [confirmedOrder, ...prev]);
     clearCart();
-    showNotification(`Order placed successfully! Order ID: ${newOrder.id}`);
-    return newOrder;
+    showNotification(`Order placed successfully! Order ID: ${confirmedOrder.id}`);
+    return { success: true, order: confirmedOrder };
   };
 
   const updateOrderStatus = (orderId: string, status: OrderStatus) => {
@@ -1630,76 +1854,129 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showNotification(`Universal Desi Craft account created for ${userData.name}!`);
   };
 
-  const loginUser = (identifier: string, password?: string) => {
-    setIsLoggedIn(true);
-    localStorage.setItem('desi_craft_logged_in', 'true');
+  const loginUser = async (
+    identifier: string,
+    password?: string,
+    targetMode?: UserMode
+  ): Promise<{ success: boolean; error?: string }> => {
+    const cleanId = identifier.trim().toLowerCase();
+    const cleanPass = password || 'HeritagePass@2026';
+    const dest = getIntendedDestination();
+    const resolvedMode: UserMode =
+      targetMode || dest.mode || intendedMode || user.active_mode || 'CUSTOMER';
 
-    if (identifier.toLowerCase().includes('rajeshwar') || identifier.toLowerCase().includes('artisan')) {
-      const artisanUser: User = {
-        id: 'artisan-rajesh-varanasi',
-        name: 'Master Rajeshwar Ansari',
-        email: 'rajeshwar.kashi@crafts.in',
-        phone: '+91 98450 88492',
-        preferred_language: 'hi',
-        active_mode: 'ARTISAN',
-        artisan_profile: {
-          id: 'ap-rajesh-01',
-          user_id: 'artisan-rajesh-varanasi',
-          name: 'Master Rajeshwar Ansari',
-          craft_id: 'craft-varanasi-brocade',
-          craft_name: 'Varanasi Zari & Brocade',
-          state: 'Uttar Pradesh',
-          district: 'Varanasi',
-          experience_years: 28,
-          bio: 'Preserving 5 generations of Kadwa pit-loom tapestry weaving with pure silver Zari in Varanasi.',
-          craft_story: 'Handwoven across 48 consecutive days with two weavers simultaneously operating the drawloom.',
-          learning_available: true,
-          collaboration_available: true,
-          verification_status: 'VERIFIED',
-          languages_spoken: ['Hindi', 'Urdu', 'English'],
-          avatar_url: '/images/hero-saree.png',
-          guild_name: 'Kashi Bunakar Vankar Cooperative Society',
-          rating: 4.98,
-          reviews_count: 142,
-        },
-        created_at: '2025-01-01T00:00:00Z',
+    try {
+      // 1. Attempt Supabase Auth login if connected
+      let authUser: User | null = null;
+      if (isSupabaseConnected) {
+        const { user: supaUser, error } = await signInWithSupabase(cleanId, cleanPass);
+        if (
+          error &&
+          !cleanId.includes('rajeshwar') &&
+          !cleanId.includes('deviprasad') &&
+          !cleanId.includes('artisan') &&
+          !cleanId.includes('patron')
+        ) {
+          return { success: false, error: error.message || t('Invalid email or password.') };
+        }
+        if (supaUser) {
+          authUser = supaUser;
+        }
+      }
+
+      // 2. Resolve single user account (preserving all user profile data)
+      if (!authUser) {
+        if (cleanId.includes('rajeshwar') || cleanId.includes('artisan')) {
+          authUser = {
+            ...defaultUser,
+            active_mode: resolvedMode,
+          };
+        } else {
+          authUser = {
+            id: user.id || 'user-heirloom-001',
+            name: cleanId.includes('@')
+              ? cleanId.split('@')[0].replace(/\./g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+              : user.name || 'Devi Prasad Sharma',
+            email: cleanId.includes('@') ? cleanId : user.email || 'deviprasad.crafts@bharat.in',
+            phone: cleanId.startsWith('+') || /^\d+$/.test(cleanId) ? cleanId : user.phone || '+91 98450 12345',
+            preferred_language: language,
+            active_mode: resolvedMode,
+            customer_profile: user.customer_profile || {
+              id: `cp-${Date.now()}`,
+              user_id: user.id || 'user-heirloom-001',
+              location_state: 'Telangana',
+              location_district: 'Hyderabad',
+              interests: ['Handloom Sarees', 'Tribal Metalcraft'],
+              budget_preference: 25000,
+            },
+            artisan_profile: user.artisan_profile || defaultUser.artisan_profile,
+            created_at: user.created_at || '2025-10-01T00:00:00Z',
+          };
+        }
+      }
+
+      // 3. Update single account state
+      const updatedUser: User = {
+        ...authUser,
+        active_mode: resolvedMode,
       };
-      setUser(artisanUser);
-      localStorage.setItem('desi_craft_user', JSON.stringify(artisanUser));
-      setMode('ARTISAN');
-      showNotification('Logged in as Master Rajeshwar Ansari (Artisan Studio Mode)');
-    } else {
-      const patronUser: User = {
-        id: 'user-heirloom-001',
-        name:
-          identifier.includes('@')
-            ? identifier.split('@')[0].replace(/\./g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
-            : 'Devi Prasad Sharma',
-        email: identifier.includes('@') ? identifier : 'deviprasad.crafts@bharat.in',
-        phone: identifier.startsWith('+') || /^\d+$/.test(identifier) ? identifier : '+91 98450 12345',
-        preferred_language: language,
-        active_mode: 'CUSTOMER',
-        customer_profile: {
-          id: 'cp-001',
-          user_id: 'user-heirloom-001',
-          location_state: 'Telangana',
-          location_district: 'Hyderabad',
-          interests: ['Handloom Sarees', 'Tribal Metalcraft'],
-          budget_preference: 25000,
-        },
-        created_at: '2025-10-01T00:00:00Z',
-      };
-      setUser(patronUser);
-      localStorage.setItem('desi_craft_user', JSON.stringify(patronUser));
-      setMode('CUSTOMER');
-      showNotification(`Welcome back, ${patronUser.name}!`);
+
+      setUser(updatedUser);
+      setIsLoggedIn(true);
+      setModeGateStatus(resolvedMode);
+      localStorage.setItem('desi_craft_logged_in', 'true');
+      localStorage.setItem('desi_craft_user', JSON.stringify(updatedUser));
+      sessionStorage.setItem('desi_craft_mode_gate', resolvedMode);
+
+      // 4. Artisan Onboarding Check (Requirement 17)
+      if (resolvedMode === 'ARTISAN') {
+        if (!updatedUser.artisan_profile || !updatedUser.artisan_profile.craft_name) {
+          setIsVoiceArtisanSetupOpen(true);
+        }
+      }
+
+      // 5. Navigate to destination route and clear intended
+      const destinationPath = resolvedMode === 'ARTISAN' ? '/artisan-studio' : '/marketplace';
+      clearIntendedDestination();
+      setIntendedMode(null);
+      navigate(destinationPath);
+
+      showNotification(
+        resolvedMode === 'ARTISAN'
+          ? t('Switched to Artisan Studio Mode — Welcome to your digital loom workspace!')
+          : t('Switched to Heritage Marketplace Mode — Explore India’s authentic treasures!')
+      );
+
+      return { success: true };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { success: false, error: msg || t('Invalid email or password.') };
     }
   };
 
-  const logoutUser = () => {
+  const logoutUser = async () => {
+    speechController.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setActiveTourId(null);
+    setActiveStepIndex(0);
+
+    try {
+      await signOutWithSupabase();
+    } catch {
+      // Ignore
+    }
+
     setIsLoggedIn(false);
+    setModeGateStatus(null);
+    setIntendedMode(null);
+    clearIntendedDestination();
     localStorage.removeItem('desi_craft_logged_in');
-    showNotification('Logged out from Desi Craft.');
+    sessionStorage.removeItem('desi_craft_mode_gate');
+
+    navigate('/');
+    showNotification(t('Logged out from Desi Craft.'));
   };
 
   const t = useMemo(() => createTranslator(language), [language]);
@@ -1723,6 +2000,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addProduct,
         updateProduct,
         deleteProduct,
+        editingProduct,
+        setEditingProduct,
+        beginEditProduct,
+        saveProductEdit,
+        cancelProductEditSession,
         cart,
         addToCart,
         removeFromCart,
@@ -1811,6 +2093,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setVoiceGuidanceEnabled,
         autoStartHelp,
         setAutoStartHelp,
+        isGuideActive: activeTourId !== null && guidedHelpEnabled,
         activeTourId,
         activeStepIndex,
         completedTours,
@@ -1830,6 +2113,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         logoutUser,
         supabaseStatus,
         isSupabaseConnected,
+        currentRoute,
+        setCurrentRoute,
+        isAuthChecking,
+        modeGateStatus,
+        intendedMode,
+        setIntendedMode,
+        enterMode,
+        requestModeSwitch,
       }}
     >
       {children}

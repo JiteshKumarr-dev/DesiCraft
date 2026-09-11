@@ -96,8 +96,9 @@ export const CustomerHome: React.FC = () => {
     return c.region === activeRegionFilter;
   });
 
-  // Filter products by region, category, search
+  // Filter products by published status (customer security), region, category, search
   const filteredProducts = products.filter((p) => {
+    const isPublished = p.status === 'PUBLISHED';
     const matchesRegion = activeRegionFilter === 'All' || p.region === activeRegionFilter;
     const matchesCategory =
       selectedCategory === 'ALL' ||
@@ -108,7 +109,7 @@ export const CustomerHome: React.FC = () => {
       p.craft_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.artisan_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.technique.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesRegion && matchesCategory && matchesSearch;
+    return isPublished && matchesRegion && matchesCategory && matchesSearch;
   });
 
   const currentPlayingArtisan = artisans.find((a) => a.id === playingArtisanId) || artisans[0];
@@ -332,7 +333,7 @@ export const CustomerHome: React.FC = () => {
           </section>
 
           {/* 4. ORAL ARTISAN STORIES AUDIO & READING PLAYER */}
-          <section className="p-6 sm:p-8 rounded-3xl bg-surface-container-low border border-outline/20 space-y-6">
+          <section data-guide="artisan-oral-stories" className="p-6 sm:p-8 rounded-3xl bg-surface-container-low border border-outline/20 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-secondary/15 text-secondary border border-secondary/30">
@@ -440,7 +441,7 @@ export const CustomerHome: React.FC = () => {
           </section>
 
           {/* 5. FEATURED MASTERPIECES CATALOG */}
-          <section id="marketplace-section" className="space-y-6">
+          <section id="marketplace-section" data-guide="marketplace-section" className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
                 <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
@@ -503,7 +504,7 @@ export const CustomerHome: React.FC = () => {
                       {/* GI Tag chip */}
                       <span className="absolute bottom-3 left-3 bg-black/75 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded-md flex items-center gap-1">
                         <ShieldCheck className="w-3 h-3 text-secondary" />
-                        <span>{product.gi_tag}</span>
+                        <span>{t(product.gi_tag)}</span>
                       </span>
                     </div>
 
@@ -511,18 +512,18 @@ export const CustomerHome: React.FC = () => {
                     <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
                       <div className="space-y-1">
                         <span className="text-[10px] font-bold text-primary uppercase tracking-wider block">
-                          {product.craft_name}
+                          {t(product.craft_name)}
                         </span>
 
                         <h3
                           onClick={() => setSelectedProduct(product)}
                           className="font-serif font-bold text-sm text-on-surface line-clamp-1 hover:text-primary transition cursor-pointer"
                         >
-                          {product.name}
+                          {t(product.name)}
                         </h3>
 
                         <p className="text-[11px] text-on-surface-variant">
-                          By {product.artisan_name}
+                          {t('By')} {t(product.artisan_name)}
                         </p>
                       </div>
 

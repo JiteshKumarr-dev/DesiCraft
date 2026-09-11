@@ -51,9 +51,9 @@ export const CartDrawer: React.FC = () => {
               <div className="w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center">
                 <ShoppingBag className="w-8 h-8" />
               </div>
-              <p className="font-serif text-lg text-on-surface font-semibold">Your Cart is Empty</p>
+              <p className="font-serif text-lg text-on-surface font-semibold">{t('Your Cart is Empty')}</p>
               <p className="text-xs text-on-surface-variant max-w-xs mx-auto">
-                Explore handloom sarees, lost-wax bronze sculptures, and GI certified treasures from master artisans.
+                {t('Explore handloom sarees, lost-wax bronze sculptures, and GI certified treasures from master artisans.')}
               </p>
             </div>
           ) : (
@@ -120,19 +120,19 @@ export const CartDrawer: React.FC = () => {
 
             <div className="space-y-1.5 text-xs text-on-surface-variant">
               <div className="flex justify-between">
-                <span>Subtotal</span>
+                <span>{t('Subtotal')}</span>
                 <span>₹{cartTotal.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-green-700 font-medium">
-                <span>Digital Craft Passport Certificate</span>
-                <span>FREE (Included)</span>
+                <span>{t('Digital Craft Passport Certificate')}</span>
+                <span>{t('FREE')} ({t('Included')})</span>
               </div>
               <div className="flex justify-between text-green-700 font-medium">
-                <span>Direct Artisan Insured Shipping</span>
-                <span>FREE</span>
+                <span>{t('Direct Artisan Insured Shipping')}</span>
+                <span>{t('FREE')}</span>
               </div>
               <div className="flex justify-between text-sm font-bold text-on-surface pt-2 border-t border-outline/10">
-                <span>Total Amount</span>
+                <span>{t('Total Amount')}</span>
                 <span className="text-primary font-serif text-base">
                   ₹{cartTotal.toLocaleString('en-IN')}
                 </span>
@@ -146,7 +146,7 @@ export const CartDrawer: React.FC = () => {
               }}
               className="w-full py-3 px-4 rounded-full bg-primary text-on-primary font-bold text-xs sm:text-sm hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>{t.buyNow}</span>
+              <span>{t('Buy Now')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

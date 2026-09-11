@@ -34,8 +34,13 @@ import { FairPriceAdvisorModal } from './components/artisan/FairPriceAdvisorModa
 import { PhotoEnhancerModal } from './components/artisan/PhotoEnhancerModal';
 import { VoiceArtisanSetupModal } from './components/artisan/VoiceArtisanSetupModal';
 
+// Public Portal & Auth Guard
+import { PublicLanding } from './components/common/PublicLanding';
+import { LoginPage } from './components/common/LoginPage';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
+
 export const App: React.FC = () => {
-  const { activeMode } = useApp();
+  const { currentRoute, activeMode } = useApp();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
@@ -51,9 +56,21 @@ export const App: React.FC = () => {
         onOpenEndangeredModal={() => setIsEndangeredOpen(true)}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content Area: Route-level Authentication Guard */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {activeMode === 'CUSTOMER' ? <CustomerHome /> : <ArtisanDashboard />}
+        {currentRoute === '/login' ? (
+          <LoginPage />
+        ) : currentRoute === '/marketplace' ? (
+          <ProtectedRoute requiredMode="CUSTOMER">
+            <CustomerHome />
+          </ProtectedRoute>
+        ) : currentRoute === '/artisan-studio' ? (
+          <ProtectedRoute requiredMode="ARTISAN">
+            <ArtisanDashboard />
+          </ProtectedRoute>
+        ) : (
+          <PublicLanding />
+        )}
       </main>
 
       {/* Global Footer */}

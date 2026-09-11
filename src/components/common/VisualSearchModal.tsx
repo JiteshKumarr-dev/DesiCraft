@@ -228,7 +228,7 @@ const SAMPLE_PRESETS = [
 ];
 
 export const VisualSearchModal: React.FC = () => {
-  const { isVisualSearchOpen, setIsVisualSearchOpen, products, setSelectedProduct, showNotification } = useApp();
+  const { isVisualSearchOpen, setIsVisualSearchOpen, products, setSelectedProduct, showNotification, t } = useApp();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -437,7 +437,7 @@ export const VisualSearchModal: React.FC = () => {
           <button
             onClick={handleClose}
             className="p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer"
-            aria-label="Close"
+            aria-label={t('Close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -447,7 +447,7 @@ export const VisualSearchModal: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 no-scrollbar">
           {/* Subtitle description */}
           <p className="text-xs text-on-surface-variant leading-relaxed">
-            Upload or photograph any Indian handloom saree, embroidery, pottery, or metal sculpture. Our neural network analyzes weave geometry, botanical dye chromatography, and thread density to identify its authentic Geographical Indication (GI) heritage.
+            {t('Upload or photograph any Indian handloom saree, embroidery, pottery, or metal sculpture. Our neural network analyzes weave geometry, botanical dye chromatography, and thread density to identify its authentic Geographical Indication (GI) heritage.')}
           </p>
 
           {/* Hidden File Input */}
@@ -480,16 +480,16 @@ export const VisualSearchModal: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-serif font-bold text-on-surface group-hover:text-primary transition">
-                  Click to upload photo of textile, embroidery, or craft
+                  {t('Click to upload photo of textile, embroidery, or craft')}
                 </p>
                 <p className="text-xs text-on-surface-variant">
-                  or drag & drop your image file here
+                  {t('or drag & drop your image file here')}
                 </p>
               </div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container border border-outline/20 text-[11px] text-on-surface-variant">
-                <span>Supports JPEG, PNG, WEBP</span>
+                <span>{t('Supports JPEG, PNG, WEBP')}</span>
                 <span>•</span>
-                <span>Loom shots, saree pallu, museum artifacts</span>
+                <span>{t('Loom shots, saree pallu, museum artifacts')}</span>
               </div>
             </div>
           ) : (
@@ -515,7 +515,7 @@ export const VisualSearchModal: React.FC = () => {
               <div className="p-3 bg-surface-container-low border-t border-outline/20 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs text-on-surface font-medium truncate max-w-[65%]">
                   <ImageIcon className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="truncate">{selectedFileName || 'Visual Pattern Sample'}</span>
+                  <span className="truncate">{selectedFileName || t('Visual Pattern Sample')}</span>
                 </div>
                 <button
                   type="button"
@@ -523,7 +523,7 @@ export const VisualSearchModal: React.FC = () => {
                   className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <RefreshCw className="w-3 h-3" />
-                  <span>Upload Different Photo</span>
+                  <span>{t('Upload Different Photo')}</span>
                 </button>
               </div>
             </div>
@@ -610,7 +610,7 @@ export const VisualSearchModal: React.FC = () => {
               <div className="space-y-1.5">
                 <span className="text-[11px] font-bold text-on-surface flex items-center gap-1">
                   <Layers className="w-3.5 h-3.5 text-primary" />
-                  <span>Identified Heritage Markers</span>
+                  <span>{t('Identified Heritage Markers')}</span>
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {matchedCraft.characteristics.map((c, i) => (
@@ -619,7 +619,7 @@ export const VisualSearchModal: React.FC = () => {
                       className="px-2.5 py-1 rounded-lg bg-surface text-[11px] font-medium border border-outline/25 text-on-surface flex items-center gap-1 shadow-2xs"
                     >
                       <span className="text-primary font-bold">✦</span>
-                      <span>{c}</span>
+                      <span>{t(c)}</span>
                     </span>
                   ))}
                 </div>
@@ -631,7 +631,7 @@ export const VisualSearchModal: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-on-surface flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-green-700" />
-                      <span>Certified Heirloom Available in Desi Craft Catalog</span>
+                      <span>{t('Certified Heirloom Available in Desi Craft Catalog')}</span>
                     </span>
                     <span className="text-[11px] font-bold text-primary">
                       ₹{matchedProduct.price.toLocaleString('en-IN')}
@@ -647,10 +647,10 @@ export const VisualSearchModal: React.FC = () => {
                       />
                       <div className="min-w-0">
                         <h5 className="font-serif text-xs font-bold text-on-surface truncate">
-                          {matchedProduct.name}
+                          {t(matchedProduct.name)}
                         </h5>
                         <p className="text-[11px] text-on-surface-variant truncate">
-                          By {matchedProduct.artisan_name} • {matchedProduct.region}
+                          {t('By')} {t(matchedProduct.artisan_name)} • {t(matchedProduct.region)}
                         </p>
                       </div>
                     </div>
@@ -662,7 +662,7 @@ export const VisualSearchModal: React.FC = () => {
                       }}
                       className="px-3.5 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs flex items-center gap-1 shrink-0 cursor-pointer"
                     >
-                      <span>Explore Piece</span>
+                      <span>{t('Explore Piece')}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -675,7 +675,7 @@ export const VisualSearchModal: React.FC = () => {
           <div className="space-y-2.5 pt-2 border-t border-outline/15">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-on-surface">
-                Or pick a sample heritage motif to test instant recognition:
+                {t('Or pick a sample heritage motif to test instant recognition:')}
               </label>
             </div>
 
@@ -698,7 +698,7 @@ export const VisualSearchModal: React.FC = () => {
                     />
                   </div>
                   <span className="text-[10px] font-medium text-on-surface text-center line-clamp-1 group-hover:text-primary">
-                    {sample.label}
+                    {t(sample.label)}
                   </span>
                 </button>
               ))}
@@ -709,9 +709,9 @@ export const VisualSearchModal: React.FC = () => {
         {/* Footer info */}
         <div className="p-3 bg-surface-container/60 border-t border-outline/15 text-center">
           <p className="text-[11px] text-on-surface-variant flex items-center justify-center gap-1.5">
-            <span>🛡️ Verified with Government of India GI Registry database</span>
+            <span>🛡️ {t('Verified with Government of India GI Registry database')}</span>
             <span>•</span>
-            <span>Zero Data Storage</span>
+            <span>{t('Zero Data Storage')}</span>
           </p>
         </div>
       </div>

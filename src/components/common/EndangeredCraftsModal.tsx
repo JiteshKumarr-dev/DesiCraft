@@ -19,7 +19,7 @@ interface EndangeredCraftsModalProps {
 }
 
 export const EndangeredCraftsModal: React.FC<EndangeredCraftsModalProps> = ({ isOpen, onClose }) => {
-  const { user, showNotification } = useApp();
+  const { user, showNotification, t } = useApp();
 
   const [selectedCraftIndex, setSelectedCraftIndex] = useState(0);
   const [sponsorshipTier, setSponsorshipTier] = useState<'RAW_MATERIALS' | 'APPRENTICE_STIPEND' | 'FULL_LOOM'>('APPRENTICE_STIPEND');
@@ -159,71 +159,85 @@ export const EndangeredCraftsModal: React.FC<EndangeredCraftsModalProps> = ({ is
                 <h2 className="font-serif text-2xl font-bold text-on-surface">
                   Adopt a Master Loom & Lineage
                 </h2>
-                <p className="text-xs text-on-surface-variant">
-                  Direct micro-patronage preserving living traditions at risk of disappearing.
-                </p>
               </div>
             </div>
 
-            {/* Endangered Craft Selector */}
+            {/* Craft Selector Tabs */}
             <div className="grid grid-cols-3 gap-2">
               {endangeredList.map((craft, idx) => (
                 <button
-                  key={idx}
+                  key={craft.name}
                   type="button"
-                  onClick={() => setSelectedCraftIndex(idx)}
+                  onClick={() => {
+                    setSelectedCraftIndex(idx);
+                    setIsSponsored(false);
+                  }}
                   className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
                     selectedCraftIndex === idx
-                      ? 'border-primary bg-primary/10 shadow-xs ring-1 ring-primary'
-                      : 'border-outline/20 hover:bg-surface-container'
+                      ? 'border-primary bg-primary/10 ring-1 ring-primary'
+                      : 'border-outline/20 bg-surface hover:bg-surface-container'
                   }`}
                 >
-                  <span className="text-[10px] font-bold text-red-700 uppercase block">
+                  <span className="text-[10px] font-bold text-red-600 uppercase block">
                     {craft.urgency}
                   </span>
-                  <span className="font-serif font-bold text-xs text-on-surface line-clamp-1 mt-0.5">
+                  <h4 className="font-serif font-bold text-xs text-on-surface truncate mt-0.5">
                     {craft.name}
-                  </span>
+                  </h4>
+                  <p className="text-[10px] text-on-surface-variant truncate mt-0.5">
+                    {craft.location}
+                  </p>
                 </button>
               ))}
             </div>
 
-            {/* Selected Craft Details */}
-            <div className="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="font-serif font-bold text-base text-on-surface">
-                  {currentCraft.name}
-                </h3>
-                <span className="text-xs font-mono text-primary font-semibold">{currentCraft.giTag}</span>
+            {/* Selected Craft Card */}
+            <div className="relative rounded-2xl overflow-hidden border border-outline/20 bg-surface-container-low">
+              <div className="aspect-16/7 w-full overflow-hidden">
+                <img
+                  src={currentCraft.image}
+                  alt={currentCraft.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <p className="text-xs text-on-surface-variant leading-relaxed">
-                {currentCraft.description}
-              </p>
-              <div className="text-[11px] font-semibold text-red-700 bg-red-50 p-2 rounded-lg border border-red-200">
-                ⚠️ Surviving Custodians: {currentCraft.survivingLineages}
+              <div className="p-4 space-y-2">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <h3 className="font-serif text-base font-bold text-on-surface">
+                    {currentCraft.name}
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-secondary/15 text-secondary border border-secondary/20">
+                    {currentCraft.giTag}
+                  </span>
+                </div>
+                <p className="text-xs text-on-surface-variant leading-relaxed">
+                  {currentCraft.description}
+                </p>
+                <div className="text-[11px] font-semibold text-red-700 bg-red-50 p-2 rounded-lg border border-red-200">
+                  ⚠️ Surviving Custodians: {currentCraft.survivingLineages}
+                </div>
               </div>
             </div>
 
             {/* Sponsorship Tiers */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-on-surface">Choose Micro-Patronage Tier</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Choose Micro-Patronage Tier')}</label>
               <div className="space-y-2">
-                {tiers.map((t) => (
+                {tiers.map((tier) => (
                   <div
-                    key={t.id}
-                    onClick={() => setSponsorshipTier(t.id as any)}
+                    key={tier.id}
+                    onClick={() => setSponsorshipTier(tier.id as any)}
                     className={`p-3.5 rounded-xl border transition cursor-pointer flex items-center justify-between ${
-                      sponsorshipTier === t.id
+                      sponsorshipTier === tier.id
                         ? 'border-primary bg-primary/10 ring-1 ring-primary'
                         : 'border-outline/20 bg-surface hover:bg-surface-container'
                     }`}
                   >
                     <div>
-                      <h4 className="font-serif font-bold text-xs text-on-surface">{t.label}</h4>
-                      <p className="text-[11px] text-on-surface-variant mt-0.5">{t.desc}</p>
+                      <h4 className="font-serif font-bold text-xs text-on-surface">{t(tier.label)}</h4>
+                      <p className="text-[11px] text-on-surface-variant mt-0.5">{t(tier.desc)}</p>
                     </div>
                     <span className="font-bold text-sm text-primary font-mono shrink-0 ml-3">
-                      ₹{t.amount.toLocaleString('en-IN')}
+                      ₹{tier.amount.toLocaleString('en-IN')}
                     </span>
                   </div>
                 ))}
@@ -233,7 +247,7 @@ export const EndangeredCraftsModal: React.FC<EndangeredCraftsModalProps> = ({ is
             {/* Form */}
             <form onSubmit={handleSponsor} className="space-y-3 pt-2 border-t border-outline/10">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-on-surface">Name for Official Patron Certificate</label>
+                <label className="text-xs font-semibold text-on-surface">{t('Name for Official Patron Certificate')}</label>
                 <input
                   type="text"
                   required

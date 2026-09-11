@@ -38,6 +38,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
     setVoiceGuidanceEnabled,
     autoStartHelp,
     setAutoStartHelp,
+    t,
   } = useApp();
 
   if (!isOpen) return null;
@@ -62,13 +63,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               <div className="flex items-center gap-2">
                 <h2 className="font-serif text-xl font-bold text-on-surface">{user.name}</h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-secondary/15 text-secondary border border-secondary/30">
-                  VERIFIED PATRON & ARTISAN
+                  {t('VERIFIED PATRON & ARTISAN')}
                 </span>
               </div>
               <p className="text-xs text-on-surface-variant">{user.email}</p>
               <div className="flex items-center gap-1 text-xs text-on-surface-variant mt-1">
                 <MapPin className="w-3.5 h-3.5 text-primary" />
-                <span>Hyderabad, Telangana / Varanasi, UP</span>
+                <span>{t('Hyderabad, Telangana / Varanasi, UP')}</span>
               </div>
             </div>
           </div>
@@ -78,10 +79,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                  ONE ACCOUNT → DUAL MODES
+                  {t('ONE ACCOUNT → DUAL MODES')}
                 </span>
                 <p className="text-sm font-bold text-on-surface">
-                  Currently in: <span className="text-primary">{activeMode === 'CUSTOMER' ? 'Heritage Marketplace' : 'Artisan Studio'}</span>
+                  {t('Currently in')}: <span className="text-primary">{activeMode === 'CUSTOMER' ? t('Heritage Marketplace') : t('Artisan Studio')}</span>
                 </p>
               </div>
               <button
@@ -89,11 +90,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs cursor-pointer"
               >
                 <ArrowLeftRight className="w-3.5 h-3.5" />
-                <span>Switch to {activeMode === 'CUSTOMER' ? 'Artisan Studio' : 'Marketplace'}</span>
+                <span>{t('Switch to')} {activeMode === 'CUSTOMER' ? t('Artisan Studio') : t('Marketplace')}</span>
               </button>
             </div>
             <p className="text-[11px] text-on-surface-variant leading-tight">
-              You do not need multiple logins. Sell handcrafted masterpieces and commission bespoke works from fellow artisans from the same account.
+              {t('You do not need multiple logins. Sell handcrafted masterpieces and commission bespoke works from fellow artisans from the same account.')}
             </p>
           </div>
 
@@ -101,21 +102,21 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           <div className="grid grid-cols-3 gap-3 text-center">
             <div className="p-3 rounded-xl bg-surface-container border border-outline/20">
               <span className="text-[10px] uppercase font-semibold text-on-surface-variant block">
-                Direct Wage Impact
+                {t('Direct Wage Impact')}
               </span>
               <span className="font-serif text-lg font-bold text-primary">₹18,900</span>
             </div>
 
             <div className="p-3 rounded-xl bg-surface-container border border-outline/20">
               <span className="text-[10px] uppercase font-semibold text-on-surface-variant block">
-                Lineages Backed
+                {t('Lineages Backed')}
               </span>
               <span className="font-serif text-lg font-bold text-on-surface">3 Guilds</span>
             </div>
 
             <div className="p-3 rounded-xl bg-surface-container border border-outline/20">
               <span className="text-[10px] uppercase font-semibold text-on-surface-variant block">
-                GI Passports Held
+                {t('GI Passports Held')}
               </span>
               <span className="font-serif text-lg font-bold text-secondary">2 Verified</span>
             </div>
@@ -124,7 +125,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           {/* Recent Orders */}
           <div className="space-y-2">
             <h3 className="font-serif text-sm font-bold text-on-surface flex items-center gap-2">
-              <Package className="w-4 h-4 text-primary" /> Active Orders ({orders.length})
+              <Package className="w-4 h-4 text-primary" /> {t('Active Orders')} ({orders.length})
             </h3>
             <div className="space-y-2">
               {orders.map((o) => (
@@ -157,7 +158,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               <Globe className="w-4 h-4 text-primary" />
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant block">
-                  INTERFACE LANGUAGE
+                  {t('INTERFACE LANGUAGE')}
                 </span>
                 <span className="font-serif font-bold text-xs text-on-surface">
                   {language.toUpperCase()} (Selected)
@@ -172,7 +173,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               }}
               className="px-3 py-1.5 rounded-lg border border-primary/40 bg-surface text-primary text-xs font-semibold hover:bg-primary/10 transition cursor-pointer"
             >
-              Change Language
+              {t('Change Language')}
             </button>
           </div>
 
@@ -180,15 +181,15 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           <div className="p-4 rounded-xl bg-surface-container-low border border-primary/25 space-y-4">
             <div className="flex items-center gap-2 text-xs font-serif font-bold text-on-surface">
               <HelpCircle className="w-4 h-4 text-primary" />
-              <span>Accessibility & Assistance</span>
+              <span>{t('Accessibility & Assistance')}</span>
             </div>
 
             {/* Guided Help Switch */}
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h4 className="text-xs font-bold text-on-surface">Guided Help</h4>
+                <h4 className="text-xs font-bold text-on-surface">{t('Guided Help')}</h4>
                 <p className="text-[11px] text-on-surface-variant">
-                  Get step-by-step guidance while using Desi Craft.
+                  {t('Get step-by-step guidance while using Desi Craft.')}
                 </p>
               </div>
               <button
@@ -200,7 +201,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                     : 'bg-surface-container-highest text-on-surface-variant border border-outline/30'
                 }`}
               >
-                {guidedHelpEnabled ? 'ON' : 'OFF'}
+                {guidedHelpEnabled ? t('ON') : t('OFF')}
               </button>
             </div>
 
@@ -209,10 +210,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               <div>
                 <h4 className="text-xs font-bold text-on-surface flex items-center gap-1.5">
                   <Volume2 className="w-3.5 h-3.5 text-primary" />
-                  <span>Voice Guidance</span>
+                  <span>{t('Voice Guidance')}</span>
                 </h4>
                 <p className="text-[11px] text-on-surface-variant">
-                  Hear instructions aloud in your selected language.
+                  {t('Hear instructions aloud in your selected language.')}
                 </p>
               </div>
               <button
@@ -224,16 +225,16 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                     : 'bg-surface-container-highest text-on-surface-variant border border-outline/30'
                 }`}
               >
-                {voiceGuidanceEnabled ? 'ON' : 'OFF'}
+                {voiceGuidanceEnabled ? t('ON') : t('OFF')}
               </button>
             </div>
 
             {/* Auto-start Help Switch */}
             <div className="flex items-center justify-between gap-3 pt-2 border-t border-outline/10">
               <div>
-                <h4 className="text-xs font-bold text-on-surface">Auto-start Help</h4>
+                <h4 className="text-xs font-bold text-on-surface">{t('Auto-start Help')}</h4>
                 <p className="text-[11px] text-on-surface-variant">
-                  Start guidance automatically on new features.
+                  {t('Start guidance automatically on new features.')}
                 </p>
               </div>
               <button
@@ -245,7 +246,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                     : 'bg-surface-container-highest text-on-surface-variant border border-outline/30'
                 }`}
               >
-                {autoStartHelp ? 'ON' : 'OFF'}
+                {autoStartHelp ? t('ON') : t('OFF')}
               </button>
             </div>
           </div>
@@ -255,13 +256,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
             <div className="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-2">
               <div className="flex items-center gap-2 text-xs font-serif font-bold text-on-surface">
                 <Award className="w-4 h-4 text-secondary" />
-                <span>Affiliated Guild & Artisan Profile</span>
+                <span>{t('Affiliated Guild & Artisan Profile')}</span>
               </div>
               <p className="text-xs text-on-surface">
                 <strong>{user.artisan_profile.guild_name}</strong> • {user.artisan_profile.experience_years} Years Experience
               </p>
               <p className="text-[11px] text-on-surface-variant">
-                Craft Specialty: {user.artisan_profile.craft_name} ({user.artisan_profile.district}, {user.artisan_profile.state})
+                {t('Craft Specialty')}: {user.artisan_profile.craft_name} ({user.artisan_profile.district}, {user.artisan_profile.state})
               </p>
             </div>
           )}
@@ -275,7 +276,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               }}
               className="text-xs font-semibold text-primary hover:underline cursor-pointer"
             >
-              Switch Account / Demo Logins
+              {t('Switch Account / Demo Logins')}
             </button>
 
             <button
@@ -287,7 +288,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 transition flex items-center gap-1.5 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
+              <span>{t('Sign Out')}</span>
             </button>
           </div>
         </div>

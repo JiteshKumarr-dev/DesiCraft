@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export const StudioAnalytics: React.FC = () => {
-  const { user, orders } = useApp();
+  const { user, orders, t } = useApp();
 
   const totalEarnings = orders.reduce((sum, o) => sum + o.total_price, 0);
   const artisanShare = Math.round(totalEarnings * 0.82);
@@ -74,15 +74,15 @@ export const StudioAnalytics: React.FC = () => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-green-900/15 text-green-700 border border-green-700/30">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>DIRECT BENEFIT TRANSFER (DBT) VERIFIED</span>
+            <span>{t('DIRECT BENEFIT TRANSFER (DBT) VERIFIED')}</span>
           </div>
 
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-on-surface">
-            Studio Earnings & Heritage Realization
+            {t('Studio Earnings & Heritage Realization')}
           </h2>
 
           <p className="text-xs sm:text-sm text-on-surface-variant max-w-xl">
-            Linked to Pehchan Card <strong>{user.artisan_profile?.craft_id ? 'UP-VNS-2023-88492' : 'VERIFIED-ARTISAN'}</strong>. Zero middleman commissions. 82% of customer spend flows directly to your bank.
+            {t('Linked to Pehchan Card')} <strong>{user.artisan_profile?.craft_id ? 'UP-VNS-2023-88492' : 'VERIFIED-ARTISAN'}</strong>. {t('Zero middleman commissions. 82% of customer spend flows directly to your bank.')}
           </p>
         </div>
 
@@ -90,16 +90,16 @@ export const StudioAnalytics: React.FC = () => {
           <div className="flex items-center justify-between text-xs text-on-surface-variant">
             <span className="flex items-center gap-1.5 font-medium">
               <Landmark className="w-3.5 h-3.5 text-primary" />
-              Settlement Bank
+              {t('Settlement Bank')}
             </span>
-            <span className="font-bold text-green-700">Active DBT</span>
+            <span className="font-bold text-green-700">{t('Active DBT')}</span>
           </div>
           <p className="font-serif font-bold text-sm text-on-surface">
             HDFC Bank ••••••••8492
           </p>
           <div className="text-[11px] text-on-surface-variant flex items-center justify-between border-t border-outline/10 pt-1.5">
             <span>IFSC: HDFC0001842</span>
-            <span>Kashi Branch</span>
+            <span>{t('Kashi Branch')}</span>
           </div>
         </div>
       </div>
@@ -188,50 +188,50 @@ export const StudioAnalytics: React.FC = () => {
           {/* Bar Visualization */}
           <div className="space-y-3">
             <div className="h-4 w-full bg-surface-container-high rounded-full overflow-hidden flex">
-              <div style={{ width: '82%' }} className="bg-primary h-full" title="Artisan Direct Share (82%)" />
-              <div style={{ width: '11%' }} className="bg-secondary h-full" title="Raw Material Reserve (11%)" />
-              <div style={{ width: '4%' }} className="bg-green-700 h-full" title="Guild & Apprentice Fund (4%)" />
-              <div style={{ width: '3%' }} className="bg-neutral-400 h-full" title="Platform Cloud & Logistics (3%)" />
+              <div style={{ width: '82%' }} className="bg-primary h-full" title={t('Artisan Direct Share (82%)')} />
+              <div style={{ width: '11%' }} className="bg-secondary h-full" title={t('Raw Material Reserve (11%)')} />
+              <div style={{ width: '4%' }} className="bg-green-700 h-full" title={t('Guild & Apprentice Fund (4%)')} />
+              <div style={{ width: '3%' }} className="bg-neutral-400 h-full" title={t('Platform Cloud & Logistics (3%)')} />
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-1.5 font-bold text-on-surface">
                   <span className="w-2.5 h-2.5 rounded-full bg-primary inline-block" />
-                  <span>82% Artisan Share</span>
+                  <span>{t('82% Artisan Share')}</span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant">
-                  Direct living wage & family security
+                  {t('Direct living wage & family security')}
                 </p>
               </div>
 
               <div className="space-y-0.5">
                 <div className="flex items-center gap-1.5 font-bold text-on-surface">
                   <span className="w-2.5 h-2.5 rounded-full bg-secondary inline-block" />
-                  <span>11% Raw Materials</span>
+                  <span>{t('11% Raw Materials')}</span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant">
-                  Pure Mulberry silk & Tested silver Zari
+                  {t('Pure Mulberry silk & Tested silver Zari')}
                 </p>
               </div>
 
               <div className="space-y-0.5">
                 <div className="flex items-center gap-1.5 font-bold text-on-surface">
                   <span className="w-2.5 h-2.5 rounded-full bg-green-700 inline-block" />
-                  <span>4% Guild Fund</span>
+                  <span>{t('4% Guild Fund')}</span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant">
-                  Weaver cooperative apprentice stipend
+                  {t('Weaver cooperative apprentice stipend')}
                 </p>
               </div>
 
               <div className="space-y-0.5">
                 <div className="flex items-center gap-1.5 font-bold text-on-surface">
                   <span className="w-2.5 h-2.5 rounded-full bg-neutral-400 inline-block" />
-                  <span>3% Tech & Postage</span>
+                  <span>{t('3% Tech & Postage')}</span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant">
-                  Desi Craft cloud servers & speed post
+                  {t('Desi Craft cloud servers & speed post')}
                 </p>
               </div>
             </div>
@@ -240,16 +240,16 @@ export const StudioAnalytics: React.FC = () => {
           {/* Comparison with Mass Retail */}
           <div className="p-4 rounded-xl bg-surface-container-low border border-outline/20 text-xs space-y-2">
             <h4 className="font-serif font-bold text-on-surface">
-              Why This Matters: Desi Craft vs Traditional Middlemen
+              {t('Why This Matters: Desi Craft vs Traditional Middlemen')}
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] text-on-surface-variant">
               <div className="p-3 rounded-lg bg-surface border border-outline/15 space-y-1">
-                <span className="font-bold text-red-600 block">Traditional Middleman Channels</span>
-                <p>Artisan receives <strong>10% to 15%</strong> of retail price. Wholesalers and master-traders capture 85% markup.</p>
+                <span className="font-bold text-red-600 block">{t('Traditional Middleman Channels')}</span>
+                <p>{t('Artisan receives')} <strong>10% to 15%</strong> {t('of retail price. Wholesalers and master-traders capture 85% markup.')}</p>
               </div>
               <div className="p-3 rounded-lg bg-surface border border-outline/15 space-y-1">
-                <span className="font-bold text-green-700 block">Desi Craft Sovereign Ecosystem</span>
-                <p>Artisan retains <strong>82% direct value</strong>. Digital Craft Passport guarantees customer authenticity without intermediaries.</p>
+                <span className="font-bold text-green-700 block">{t('Desi Craft Sovereign Ecosystem')}</span>
+                <p>{t('Artisan retains')} <strong>82% direct value</strong>. {t('Digital Craft Passport guarantees customer authenticity without intermediaries.')}</p>
               </div>
             </div>
           </div>
@@ -285,17 +285,17 @@ export const StudioAnalytics: React.FC = () => {
             <div className="p-3 rounded-xl bg-surface-container-low border border-outline/20 space-y-1">
               <div className="flex items-center justify-between font-semibold text-on-surface">
                 <span>Loom #3 (Brocade Loom)</span>
-                <span className="text-green-700 font-bold">Idle / Ready</span>
+                <span className="text-green-700 font-bold">{t('Idle / Ready')}</span>
               </div>
               <p className="text-[11px] text-on-surface-variant">
-                Available for Bespoke Patron Commission
+                {t('Available for Bespoke Patron Commission')}
               </p>
             </div>
           </div>
 
           <div className="pt-2 text-center">
             <span className="text-[11px] text-on-surface-variant">
-              Guild Audit Verified: 0 child labor • 100% handloom certified
+              {t('Guild Audit Verified: 0 child labor • 100% handloom certified')}
             </span>
           </div>
         </div>
@@ -306,10 +306,10 @@ export const StudioAnalytics: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/10 pb-3">
           <div>
             <h3 className="font-serif text-base font-bold text-on-surface">
-              Direct Benefit Transfer (DBT) Bank Ledger
+              {t('Direct Benefit Transfer (DBT) Bank Ledger')}
             </h3>
             <p className="text-xs text-on-surface-variant">
-              Real-time audit trail of bank settlements, patron grants, and ODOP subsidies.
+              {t('Real-time audit trail of bank settlements, patron grants, and ODOP subsidies.')}
             </p>
           </div>
           <button
@@ -317,7 +317,7 @@ export const StudioAnalytics: React.FC = () => {
             className="px-3 py-1.5 rounded-lg border border-outline/20 text-xs font-semibold text-on-surface hover:bg-surface-container transition flex items-center gap-1.5 self-start cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Download Bank Statement</span>
+            <span>{t('Download Bank Statement')}</span>
           </button>
         </div>
 
@@ -325,11 +325,11 @@ export const StudioAnalytics: React.FC = () => {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-outline/15 text-on-surface-variant font-semibold">
-                <th className="pb-3 pl-1">Date & Ref</th>
-                <th className="pb-3">Description & Patron</th>
-                <th className="pb-3">Settlement Route</th>
-                <th className="pb-3 text-right">Amount</th>
-                <th className="pb-3 text-right pr-1">Status</th>
+                <th className="pb-3 pl-1">{t('Date & Ref')}</th>
+                <th className="pb-3">{t('Description & Patron')}</th>
+                <th className="pb-3">{t('Settlement Route')}</th>
+                <th className="pb-3 text-right">{t('Amount')}</th>
+                <th className="pb-3 text-right pr-1">{t('Status')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline/10">

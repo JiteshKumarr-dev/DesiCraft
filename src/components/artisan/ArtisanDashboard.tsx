@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { OrderStatus } from '../../types';
+import { OrderStatus, Product } from '../../types';
 import {
   Mic,
   DollarSign,
@@ -22,8 +22,10 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Sparkles,
-  MessageSquare,
   UserCheck,
+  Edit3,
+  EyeOff,
+  MessageSquare,
 } from 'lucide-react';
 import { CollaborationDiscoveryPage } from './CollaborationDiscoveryPage';
 import { SellerMessagesPage } from './SellerMessagesPage';
@@ -31,6 +33,7 @@ import { DemandPulse } from './DemandPulse';
 import { GovernmentNavigator } from './GovernmentNavigator';
 import { EditArtisanProfileModal } from './EditArtisanProfileModal';
 import { StudioAnalytics } from './StudioAnalytics';
+import { EditProductModal } from './EditProductModal';
 
 export const ArtisanDashboard: React.FC = () => {
   const {
@@ -39,6 +42,8 @@ export const ArtisanDashboard: React.FC = () => {
     updateOrderStatus,
     products,
     deleteProduct,
+    beginEditProduct,
+    editingProduct,
     passports,
     setSelectedPassport,
     setIsVoiceCreatorOpen,
@@ -55,6 +60,8 @@ export const ArtisanDashboard: React.FC = () => {
   } = useApp();
 
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedEditProduct, setSelectedEditProduct] = useState<Product | null>(null);
 
   // Filter products by artisan user
   const myProducts = products.filter(
@@ -80,11 +87,11 @@ export const ArtisanDashboard: React.FC = () => {
   );
 
   const SELLER_NAV_ITEMS = [
-    { id: 'DASHBOARD' as const, label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'CATALOG' as const, label: 'My Products', icon: Package },
-    { id: 'ORDERS' as const, label: 'Orders', icon: ShoppingBag, badge: orders.length },
-    { id: 'AISTUDIO' as const, label: 'AI Studio', icon: Sparkles },
-    { id: 'OPPORTUNITIES' as const, label: 'Opportunities', icon: Building2 },
+    { id: 'DASHBOARD' as const, label: 'Dashboard', icon: LayoutDashboard, guide: 'seller-dashboard-tab' },
+    { id: 'CATALOG' as const, label: 'My Products', icon: Package, guide: 'seller-products-tab' },
+    { id: 'ORDERS' as const, label: 'Orders', icon: ShoppingBag, badge: orders.length, guide: 'seller-orders-tab' },
+    { id: 'AISTUDIO' as const, label: 'AI Studio', icon: Sparkles, guide: 'seller-aistudio-tab' },
+    { id: 'OPPORTUNITIES' as const, label: 'Opportunities', icon: Building2, guide: 'seller-opportunities-tab' },
     {
       id: 'COLLABORATE' as const,
       label: 'Collaborate',
@@ -99,7 +106,7 @@ export const ArtisanDashboard: React.FC = () => {
       badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined,
       guide: 'seller-messages-tab',
     },
-    { id: 'PROFILE' as const, label: 'Profile', icon: ShieldCheck },
+    { id: 'PROFILE' as const, label: 'Profile', icon: ShieldCheck, guide: 'seller-profile-tab' },
   ];
 
   return (
@@ -109,19 +116,19 @@ export const ArtisanDashboard: React.FC = () => {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary text-on-primary uppercase tracking-wider">
-              ARTISAN STUDIO COMMAND CENTER
+              {t('ARTISAN STUDIO COMMAND CENTER')}
             </span>
             <span className="text-xs text-on-surface-variant font-medium">
-              Varanasi Weaving Cluster
+              {t('Varanasi Weaving Cluster')}
             </span>
           </div>
 
           <h1 className="font-serif text-2xl sm:text-4xl font-bold text-on-surface">
-            Welcome, {user.name}
+            {t('Welcome')}, {user.name}
           </h1>
 
           <p className="text-xs sm:text-sm text-on-surface-variant max-w-xl">
-            Guild: <strong>{user.artisan_profile?.guild_name || 'Kashi Bunakar Vankar Cooperative'}</strong> • Manage looms, verify digital craft passports, collaborate with fellow artisans, and create listings with your voice.
+            {t('Guild')}: <strong>{user.artisan_profile?.guild_name ? t(user.artisan_profile.guild_name) : t('Kashi Bunakar Vankar Cooperative Society')}</strong> • {t('Manage looms, verify digital craft passports, collaborate with fellow artisans, and create listings with your voice.')}
           </p>
         </div>
 
@@ -131,7 +138,7 @@ export const ArtisanDashboard: React.FC = () => {
             className="px-4 py-3 rounded-full border border-primary/40 bg-surface text-primary text-xs font-bold hover:bg-primary/10 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           >
             <ShieldCheck className="w-4 h-4 text-primary" />
-            <span>Pehchan & Studio Credentials</span>
+            <span>{t('Pehchan & Studio Credentials')}</span>
           </button>
 
           {/* Quick Voice Creator Button */}
@@ -147,7 +154,7 @@ export const ArtisanDashboard: React.FC = () => {
       </div>
 
       {/* Unified Seller Mode Navigation Bar */}
-      <div className="flex gap-2 overflow-x-auto border-b border-outline/20 pb-3 no-scrollbar">
+      <div data-guide="seller-navigation" className="flex gap-2 overflow-x-auto border-b border-outline/20 pb-3 no-scrollbar">
         {SELLER_NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = sellerTab === item.id;
@@ -170,7 +177,7 @@ export const ArtisanDashboard: React.FC = () => {
               }`}
             >
               <Icon className="w-4 h-4" />
-              <span>{item.label}</span>
+              <span>{t(item.label)}</span>
               {item.badge !== undefined && item.badge > 0 && (
                 <span
                   className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
@@ -189,7 +196,7 @@ export const ArtisanDashboard: React.FC = () => {
       {sellerTab === 'DASHBOARD' && (
         <div className="space-y-8 animate-fadeIn">
           {/* Metrics Row */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div data-guide="artisan-metrics-row" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-on-surface-variant uppercase">
@@ -198,7 +205,7 @@ export const ArtisanDashboard: React.FC = () => {
                 <Package className="w-4 h-4 text-primary" />
               </div>
               <p className="font-serif text-2xl font-bold text-on-surface">{orders.length}</p>
-              <span className="text-[11px] text-green-700 font-medium">100% on-time fulfillment</span>
+              <span className="text-[11px] text-green-700 font-medium">{t('100% on-time fulfillment')}</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
@@ -211,43 +218,43 @@ export const ArtisanDashboard: React.FC = () => {
               <p className="font-serif text-2xl font-bold text-primary">
                 ₹{totalEarnings.toLocaleString('en-IN')}
               </p>
-              <span className="text-[11px] text-on-surface-variant">Direct to Bank / UPI</span>
+              <span className="text-[11px] text-on-surface-variant">{t('Direct to Bank / UPI')}</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-on-surface-variant uppercase">
-                  GI Passports Minted
+                  {t('GI Passports Minted')}
                 </span>
                 <Award className="w-4 h-4 text-secondary" />
               </div>
               <p className="font-serif text-2xl font-bold text-secondary">{passports.length}</p>
-              <span className="text-[11px] text-secondary font-medium">Cryptographically Verified</span>
+              <span className="text-[11px] text-secondary font-medium">{t('Cryptographically Verified')}</span>
             </div>
 
             <div className="p-5 rounded-2xl bg-surface border border-outline/20 shadow-xs space-y-1">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-on-surface-variant uppercase">
-                  Heritage Impact Score
+                  {t('Heritage Impact Score')}
                 </span>
                 <ShieldCheck className="w-4 h-4 text-primary" />
               </div>
               <p className="font-serif text-2xl font-bold text-on-surface">99.4 / 100</p>
-              <span className="text-[11px] text-primary font-medium">Master Artisan Tier</span>
+              <span className="text-[11px] text-primary font-medium">{t('Master Artisan Tier')}</span>
             </div>
           </div>
 
           {/* SELLER DASHBOARD SUMMARY CARD: COLLABORATION */}
-          <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-surface to-surface-container border border-amber-500/30 shadow-sm space-y-4">
+          <div data-guide="artisan-collab-summary" className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-surface to-surface-container border border-amber-500/30 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-800 dark:text-amber-200 border border-amber-500/30">
                   <Handshake className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold font-serif text-on-surface">Collaboration</h3>
+                  <h3 className="text-lg font-bold font-serif text-on-surface">{t('Collaboration')}</h3>
                   <p className="text-xs text-on-surface-variant">
-                    Inter-craft partnerships, joint collections & direct messaging with creators
+                    {t('Inter-craft partnerships, joint collections & direct messaging with creators')}
                   </p>
                 </div>
               </div>
@@ -256,7 +263,7 @@ export const ArtisanDashboard: React.FC = () => {
                 onClick={() => setSellerTab('COLLABORATE')}
                 className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-primary text-white text-xs font-bold shadow hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
               >
-                <span>Open Collaborations</span>
+                <span>{t('Open Collaborations')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -266,12 +273,12 @@ export const ArtisanDashboard: React.FC = () => {
                 onClick={() => setSellerTab('COLLABORATE')}
                 className="p-4 rounded-2xl bg-surface border border-outline/15 hover:border-amber-500/40 text-left transition-colors cursor-pointer group"
               >
-                <span className="text-xs font-medium text-on-surface-variant block">Pending Requests</span>
+                <span className="text-xs font-medium text-on-surface-variant block">{t('Pending Requests')}</span>
                 <p className="text-2xl font-bold font-serif text-amber-600 dark:text-amber-400 mt-1">
                   {pendingRequestsCount}
                 </p>
                 <span className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold group-hover:underline inline-block mt-0.5">
-                  Review proposals →
+                  {t('Review proposals →')}
                 </span>
               </button>
 
@@ -279,12 +286,12 @@ export const ArtisanDashboard: React.FC = () => {
                 onClick={() => setSellerTab('COLLABORATE')}
                 className="p-4 rounded-2xl bg-surface border border-outline/15 hover:border-emerald-500/40 text-left transition-colors cursor-pointer group"
               >
-                <span className="text-xs font-medium text-on-surface-variant block">Active Collaborations</span>
+                <span className="text-xs font-medium text-on-surface-variant block">{t('Active Collaborations')}</span>
                 <p className="text-2xl font-bold font-serif text-emerald-600 dark:text-emerald-400 mt-1">
                   {activeCollaborationsCount}
                 </p>
                 <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold group-hover:underline inline-block mt-0.5">
-                  View active work →
+                  {t('View active work →')}
                 </span>
               </button>
 
@@ -292,12 +299,12 @@ export const ArtisanDashboard: React.FC = () => {
                 onClick={() => setSellerTab('MESSAGES')}
                 className="p-4 rounded-2xl bg-surface border border-outline/15 hover:border-primary/40 text-left transition-colors cursor-pointer group"
               >
-                <span className="text-xs font-medium text-on-surface-variant block">Unread Messages</span>
+                <span className="text-xs font-medium text-on-surface-variant block">{t('Unread Messages')}</span>
                 <p className="text-2xl font-bold font-serif text-primary mt-1">
                   {unreadMessagesCount}
                 </p>
                 <span className="text-[10px] text-primary font-semibold group-hover:underline inline-block mt-0.5">
-                  Open chat inbox →
+                  {t('Open chat inbox →')}
                 </span>
               </button>
             </div>
@@ -313,10 +320,10 @@ export const ArtisanDashboard: React.FC = () => {
                 <Mic className="w-5 h-5" />
               </div>
               <h3 className="font-serif font-bold text-sm text-on-surface">
-                Voice Product Creator
+                {t('Voice Product Creator')}
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                Speak in any Indian language. AI creates listing specs, materials, and fair pricing.
+                {t('Speak in any Indian language. AI creates listing specs, materials, and fair pricing.')}
               </p>
             </button>
 
@@ -329,10 +336,10 @@ export const ArtisanDashboard: React.FC = () => {
                 <DollarSign className="w-5 h-5" />
               </div>
               <h3 className="font-serif font-bold text-sm text-on-surface">
-                AI Fair Price Advisor
+                {t('AI Fair Price Advisor')}
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                Calculate equitable prices covering labor hours, living wages, and GI lineage.
+                {t('Calculate equitable prices covering labor hours, living wages, and GI lineage.')}
               </p>
             </button>
 
@@ -345,10 +352,10 @@ export const ArtisanDashboard: React.FC = () => {
                 <SunMedium className="w-5 h-5" />
               </div>
               <h3 className="font-serif font-bold text-sm text-on-surface">
-                Studio Lighting Enhancer
+                {t('Studio Lighting Enhancer')}
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                Transform raw loom workshop photos into diffused studio-grade gallery shots.
+                {t('Transform raw loom workshop photos into diffused studio-grade gallery shots.')}
               </p>
             </button>
           </div>
@@ -357,13 +364,13 @@ export const ArtisanDashboard: React.FC = () => {
           <div className="space-y-4" data-guide="orders-management-section">
             <div className="flex items-center justify-between">
               <h3 className="font-serif text-lg font-bold text-on-surface">
-                Active Loom Fulfillment ({orders.length})
+                {t('Active Loom Fulfillment')} ({orders.length})
               </h3>
               <button
                 onClick={() => setSellerTab('ORDERS')}
                 className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
               >
-                View all orders <ArrowRight className="w-3.5 h-3.5" />
+                {t('View all orders')} <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -380,16 +387,16 @@ export const ArtisanDashboard: React.FC = () => {
                           {order.id}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
-                          {order.order_status}
+                          {t(order.order_status)}
                         </span>
                       </div>
                       <p className="text-xs text-on-surface-variant mt-0.5">
-                        Customer: <strong>{order.customer_name}</strong> ({order.shipping_address.city}, {order.shipping_address.state})
+                        {t('Customer')}: <strong>{order.customer_name}</strong> ({order.shipping_address.city}, {order.shipping_address.state})
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-xs text-on-surface-variant">Order Value</span>
+                      <span className="text-xs text-on-surface-variant">{t('Order Value')}</span>
                       <p className="font-serif text-lg font-bold text-primary">
                         ₹{order.total_price.toLocaleString('en-IN')}
                       </p>
@@ -399,7 +406,7 @@ export const ArtisanDashboard: React.FC = () => {
                   {/* Status Stepper */}
                   <div className="space-y-2">
                     <span className="text-[11px] font-semibold text-on-surface-variant uppercase">
-                      Loom Stage Progress:
+                      {t('Loom Stage Progress:')}
                     </span>
                     <div className="grid grid-cols-5 gap-1.5 sm:gap-3 text-center">
                       {orderStatuses.map((st, idx) => {
@@ -420,7 +427,7 @@ export const ArtisanDashboard: React.FC = () => {
                             }`}
                           >
                             {isComplete && !isCurrent ? '✓ ' : ''}
-                            {st}
+                            {t(st)}
                           </button>
                         );
                       })}
@@ -430,10 +437,10 @@ export const ArtisanDashboard: React.FC = () => {
                   {/* Items & Shipping */}
                   <div className="p-3 rounded-xl bg-surface-container-low border border-outline/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                     <span className="text-on-surface-variant">
-                      Item: <strong>{order.items[0]?.product_name}</strong>
+                      {t('Item')}: <strong>{order.items[0]?.product_name ? t(order.items[0].product_name) : ''}</strong>
                     </span>
                     <span className="font-mono text-primary">
-                      Tracking: {order.tracking_id}
+                      {t('Tracking')}: {order.tracking_id}
                     </span>
                   </div>
                 </div>
@@ -448,14 +455,14 @@ export const ArtisanDashboard: React.FC = () => {
         <div className="space-y-4 animate-fadeIn">
           <div className="flex items-center justify-between">
             <h3 className="font-serif text-lg font-bold text-on-surface">
-              Active Handcrafted Inventory ({myProducts.length})
+              {t('Active Handcrafted Inventory')} ({myProducts.length})
             </h3>
             <button
               onClick={() => setIsVoiceCreatorOpen(true)}
               className="px-4 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Add via Voice</span>
+              <span>{t('Add via Voice')}</span>
             </button>
           </div>
 
@@ -476,33 +483,64 @@ export const ArtisanDashboard: React.FC = () => {
                     />
                     <div className="min-w-0">
                       <span className="text-[10px] font-bold text-primary uppercase">
-                        {prod.craft_name}
+                        {t(prod.craft_name)}
                       </span>
                       <h4 className="font-serif font-bold text-xs text-on-surface line-clamp-1">
-                        {prod.name}
+                        {t(prod.name)}
                       </h4>
                       <p className="font-bold text-xs text-on-surface mt-1">
                         ₹{prod.price.toLocaleString('en-IN')}
                       </p>
-                      <span className="text-[10px] text-green-700 bg-green-50 px-2 py-0.5 rounded-sm font-semibold border border-green-200 inline-block mt-1">
-                        {prod.gi_tag}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                        <span className="text-[10px] text-green-700 bg-green-50 px-2 py-0.5 rounded-sm font-semibold border border-green-200 inline-block">
+                          {t(prod.gi_tag)}
+                        </span>
+                        {prod.status === 'EDITING' ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-sm font-bold border border-amber-300 dark:border-amber-700">
+                            <EyeOff className="w-3 h-3" />
+                            <span>{t('Editing — Hidden from customers')}</span>
+                          </span>
+                        ) : prod.status === 'UNPUBLISHED' ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-gray-700 bg-gray-100 px-2 py-0.5 rounded-sm font-semibold border border-gray-300">
+                            <span>{t('Unpublished')}</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm font-semibold border border-emerald-300">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>{t('Published')}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-outline/10 flex items-center justify-between text-xs">
-                    <button
-                      onClick={() => setSelectedPassport(passport)}
-                      className="text-primary hover:underline font-semibold flex items-center gap-1 cursor-pointer"
-                    >
-                      <Award className="w-3.5 h-3.5" />
-                      <span>View Passport QR</span>
-                    </button>
+                  <div className="pt-2 border-t border-outline/10 flex items-center justify-between text-xs gap-2 flex-wrap">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setSelectedPassport(passport)}
+                        className="text-primary hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Award className="w-3.5 h-3.5" />
+                        <span>{t('Passport')}</span>
+                      </button>
+
+                      <button
+                        onClick={async () => {
+                          setSelectedEditProduct(prod);
+                          setIsEditModalOpen(true);
+                          await beginEditProduct(prod.id);
+                        }}
+                        className="text-amber-700 dark:text-amber-400 hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>{prod.status === 'EDITING' ? t('Continue Editing') : t('Edit Product')}</span>
+                      </button>
+                    </div>
 
                     <button
                       onClick={() => deleteProduct(prod.id)}
                       className="text-on-surface-variant hover:text-red-600 transition p-1 cursor-pointer"
-                      title="Delete Product"
+                      title={t('Delete Product')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -520,7 +558,7 @@ export const ArtisanDashboard: React.FC = () => {
           {/* Loom Orders */}
           <div className="space-y-4" data-guide="orders-management-section">
             <h3 className="font-serif text-lg font-bold text-on-surface">
-              Active Loom Fulfillment ({orders.length})
+              {t('Active Loom Fulfillment')} ({orders.length})
             </h3>
 
             <div className="space-y-4">
@@ -536,16 +574,16 @@ export const ArtisanDashboard: React.FC = () => {
                           {order.id}
                         </span>
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
-                          {order.order_status}
+                          {t(order.order_status)}
                         </span>
                       </div>
                       <p className="text-xs text-on-surface-variant mt-0.5">
-                        Customer: <strong>{order.customer_name}</strong> ({order.shipping_address.city}, {order.shipping_address.state})
+                        {t('Customer')}: <strong>{order.customer_name}</strong> ({order.shipping_address.city}, {order.shipping_address.state})
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-xs text-on-surface-variant">Order Value</span>
+                      <span className="text-xs text-on-surface-variant">{t('Order Value')}</span>
                       <p className="font-serif text-lg font-bold text-primary">
                         ₹{order.total_price.toLocaleString('en-IN')}
                       </p>
@@ -555,7 +593,7 @@ export const ArtisanDashboard: React.FC = () => {
                   {/* Status Stepper */}
                   <div className="space-y-2">
                     <span className="text-[11px] font-semibold text-on-surface-variant uppercase">
-                      Loom Stage Progress:
+                      {t('Loom Stage Progress:')}
                     </span>
                     <div className="grid grid-cols-5 gap-1.5 sm:gap-3 text-center">
                       {orderStatuses.map((st, idx) => {
@@ -576,7 +614,7 @@ export const ArtisanDashboard: React.FC = () => {
                             }`}
                           >
                             {isComplete && !isCurrent ? '✓ ' : ''}
-                            {st}
+                            {t(st)}
                           </button>
                         );
                       })}
@@ -586,10 +624,10 @@ export const ArtisanDashboard: React.FC = () => {
                   {/* Items & Shipping */}
                   <div className="p-3 rounded-xl bg-surface-container-low border border-outline/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                     <span className="text-on-surface-variant">
-                      Item: <strong>{order.items[0]?.product_name}</strong>
+                      {t('Item')}: <strong>{order.items[0]?.product_name ? t(order.items[0].product_name) : ''}</strong>
                     </span>
                     <span className="font-mono text-primary">
-                      Tracking: {order.tracking_id}
+                      {t('Tracking')}: {order.tracking_id}
                     </span>
                   </div>
                 </div>
@@ -600,7 +638,7 @@ export const ArtisanDashboard: React.FC = () => {
           {/* Bespoke Customer Commissions */}
           <div className="space-y-4 pt-6 border-t border-outline/15">
             <h3 className="font-serif text-lg font-bold text-on-surface">
-              Incoming Bespoke Patron Commissions ({customOrders.length})
+              {t('Incoming Bespoke Patron Commissions')} ({customOrders.length})
             </h3>
             <div className="space-y-4">
               {customOrders.map((order) => (
@@ -619,12 +657,12 @@ export const ArtisanDashboard: React.FC = () => {
                         </span>
                       </div>
                       <p className="text-xs text-primary font-semibold mt-0.5">
-                        Target Craft: {order.craft_name}
+                        {t('Target Craft')}: {t(order.craft_name || '')}
                       </p>
                     </div>
 
                     <div className="text-left sm:text-right">
-                      <span className="text-xs text-on-surface-variant">Patron Budget Range</span>
+                      <span className="text-xs text-on-surface-variant">{t('Patron Budget Range')}</span>
                       <p className="font-serif text-base font-bold text-primary">
                         ₹{order.budget_min.toLocaleString('en-IN')} – ₹{order.budget_max.toLocaleString('en-IN')}
                       </p>
@@ -645,7 +683,7 @@ export const ArtisanDashboard: React.FC = () => {
                       }
                       className="text-xs font-semibold text-primary hover:underline cursor-pointer"
                     >
-                      Chat with Patron in Mother Tongue
+                      {t('Chat with Patron in Mother Tongue')}
                     </button>
 
                     <div className="flex items-center gap-2">
@@ -654,12 +692,12 @@ export const ArtisanDashboard: React.FC = () => {
                           onClick={() => updateCustomOrderStatus(order.id, 'ACCEPTED')}
                           className="px-4 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs cursor-pointer"
                         >
-                          Accept & Commit to Loom
+                          {t('Accept & Commit to Loom')}
                         </button>
                       )}
                       {order.status === 'ACCEPTED' && (
                         <span className="text-green-700 font-bold text-xs flex items-center gap-1">
-                          <CheckCircle2 className="w-4 h-4" /> Commission Active on Loom
+                          <CheckCircle2 className="w-4 h-4" /> {t('Commission Active on Loom')}
                         </span>
                       )}
                     </div>
@@ -684,10 +722,10 @@ export const ArtisanDashboard: React.FC = () => {
                 <Mic className="w-6 h-6" />
               </div>
               <h3 className="font-serif font-bold text-base text-on-surface">
-                Voice Product Creator
+                {t('Voice Product Creator')}
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                Speak in any Indian language. AI creates listing specs, materials, and fair pricing.
+                {t('Speak in any Indian language. AI creates listing specs, materials, and fair pricing.')}
               </p>
             </button>
 
@@ -699,10 +737,10 @@ export const ArtisanDashboard: React.FC = () => {
                 <DollarSign className="w-6 h-6" />
               </div>
               <h3 className="font-serif font-bold text-base text-on-surface">
-                AI Fair Price Advisor
+                {t('AI Fair Price Advisor')}
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                Calculate equitable prices covering labor hours, living wages, and GI lineage.
+                {t('Calculate equitable prices covering labor hours, living wages, and GI lineage.')}
               </p>
             </button>
 
@@ -714,10 +752,10 @@ export const ArtisanDashboard: React.FC = () => {
                 <SunMedium className="w-6 h-6" />
               </div>
               <h3 className="font-serif font-bold text-base text-on-surface">
-                Studio Lighting Enhancer
+                {t('Studio Lighting Enhancer')}
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                Transform raw loom workshop photos into diffused studio-grade gallery shots.
+                {t('Transform raw loom workshop photos into diffused studio-grade gallery shots.')}
               </p>
             </button>
           </div>
@@ -751,6 +789,16 @@ export const ArtisanDashboard: React.FC = () => {
       <EditArtisanProfileModal
         isOpen={isEditProfileOpen}
         onClose={() => setIsEditProfileOpen(false)}
+      />
+
+      {/* Edit Product Modal (Safe Editing Workflow) */}
+      <EditProductModal
+        product={selectedEditProduct || editingProduct}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedEditProduct(null);
+        }}
       />
     </div>
   );

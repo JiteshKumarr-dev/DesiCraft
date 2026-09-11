@@ -35,6 +35,7 @@ export const HeritageAiCoPilot: React.FC = () => {
     setSelectedPassport,
     passports,
     setIsGiftModeModalOpen,
+    t,
   } = useApp();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -167,13 +168,13 @@ You can also launch our Handmade Gift Mode for custom raw silk gift wrapping and
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-primary text-on-primary shadow-xl hover:bg-primary/90 transition-all duration-300 hover:scale-105 cursor-pointer border-2 border-surface"
-          aria-label="Open Desi Craft Heritage AI Co-Pilot"
+          aria-label={t('Open Desi Craft Heritage AI Co-Pilot')}
         >
           <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
             <Sparkles className="w-3.5 h-3.5 text-secondary animate-pulse" />
           </div>
           <span className="font-serif font-bold text-xs sm:text-sm tracking-wide">
-            Ask Desi AI Co-Pilot
+            {t('Ask Desi AI Co-Pilot')}
           </span>
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-secondary rounded-full ring-2 ring-surface animate-ping" />
         </button>
@@ -190,7 +191,7 @@ You can also launch our Handmade Gift Mode for custom raw silk gift wrapping and
               </div>
               <div>
                 <h3 className="font-serif font-bold text-sm text-on-surface flex items-center gap-1.5">
-                  <span>Desi AI Heritage Co-Pilot</span>
+                  <span>{t('Desi AI Heritage Co-Pilot')}</span>
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                 </h3>
                 <p className="text-[10px] text-on-surface-variant">
@@ -280,7 +281,7 @@ You can also launch our Handmade Gift Mode for custom raw silk gift wrapping and
             >
               <input
                 type="text"
-                placeholder="Ask about crafts, GI tags, authenticity, care..."
+                placeholder={t('Ask about crafts, GI tags, authenticity, care...')}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 className="flex-1 px-3.5 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-full text-on-surface focus:outline-hidden focus:ring-1 focus:ring-primary"

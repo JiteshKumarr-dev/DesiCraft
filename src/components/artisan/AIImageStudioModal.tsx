@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useApp } from '../../context/AppContext';
 import {
   Sparkles,
   X,
@@ -35,6 +36,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
   onApply,
   craftName = 'Handcrafted Creation',
 }) => {
+  const { t } = useApp();
   const [originalImageSrc, setOriginalImageSrc] = useState<string>(initialImageSrc);
   const [deblurredResultUrl, setDeblurredResultUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -184,14 +186,14 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded">
-                  AI Sharpness & Clarity
+                  {t('AI Sharpness & Clarity')}
                 </span>
                 <span className="text-xs text-on-surface-variant hidden sm:inline">
-                  Preserves Original Background & Scene
+                  {t('Preserves Original Background & Scene')}
                 </span>
               </div>
               <h2 className="font-serif text-xl sm:text-2xl font-bold text-on-surface">
-                AI Photo Deblur Enhancer
+                {t('AI Photo Deblur Enhancer')}
               </h2>
             </div>
           </div>
@@ -204,7 +206,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition cursor-pointer"
             >
               <UploadCloud className="w-3.5 h-3.5 text-primary" />
-              <span>Change Photo</span>
+              <span>{t('Change Photo')}</span>
             </button>
             <input
               type="file"
@@ -217,7 +219,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={t('Close')}
               className="p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -230,7 +232,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
           {/* Deblur Strength Presets */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-on-surface uppercase tracking-wider">
-              Deblur Strength
+              {t('Deblur Strength')}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" data-guide="enhancement-modes">
               {DEBLUR_PRESETS.map((preset) => {
@@ -256,15 +258,15 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
                           {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
                         </span>
                         <span className="font-serif font-bold text-xs sm:text-sm text-on-surface">
-                          {preset.name}
+                          {t(preset.name)}
                         </span>
                       </div>
                       <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                        {preset.badge}
+                        {t(preset.badge)}
                       </span>
                     </div>
                     <p className="text-[11px] text-on-surface-variant mt-1.5 leading-relaxed">
-                      {preset.description}
+                      {t(preset.description)}
                     </p>
                   </button>
                 );
@@ -276,12 +278,12 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
           <div className="p-3.5 rounded-xl bg-surface-container-low border border-outline/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <Sliders className="w-4 h-4 text-primary shrink-0" />
-              <span className="font-semibold text-on-surface shrink-0">Fine-Tune Clarity:</span>
+              <span className="font-semibold text-on-surface shrink-0">{t('Fine-Tune Clarity:')}</span>
               <span className="font-mono font-bold text-primary">{customStrength}%</span>
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-3/5">
-              <span className="text-[10px] text-on-surface-variant">Soft</span>
+              <span className="text-[10px] text-on-surface-variant">{t('Soft')}</span>
               <input
                 type="range"
                 min="10"
@@ -292,7 +294,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
                 onTouchEnd={handleStrengthSliderCommit}
                 className="w-full accent-primary cursor-pointer"
               />
-              <span className="text-[10px] text-on-surface-variant">Sharp</span>
+              <span className="text-[10px] text-on-surface-variant">{t('Sharp')}</span>
             </div>
           </div>
 
@@ -311,7 +313,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
                     : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                Split Comparison
+                {t('Split Comparison')}
               </button>
               <button
                 type="button"
@@ -322,7 +324,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
                     : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                Side by Side
+                {t('Side by Side')}
               </button>
               <button
                 type="button"
@@ -416,8 +418,8 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-[11px] font-bold text-white/70 px-1">
-                    <span>ORIGINAL PHOTO</span>
-                    <span className="text-white/40 text-[10px]">Unmodified</span>
+                    <span>{t('ORIGINAL PHOTO')}</span>
+                    <span className="text-white/40 text-[10px]">{t('Unmodified')}</span>
                   </div>
                   <div className="relative aspect-square rounded-xl overflow-hidden bg-black/40 border border-white/10 flex items-center justify-center">
                     <img
@@ -479,7 +481,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
               onClick={handleKeepOriginal}
               className="px-4 py-2 rounded-lg border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition cursor-pointer"
             >
-              Keep Original
+              {t('Keep Original')}
             </button>
 
             <button
@@ -490,17 +492,17 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
               className="px-3.5 py-2 rounded-lg border border-outline/30 text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer flex items-center gap-1.5"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Re-Apply</span>
+              <span>{t('Re-Apply')}</span>
             </button>
 
             <button
               type="button"
               onClick={handleDownload}
               className="hidden sm:flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer"
-              title="Download deblurred photo"
+              title={t('Download deblurred photo')}
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Download</span>
+              <span>{t('Download')}</span>
             </button>
           </div>
 
@@ -512,7 +514,7 @@ export const AIImageStudioModal: React.FC<AIImageStudioModalProps> = ({
             className="px-6 py-2.5 rounded-xl bg-primary text-on-primary text-xs sm:text-sm font-bold shadow-md hover:bg-primary/90 transition flex items-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
           >
             <Check className="w-4 h-4" />
-            <span>Use Deblurred Photo</span>
+            <span>{t('Use Deblurred Photo')}</span>
           </button>
         </div>
       </div>

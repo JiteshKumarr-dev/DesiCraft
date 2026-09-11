@@ -16,7 +16,9 @@ export const CraftDetailModal: React.FC = () => {
 
   if (!selectedCraft) return null;
 
-  const matchingProducts = products.filter((p) => p.craft_id === selectedCraft.id);
+  const matchingProducts = products.filter(
+    (p) => p.craft_id === selectedCraft.id && p.status === 'PUBLISHED'
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">

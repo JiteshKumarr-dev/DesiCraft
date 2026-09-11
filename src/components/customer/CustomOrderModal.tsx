@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { Sparkles, X, Palette, Calendar, DollarSign, Send } from 'lucide-react';
 
 export const CustomOrderModal: React.FC = () => {
-  const { isCustomOrderModalOpen, setIsCustomOrderModalOpen, crafts, createCustomOrder } = useApp();
+  const { isCustomOrderModalOpen, setIsCustomOrderModalOpen, crafts, createCustomOrder, t } = useApp();
 
   const [craftName, setCraftName] = useState(crafts[0]?.name || 'Varanasi Zari & Brocade');
   const [description, setDescription] = useState('');
@@ -49,19 +49,19 @@ export const CustomOrderModal: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
-                BESPOKE ARTISAN COMMISSIONS
+                {t('BESPOKE ARTISAN COMMISSIONS')}
               </span>
               <h2 className="font-serif text-2xl font-bold text-on-surface">
-                Commission Custom Handcraft
+                {t('Commission Custom Handcraft')}
               </h2>
               <p className="text-xs text-on-surface-variant">
-                Directly engage a master weaver or artisan for unique bespoke work.
+                {t('Directly engage a master weaver or artisan for unique bespoke work.')}
               </p>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface">Target Craft Tradition</label>
+            <label className="text-xs font-semibold text-on-surface">{t('Target Craft Tradition')}</label>
             <select
               value={craftName}
               onChange={(e) => setCraftName(e.target.value)}
@@ -77,12 +77,12 @@ export const CustomOrderModal: React.FC = () => {
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-on-surface">
-              Describe Your Vision, Colors & Dimensions
+              {t('Describe Your Vision, Colors & Dimensions')}
             </label>
             <textarea
               rows={3}
               required
-              placeholder="E.g., I would like a bridal Kadwa brocade saree in midnight blue with silver lotus motifs, 6.2 meters in length..."
+              placeholder={t('E.g., I would like a bridal Kadwa brocade saree in midnight blue with silver lotus motifs, 6.2 meters in length...')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full p-3 text-xs bg-surface-container-low border border-outline/30 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-primary"
@@ -90,20 +90,20 @@ export const CustomOrderModal: React.FC = () => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-on-surface">Material & Fiber Preference</label>
+            <label className="text-xs font-semibold text-on-surface">{t('Material & Fiber Preference')}</label>
             <input
               type="text"
               required
               value={materialPreference}
               onChange={(e) => setMaterialPreference(e.target.value)}
-              placeholder="E.g., Pure Katan Silk, Organic Indigo, Teakwood"
+              placeholder={t('E.g., Pure Katan Silk, Organic Indigo, Teakwood')}
               className="w-full px-3.5 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-primary"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-on-surface">Min Budget (₹)</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Min Budget')} (₹)</label>
               <input
                 type="number"
                 value={budgetMin}
@@ -112,7 +112,7 @@ export const CustomOrderModal: React.FC = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-on-surface">Max Budget (₹)</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Max Budget')} (₹)</label>
               <input
                 type="number"
                 value={budgetMax}
@@ -124,7 +124,7 @@ export const CustomOrderModal: React.FC = () => {
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-primary" /> Required Delivery Target
+              <Calendar className="w-3.5 h-3.5 text-primary" /> {t('Required Delivery Target')}
             </label>
             <input
               type="date"
@@ -139,7 +139,7 @@ export const CustomOrderModal: React.FC = () => {
             className="w-full py-3 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
             <Send className="w-4 h-4" />
-            <span>Send Commission Request to Master Artisans</span>
+            <span>{t('Send Commission Request to Master Artisans')}</span>
           </button>
         </form>
       </div>

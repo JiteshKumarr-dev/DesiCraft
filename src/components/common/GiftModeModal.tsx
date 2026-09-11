@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { Gift, Sparkles, X, Heart, Check, ArrowRight } from 'lucide-react';
 
 export const GiftModeModal: React.FC = () => {
-  const { isGiftModeModalOpen, setIsGiftModeModalOpen, products, addToCart, showNotification } = useApp();
+  const { isGiftModeModalOpen, setIsGiftModeModalOpen, products, addToCart, showNotification, t } = useApp();
 
   const [occasion, setOccasion] = useState('Festive & Diwali');
   const [recipient, setRecipient] = useState('Family / Elders');
@@ -58,7 +58,7 @@ export const GiftModeModal: React.FC = () => {
 
           {/* Occasion Selection */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-on-surface">Select Occasion</label>
+            <label className="text-xs font-semibold text-on-surface">{t('Select Occasion')}</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {occasions.map((occ) => (
                 <button
@@ -71,7 +71,7 @@ export const GiftModeModal: React.FC = () => {
                       : 'border-outline/20 text-on-surface hover:bg-surface-container'
                   }`}
                 >
-                  {occ}
+                  {t(occ)}
                 </button>
               ))}
             </div>
@@ -80,7 +80,7 @@ export const GiftModeModal: React.FC = () => {
           {/* Recipient & Budget */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-on-surface">Recipient Profile</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Recipient Profile')}</label>
               <select
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
@@ -88,14 +88,14 @@ export const GiftModeModal: React.FC = () => {
               >
                 {recipients.map((r) => (
                   <option key={r} value={r}>
-                    {r}
+                    {t(r)}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-on-surface">Budget Tier</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Budget Tier')}</label>
               <select
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
@@ -103,7 +103,7 @@ export const GiftModeModal: React.FC = () => {
               >
                 {budgets.map((b) => (
                   <option key={b} value={b}>
-                    {b}
+                    {t(b)}
                   </option>
                 ))}
               </select>
@@ -114,9 +114,9 @@ export const GiftModeModal: React.FC = () => {
           <div className="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-serif font-bold text-on-surface">
-                Artisan Handwritten Note (Included Free)
+                {t('Artisan Handwritten Note (Included Free)')}
               </span>
-              <span className="text-[10px] text-primary font-medium">Hand-lettered with natural ink</span>
+              <span className="text-[10px] text-primary font-medium">{t('Hand-lettered with natural ink')}</span>
             </div>
             <textarea
               rows={2}
@@ -125,8 +125,8 @@ export const GiftModeModal: React.FC = () => {
               className="w-full p-2.5 text-xs bg-surface border border-outline/30 rounded-lg font-serif italic text-on-surface"
             />
             <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
-              <span>Packaging: <strong>{giftBoxStyle}</strong></span>
-              <span className="text-secondary font-semibold">Includes Official GI Seal Wax Stamp</span>
+              <span>{t('Packaging:')} <strong>{t(giftBoxStyle)}</strong></span>
+              <span className="text-secondary font-semibold">{t('Includes Official GI Seal Wax Stamp')}</span>
             </div>
           </div>
 

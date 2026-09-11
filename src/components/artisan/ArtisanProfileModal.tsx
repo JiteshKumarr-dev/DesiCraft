@@ -68,7 +68,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             <button
               onClick={onClose}
               className="p-2 rounded-full bg-black/40 text-white/90 hover:bg-black/60 transition-colors"
-              aria-label="Close"
+              aria-label={t('Close')}
             >
               <X className="w-5 h-5" />
             </button>
@@ -82,7 +82,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                 className="w-full h-full object-cover"
               />
               {artisan.verification_status === 'VERIFIED' && (
-                <div className="absolute bottom-1 right-1 p-0.5 rounded-full bg-emerald-600 text-white" title="Verified Master Artisan">
+                <div className="absolute bottom-1 right-1 p-0.5 rounded-full bg-emerald-600 text-white" title={t('Verified Master Artisan')}>
                   <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
               )}
@@ -94,17 +94,17 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                   {artisan.name}
                 </h2>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur-md border border-white/30">
-                  {artisan.craft_name}
+                  {t(artisan.craft_name)}
                 </span>
               </div>
               <div className="flex items-center gap-3 mt-1 text-xs sm:text-sm text-white/80 flex-wrap">
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-amber-300" />
-                  {artisan.district}, {artisan.state}
+                  {t(artisan.district)}, {t(artisan.state)}
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5 text-amber-300" />
-                  {artisan.experience_years} Years Master
+                  {artisan.experience_years} {t('Years Master')}
                 </span>
                 <span className="flex items-center gap-1">
                   <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
@@ -126,7 +126,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             }`}
           >
             <ScrollText className="w-4 h-4" />
-            Ancestral Story
+            {t('Ancestral Story')}
           </button>
           <button
             onClick={() => setActiveTab('SKILLS')}
@@ -137,7 +137,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             }`}
           >
             <Layers className="w-4 h-4" />
-            Skills & Techniques
+            {t('Skills & Techniques')}
           </button>
           <button
             onClick={() => setActiveTab('PRODUCTS')}
@@ -148,7 +148,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             }`}
           >
             <Package className="w-4 h-4" />
-            Products ({artisanProducts.length})
+            {t('Products')} ({artisanProducts.length})
           </button>
           <button
             onClick={() => setActiveTab('PORTFOLIO')}
@@ -159,7 +159,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             }`}
           >
             <Handshake className="w-4 h-4" />
-            Collaborations
+            {t('Collaborations')}
           </button>
         </div>
 
@@ -171,13 +171,13 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
               <div className="p-4 rounded-2xl bg-surface border border-outline/15 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs uppercase tracking-wider font-bold text-primary flex items-center gap-1.5">
-                    <Award className="w-4 h-4" /> Guild Affiliation
+                    <Award className="w-4 h-4" /> {t('Guild Affiliation')}
                   </span>
                   <span className="text-xs text-on-surface-variant font-medium">
-                    {artisan.guild_name}
+                    {t(artisan.guild_name)}
                   </span>
                 </div>
-                <p className="text-sm text-on-surface leading-relaxed">{artisan.bio}</p>
+                <p className="text-sm text-on-surface leading-relaxed">{t(artisan.bio)}</p>
               </div>
 
               {/* Craft Story with Audio */}
@@ -185,7 +185,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-bold font-serif text-amber-900 dark:text-amber-300 flex items-center gap-2">
                     <ScrollText className="w-4 h-4 text-amber-600" />
-                    The Master's Voice & Craft Story
+                    {t("The Master's Voice & Craft Story")}
                   </h3>
                   {artisan.story_audio_url && (
                     <button
@@ -193,19 +193,19 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                       className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-500/30 flex items-center gap-1.5 transition-colors"
                     >
                       <Volume2 className={`w-3.5 h-3.5 ${isPlayingStory ? 'animate-bounce text-primary' : ''}`} />
-                      {isPlayingStory ? 'Playing...' : 'Listen Story'}
+                      {isPlayingStory ? t('Playing...') : t('Listen Story')}
                     </button>
                   )}
                 </div>
                 <p className="text-sm italic text-on-surface/90 leading-relaxed font-serif">
-                  "{artisan.craft_story}"
+                  "{t(artisan.craft_story)}"
                 </p>
               </div>
 
               {/* Spoken Languages */}
               <div className="space-y-2">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                  Languages Spoken
+                  {t('Languages Spoken')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {artisan.languages_spoken.map((lang) => (
@@ -213,7 +213,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                       key={lang}
                       className="px-3 py-1 rounded-lg text-xs font-medium bg-surface-container border border-outline/20 text-on-surface"
                     >
-                      {lang}
+                      {t(lang)}
                     </span>
                   ))}
                 </div>
@@ -226,7 +226,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
               {/* Master Skills */}
               <div className="space-y-2.5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4" /> Core Master Skills
+                  <Sparkles className="w-4 h-4" /> {t('Core Master Skills')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {artisan.skills && artisan.skills.length > 0 ? (
@@ -235,11 +235,11 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                         key={skill}
                         className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-primary/10 text-primary border border-primary/20"
                       >
-                        {skill}
+                        {t(skill)}
                       </span>
                     ))
                   ) : (
-                    <p className="text-xs text-on-surface-variant italic">Craft heritage mastery.</p>
+                    <p className="text-xs text-on-surface-variant italic">{t('Craft heritage mastery.')}</p>
                   )}
                 </div>
               </div>
@@ -247,7 +247,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
               {/* Traditional Techniques */}
               <div className="space-y-2.5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
-                  <Layers className="w-4 h-4" /> Ancestral Techniques
+                  <Layers className="w-4 h-4" /> {t('Ancestral Techniques')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {artisan.traditional_techniques && artisan.traditional_techniques.length > 0 ? (
@@ -256,11 +256,11 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                         key={tech}
                         className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-secondary/10 text-secondary border border-secondary/20"
                       >
-                        {tech}
+                        {t(tech)}
                       </span>
                     ))
                   ) : (
-                    <p className="text-xs text-on-surface-variant italic">Traditional heritage techniques.</p>
+                    <p className="text-xs text-on-surface-variant italic">{t('Traditional heritage techniques.')}</p>
                   )}
                 </div>
               </div>
@@ -268,7 +268,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
               {/* Raw Materials */}
               <div className="space-y-2.5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-tertiary flex items-center gap-1.5">
-                  <Package className="w-4 h-4" /> Pure Raw Materials Used
+                  <Package className="w-4 h-4" /> {t('Pure Raw Materials Used')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {artisan.materials && artisan.materials.length > 0 ? (
@@ -277,11 +277,11 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                         key={mat}
                         className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-tertiary/10 text-tertiary border border-tertiary/20"
                       >
-                        {mat}
+                        {t(mat)}
                       </span>
                     ))
                   ) : (
-                    <p className="text-xs text-on-surface-variant italic">100% natural, unadulterated heritage materials.</p>
+                    <p className="text-xs text-on-surface-variant italic">{t('100% natural, unadulterated heritage materials.')}</p>
                   )}
                 </div>
               </div>
@@ -293,7 +293,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
               {artisanProducts.length === 0 ? (
                 <div className="text-center py-10 text-on-surface-variant">
                   <Package className="w-10 h-10 mx-auto text-outline mb-2" />
-                  <p className="text-sm">No individual catalog items listed currently.</p>
+                  <p className="text-sm">{t('No individual catalog items listed currently.')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -310,10 +310,10 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                       <div className="flex-1 min-w-0 flex flex-col justify-between">
                         <div>
                           <h5 className="text-sm font-semibold text-on-surface truncate">
-                            {prod.name}
+                            {t(prod.name)}
                           </h5>
                           <p className="text-xs text-on-surface-variant mt-0.5 line-clamp-1">
-                            {prod.technique}
+                            {t(prod.technique)}
                           </p>
                         </div>
                         <div className="flex items-center justify-between mt-2">
@@ -321,7 +321,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                             ₹{prod.price.toLocaleString('en-IN')}
                           </span>
                           <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-semibold">
-                            Authentic GI
+                            {t('Authentic GI')}
                           </span>
                         </div>
                       </div>
@@ -337,7 +337,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
               {/* Collaboration Interests */}
               <div className="space-y-2.5">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
-                  <Handshake className="w-4 h-4" /> Open Collaboration Formats
+                  <Handshake className="w-4 h-4" /> {t('Open Collaboration Formats')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {artisan.collaboration_interests && artisan.collaboration_interests.length > 0 ? (
@@ -347,11 +347,11 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                         className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-900 dark:text-amber-200 border border-amber-500/30 flex items-center gap-1"
                       >
                         <Sparkles className="w-3 h-3 text-amber-500" />
-                        {int}
+                        {t(int)}
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-on-surface-variant">Open to creative partnerships</span>
+                    <span className="text-xs text-on-surface-variant">{t('Open to creative partnerships')}</span>
                   )}
                 </div>
               </div>
@@ -359,7 +359,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
               {/* Previous Collaborations */}
               <div className="space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                  Previous Joint Works & Capsule Collections
+                  {t('Previous Joint Works & Capsule Collections')}
                 </h4>
                 {artisan.previous_collaborations && artisan.previous_collaborations.length > 0 ? (
                   artisan.previous_collaborations.map((collab, idx) => (
@@ -376,17 +376,17 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h5 className="text-sm font-bold text-on-surface">{collab.title}</h5>
+                          <h5 className="text-sm font-bold text-on-surface">{t(collab.title)}</h5>
                           <span className="text-xs font-semibold px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">
                             {collab.year}
                           </span>
                         </div>
                         <p className="text-xs text-primary font-medium mt-0.5">
-                          With {collab.partner_name} ({collab.partner_craft})
+                          {t('With')} {collab.partner_name} ({t(collab.partner_craft)})
                         </p>
                         {collab.description && (
                           <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
-                            {collab.description}
+                            {t(collab.description)}
                           </p>
                         )}
                       </div>
@@ -394,7 +394,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
                   ))
                 ) : (
                   <p className="text-xs text-on-surface-variant italic">
-                    Ready to embark on their first inter-craft fusion!
+                    {t('Ready to embark on their first inter-craft fusion!')}
                   </p>
                 )}
               </div>
@@ -408,21 +408,21 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             onClick={onClose}
             className="px-4 py-2.5 rounded-xl border border-outline/30 text-sm font-medium text-on-surface hover:bg-surface-container transition-colors"
           >
-            Close
+            {t('Close')}
           </button>
           <button
             onClick={handleStartChat}
             className="px-4 py-2.5 rounded-xl border border-primary/30 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors flex items-center gap-1.5"
           >
             <MessageSquare className="w-4 h-4" />
-            Start a Conversation
+            {t('Start a Conversation')}
           </button>
           <button
             onClick={handleProposeCollab}
             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-primary text-white text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5"
           >
             <Handshake className="w-4 h-4" />
-            Send Collaboration Request
+            {t('Send Collaboration Request')}
           </button>
         </div>
       </div>

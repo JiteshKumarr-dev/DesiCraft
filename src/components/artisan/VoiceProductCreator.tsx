@@ -48,6 +48,7 @@ export const VoiceProductCreator: React.FC = () => {
     addProduct,
     user,
     showNotification,
+    t,
   } = useApp();
 
   const [isRecording, setIsRecording] = useState(false);
@@ -554,14 +555,14 @@ export const VoiceProductCreator: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary text-on-primary uppercase tracking-wider flex items-center gap-1">
                   <Radio className="w-3 h-3 animate-pulse" />
-                  REAL-TIME VOICE AI
+                  {t('REAL-TIME VOICE AI')}
                 </span>
                 <span className="text-xs font-semibold text-primary">
-                  10 Indian Languages Supported
+                  {t('10 Indian Languages Supported')}
                 </span>
               </div>
               <h2 className="font-serif text-2xl font-bold text-on-surface mt-0.5">
-                Voice Product Creator
+                {t('Voice Product Creator')}
               </h2>
             </div>
           </div>
@@ -570,7 +571,7 @@ export const VoiceProductCreator: React.FC = () => {
             <button
               type="button"
               onClick={() => setSpokenFeedbackEnabled(!spokenFeedbackEnabled)}
-              title={spokenFeedbackEnabled ? 'Voice feedback ON' : 'Voice feedback muted'}
+              title={spokenFeedbackEnabled ? t('Voice feedback ON') : t('Voice feedback muted')}
               className="p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition cursor-pointer"
             >
               {spokenFeedbackEnabled ? (
@@ -582,7 +583,7 @@ export const VoiceProductCreator: React.FC = () => {
 
             <button
               onClick={() => setIsVoiceCreatorOpen(false)}
-              aria-label="Close modal"
+              aria-label={t('Close modal')}
               className="p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -599,13 +600,13 @@ export const VoiceProductCreator: React.FC = () => {
 
             <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-widest text-primary">
-                Living Heritage Catalog
+                {t('Living Heritage Catalog')}
               </span>
               <h3 className="font-serif text-2xl font-bold text-on-surface">
-                Craft Listing Published Successfully!
+                {t('Craft Listing Published Successfully!')}
               </h3>
               <p className="text-sm text-on-surface-variant max-w-md mx-auto">
-                <span className="font-semibold text-on-surface">"{title}"</span> is now live on your artisan storefront with verified authenticity credentials.
+                <span className="font-semibold text-on-surface">"{title}"</span> {t('is now live on your artisan storefront with verified authenticity credentials.')}
               </p>
             </div>
 
@@ -613,18 +614,18 @@ export const VoiceProductCreator: React.FC = () => {
             <div className="max-w-md mx-auto p-4 rounded-xl bg-surface-container border border-primary/20 text-left space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-primary flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-green-600" /> Digital Craft Passport
+                  <ShieldCheck className="w-4 h-4 text-green-600" /> {t('Digital Craft Passport')}
                 </span>
                 <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-primary/10 text-primary">
                   {publishedPassportTag}
                 </span>
               </div>
               <div className="text-xs text-on-surface-variant space-y-1">
-                <div><span className="font-semibold text-on-surface">Craft:</span> {craftName}</div>
-                <div><span className="font-semibold text-on-surface">Fair Price:</span> ₹{price.toLocaleString('en-IN')}</div>
-                <div><span className="font-semibold text-on-surface">Materials:</span> {materials.join(', ')}</div>
+                <div><span className="font-semibold text-on-surface">{t('Craft')}:</span> {t(craftName)}</div>
+                <div><span className="font-semibold text-on-surface">{t('Fair Price')}:</span> ₹{price.toLocaleString('en-IN')}</div>
+                <div><span className="font-semibold text-on-surface">{t('Materials')}:</span> {materials.join(', ')}</div>
                 <div className="text-[11px] text-green-700 dark:text-green-400 pt-1 font-semibold flex items-center gap-1">
-                  <CheckCircle className="w-3.5 h-3.5" /> Synced to Supabase Realtime Database
+                  <CheckCircle className="w-3.5 h-3.5" /> {t('Synced to Supabase Realtime Database')}
                 </div>
               </div>
             </div>
@@ -639,14 +640,14 @@ export const VoiceProductCreator: React.FC = () => {
                 }}
                 className="px-5 py-2.5 rounded-full border border-outline/30 text-xs font-semibold hover:bg-surface-container transition cursor-pointer"
               >
-                + Create Another Product
+                + {t('Create Another Product')}
               </button>
               <button
                 type="button"
                 onClick={() => setIsVoiceCreatorOpen(false)}
                 className="px-6 py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-md cursor-pointer"
               >
-                Done & View Storefront
+                {t('Done & View Storefront')}
               </button>
             </div>
           </div>
@@ -655,13 +656,13 @@ export const VoiceProductCreator: React.FC = () => {
             {/* Voice Input Section */}
             <div className="p-5 sm:p-6 rounded-2xl bg-surface-container border border-primary/30 space-y-4 text-center">
               <p className="text-xs text-on-surface-variant">
-                Speak naturally in your mother tongue (Hindi, Telugu, Tamil, Gujarati, etc.). AI extracts materials, technique, and fair price automatically.
+                {t('Speak naturally in your mother tongue (Hindi, Telugu, Tamil, Gujarati, etc.). AI extracts materials, technique, and fair price automatically.')}
               </p>
 
               {/* Language Dialect Selector */}
               <div className="flex items-center justify-center gap-2" data-guide="voice-lang-selector">
                 <Globe className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-medium text-on-surface">Listening Language:</span>
+                <span className="text-xs font-medium text-on-surface">{t('Listening Language:')}</span>
                 <select
                   value={activeSpeechLang}
                   onChange={(e) => {
@@ -746,10 +747,10 @@ export const VoiceProductCreator: React.FC = () => {
 
               <span className="text-xs font-bold text-on-surface block">
                 {isRecording
-                  ? `🔴 Live Recording in ${activeSpeechLang.toUpperCase()} — Tap mic to finish`
+                  ? `🔴 ${t('Live Recording in')} ${activeSpeechLang.toUpperCase()} — ${t('Tap mic to finish')}`
                   : isSimulating
-                  ? `✨ Streaming ${activeSpeechLang.toUpperCase()} Artisan Speech Demo...`
-                  : 'Tap Mic to Speak in Native Dialect'}
+                  ? `✨ ${t('Streaming')} ${activeSpeechLang.toUpperCase()} ${t('Artisan Speech Demo...')}`
+                  : t('Tap Mic to Speak in Native Dialect')}
               </span>
 
               {/* Status note */}
@@ -762,7 +763,7 @@ export const VoiceProductCreator: React.FC = () => {
               {/* Quick Test Voice Presets with Live Audio Demo */}
               <div className="pt-3 border-t border-outline/10 space-y-2">
                 <span className="text-[11px] font-semibold text-on-surface-variant block">
-                  Quick Test Voice Presets in Indian Languages (Click to Simulate Live Speech):
+                  {t('Quick Test Voice Presets in Indian Languages (Click to Simulate Live Speech):')}
                 </span>
                 <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
                   {[
@@ -800,7 +801,7 @@ export const VoiceProductCreator: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    placeholder="Or type craft phrase (e.g. pochampalli sarees, banarasi silk)..."
+                    placeholder={t('Or type craft phrase (e.g. pochampalli sarees, banarasi silk)...')}
                     value={manualTextInput}
                     onChange={(e) => setManualTextInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -827,7 +828,7 @@ export const VoiceProductCreator: React.FC = () => {
                     className="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition cursor-pointer shrink-0 shadow-xs flex items-center gap-1"
                   >
                     <Sparkles className="w-3 h-3 text-amber-300" />
-                    <span>Extract</span>
+                    <span>{t('Extract')}</span>
                   </button>
                 </div>
               </div>
@@ -840,15 +841,15 @@ export const VoiceProductCreator: React.FC = () => {
                   <span className="font-semibold text-primary flex items-center gap-1.5">
                     <Volume2 className="w-4 h-4" />
                     {isRecording
-                      ? 'Listening in Real Time:'
+                      ? t('Listening in Real Time:')
                       : isSimulating
-                      ? 'Live Speech Streaming:'
-                      : 'Audio Transcript Detected:'}
+                      ? t('Live Speech Streaming:')
+                      : t('Audio Transcript Detected:')}
                   </span>
                   <div className="flex items-center gap-2">
                     {isExtracting ? (
                       <span className="text-primary font-medium flex items-center gap-1.5 text-xs">
-                        <Sparkles className="w-3.5 h-3.5 animate-spin" /> AI Extracting Lineage...
+                        <Sparkles className="w-3.5 h-3.5 animate-spin" /> {t('AI Extracting Lineage...')}
                       </span>
                     ) : (
                       <>
@@ -858,10 +859,10 @@ export const VoiceProductCreator: React.FC = () => {
                           className="text-[11px] text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                         >
                           <Edit3 className="w-3 h-3" />
-                          <span>{isEditingTranscript ? 'Done Editing' : 'Edit Transcript'}</span>
+                          <span>{isEditingTranscript ? t('Done Editing') : t('Edit Transcript')}</span>
                         </button>
                         <span className="text-xs font-semibold text-green-700 dark:text-green-400 flex items-center gap-1">
-                          <CheckCircle className="w-3.5 h-3.5" /> Recognized
+                          <CheckCircle className="w-3.5 h-3.5" /> {t('Recognized')}
                         </span>
                       </>
                     )}
@@ -875,10 +876,10 @@ export const VoiceProductCreator: React.FC = () => {
                       onChange={(e) => setSpokenTranscript(e.target.value)}
                       rows={2}
                       className="w-full text-xs sm:text-sm text-on-surface leading-relaxed font-serif bg-surface p-3 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs"
-                      placeholder="Type or edit detected transcript..."
+                      placeholder={t('Type or edit detected transcript...')}
                     />
                     <div className="text-[10px] text-on-surface-variant flex items-center justify-between">
-                      <span>Edit the audio transcript if speech recognition missed any words</span>
+                      <span>{t('Edit the audio transcript if speech recognition missed any words')}</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -890,7 +891,7 @@ export const VoiceProductCreator: React.FC = () => {
                         className="text-primary font-bold hover:underline cursor-pointer flex items-center gap-1"
                       >
                         <Sparkles className="w-3 h-3" />
-                        <span>Save & Extract</span>
+                        <span>{t('Save & Extract')}</span>
                       </button>
                     </div>
                   </div>
@@ -910,7 +911,7 @@ export const VoiceProductCreator: React.FC = () => {
                     onClick={handleResetSession}
                     className="text-[11px] text-on-surface-variant hover:text-red-500 transition flex items-center gap-1 cursor-pointer"
                   >
-                    <RotateCcw className="w-3 h-3" /> Clear Transcript
+                    <RotateCcw className="w-3 h-3" /> {t('Clear Transcript')}
                   </button>
 
                   {isRecording ? (
@@ -919,7 +920,7 @@ export const VoiceProductCreator: React.FC = () => {
                       onClick={toggleRealtimeRecording}
                       className="px-4 py-1.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                     >
-                      <span>Done Speaking? Extract Details</span>
+                      <span>{t('Done Speaking? Extract Details')}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   ) : (
@@ -930,7 +931,7 @@ export const VoiceProductCreator: React.FC = () => {
                         className="px-4 py-1.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>Re-Extract AI Details</span>
+                        <span>{t('Re-Extract AI Details')}</span>
                       </button>
                     )
                   )}
@@ -944,15 +945,15 @@ export const VoiceProductCreator: React.FC = () => {
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
                     <h3 className="font-serif text-base font-bold text-on-surface flex items-center gap-2">
-                      <span>Structured Catalog Details</span>
+                      <span>{t('Structured Catalog Details')}</span>
                       {hasExtractedOnce && (
                         <span className="text-[11px] font-sans text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/40 px-2 py-0.5 rounded-md font-semibold border border-green-200 dark:border-green-800 flex items-center gap-1">
-                          <CheckCircle className="w-3 h-3" /> Auto-Filled by AI (98% Match)
+                          <CheckCircle className="w-3 h-3" /> {t('Auto-Filled by AI (98% Match)')}
                         </span>
                       )}
                     </h3>
                     <p className="text-xs text-on-surface-variant">
-                      Review, refine, and publish your authentic handcrafted creation with GI provenance.
+                      {t('Review, refine, and publish your authentic handcrafted creation with GI provenance.')}
                     </p>
                   </div>
 
@@ -967,16 +968,16 @@ export const VoiceProductCreator: React.FC = () => {
                   <div className="md:col-span-1 space-y-2.5">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-on-surface flex items-center gap-1">
-                        <ImageIcon className="w-3.5 h-3.5 text-primary" /> Product Photo
+                        <ImageIcon className="w-3.5 h-3.5 text-primary" /> {t('Product Photo')}
                       </label>
                       {imageSource !== 'preset' && (
                         <button
                           type="button"
                           onClick={handleResetToHeritageImage}
-                          title="Restore AI heritage sample photo"
+                          title={t('Restore AI heritage sample photo')}
                           className="text-[10px] text-primary hover:underline flex items-center gap-0.5 font-medium cursor-pointer"
                         >
-                          <RefreshCw className="w-2.5 h-2.5" /> Reset sample
+                          <RefreshCw className="w-2.5 h-2.5" /> {t('Reset sample')}
                         </button>
                       )}
                     </div>
@@ -1004,7 +1005,7 @@ export const VoiceProductCreator: React.FC = () => {
                       onDragLeave={handleImageDragLeave}
                       onDrop={handleImageDrop}
                       onClick={() => setIsAiStudioModalOpen(true)}
-                      title="Click to launch AI Image Studio & Enhancer"
+                      title={t('Click to launch AI Image Studio & Enhancer')}
                       className={`relative rounded-xl overflow-hidden border-2 aspect-4/3 bg-black/10 group shadow-sm transition-all cursor-pointer ${
                         isDraggingImage
                           ? 'border-primary border-dashed ring-4 ring-primary/20 scale-[1.02]'
@@ -1024,19 +1025,19 @@ export const VoiceProductCreator: React.FC = () => {
                       <div className="absolute top-2 left-2 flex items-center gap-1">
                         {imageSource === 'ai-enhanced' ? (
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-linear-to-r from-amber-600 via-primary to-amber-700 text-white shadow-xs flex items-center gap-1 animate-fadeIn">
-                            <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" /> AI Studio Enhanced
+                            <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" /> {t('AI Studio Enhanced')}
                           </span>
                         ) : imageSource === 'camera' ? (
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-xs flex items-center gap-1">
-                            <Camera className="w-3 h-3" /> Camera Photo
+                            <Camera className="w-3 h-3" /> {t('Camera Photo')}
                           </span>
                         ) : imageSource === 'upload' ? (
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-xs flex items-center gap-1">
-                            <UploadCloud className="w-3 h-3" /> Uploaded File
+                            <UploadCloud className="w-3 h-3" /> {t('Uploaded File')}
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-black/70 text-white backdrop-blur-xs flex items-center gap-1">
-                            <Award className="w-3 h-3 text-amber-400" /> GI Heritage
+                            <Award className="w-3 h-3 text-amber-400" /> {t('GI Heritage')}
                           </span>
                         )}
                       </div>
@@ -1044,7 +1045,7 @@ export const VoiceProductCreator: React.FC = () => {
                       {/* Hover Overlay Prompt */}
                       <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                         <span className="px-3 py-1.5 rounded-full bg-black/80 text-white text-[11px] font-bold flex items-center gap-1.5 shadow-md border border-white/20">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Open AI Studio
+                          <Sparkles className="w-3.5 h-3.5 text-amber-300" /> {t('Open AI Studio')}
                         </span>
                       </div>
 
@@ -1052,7 +1053,7 @@ export const VoiceProductCreator: React.FC = () => {
                       {isDraggingImage && (
                         <div className="absolute inset-0 bg-primary/80 backdrop-blur-xs flex flex-col items-center justify-center text-white text-xs font-bold gap-1 animate-fadeIn">
                           <UploadCloud className="w-6 h-6 animate-bounce" />
-                          <span>Drop craft photo here</span>
+                          <span>{t('Drop craft photo here')}</span>
                         </div>
                       )}
                     </div>
@@ -1069,13 +1070,13 @@ export const VoiceProductCreator: React.FC = () => {
                         </div>
                         <div className="text-left">
                           <div className="text-xs font-bold text-on-surface flex items-center gap-1.5">
-                            <span>✨ AI Deblur & Sharpen</span>
+                            <span>{t('✨ AI Deblur & Sharpen')}</span>
                             <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-amber-500 text-black uppercase">
                               AI
                             </span>
                           </div>
                           <div className="text-[10px] text-on-surface-variant">
-                            Remove camera blur & restore crisp craft details
+                            {t('Remove camera blur & restore crisp craft details')}
                           </div>
                         </div>
                       </div>
@@ -1090,7 +1091,7 @@ export const VoiceProductCreator: React.FC = () => {
                         className="w-full px-2.5 py-2 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary/90 transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02]"
                       >
                         <Camera className="w-3.5 h-3.5" />
-                        <span>Camera</span>
+                        <span>{t('Camera')}</span>
                       </button>
 
                       <button
@@ -1099,7 +1100,7 @@ export const VoiceProductCreator: React.FC = () => {
                         className="w-full px-2.5 py-2 rounded-lg bg-surface border border-outline/30 hover:border-primary text-on-surface text-xs font-semibold hover:bg-surface-container transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02]"
                       >
                         <UploadCloud className="w-3.5 h-3.5 text-primary" />
-                        <span>Upload</span>
+                        <span>{t('Upload')}</span>
                       </button>
                     </div>
 
@@ -1112,7 +1113,7 @@ export const VoiceProductCreator: React.FC = () => {
                           setImageUrl(e.target.value);
                           setImageSource('upload');
                         }}
-                        placeholder="Or paste image URL..."
+                        placeholder={t('Or paste image URL...')}
                         className="w-full px-2.5 py-1 text-[11px] bg-surface border border-outline/25 rounded-md text-on-surface focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/50"
                       />
                     </div>
@@ -1121,11 +1122,11 @@ export const VoiceProductCreator: React.FC = () => {
                   {/* Right: Title and Craft */}
                   <div className="md:col-span-2 space-y-3">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-on-surface">Product Title</label>
+                      <label className="text-xs font-semibold text-on-surface">{t('Product Title')}</label>
                       <input
                         type="text"
                         required
-                        placeholder="e.g. Pure Katan Silk Handwoven Kadwa Zari Saree"
+                        placeholder={t('e.g. Pure Katan Silk Handwoven Kadwa Zari Saree')}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         className="w-full px-3 py-2 text-xs sm:text-sm font-serif font-bold bg-surface border border-outline/30 rounded-lg text-on-surface focus:ring-1 focus:ring-primary"
@@ -1134,7 +1135,7 @@ export const VoiceProductCreator: React.FC = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-on-surface">Craft Tradition</label>
+                        <label className="text-xs font-semibold text-on-surface">{t('Craft Tradition')}</label>
                         <input
                           type="text"
                           required
@@ -1145,28 +1146,28 @@ export const VoiceProductCreator: React.FC = () => {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-on-surface">Region</label>
+                        <label className="text-xs font-semibold text-on-surface">{t('Region')}</label>
                         <select
                           value={region}
                           onChange={(e) => setRegion(e.target.value as any)}
                           className="w-full px-3 py-2 text-xs bg-surface border border-outline/30 rounded-lg text-on-surface focus:ring-1 focus:ring-primary cursor-pointer"
                         >
-                          <option value="North">North India</option>
-                          <option value="South">South India</option>
-                          <option value="East">East India</option>
-                          <option value="West">West India</option>
-                          <option value="Central">Central India</option>
-                          <option value="Northeast">Northeast India</option>
+                          <option value="North">{t('North India')}</option>
+                          <option value="South">{t('South India')}</option>
+                          <option value="East">{t('East India')}</option>
+                          <option value="West">{t('West India')}</option>
+                          <option value="Central">{t('Central India')}</option>
+                          <option value="Northeast">{t('Northeast India')}</option>
                         </select>
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-on-surface">Product Narrative & Lineage</label>
+                      <label className="text-xs font-semibold text-on-surface">{t('Product Narrative & Lineage')}</label>
                       <textarea
                         rows={2}
                         required
-                        placeholder="Story of the piece, weaving lineage, cultural significance..."
+                        placeholder={t('Story of the piece, weaving lineage, cultural significance...')}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         className="w-full p-2.5 text-xs bg-surface border border-outline/30 rounded-lg text-on-surface focus:ring-1 focus:ring-primary leading-relaxed"
@@ -1178,7 +1179,7 @@ export const VoiceProductCreator: React.FC = () => {
                 {/* Indigenous Materials Chips */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-on-surface flex items-center justify-between">
-                    <span>Indigenous Raw Materials</span>
+                    <span>{t('Indigenous Raw Materials')}</span>
                     <span className="text-[11px] text-on-surface-variant font-normal">Click × to remove, or add new</span>
                   </label>
                   <div className="flex flex-wrap gap-1.5 mb-2">
@@ -1201,7 +1202,7 @@ export const VoiceProductCreator: React.FC = () => {
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Add another pure material (e.g. Botanical Indigo, Pure Silver Zari)..."
+                      placeholder={t('Add another pure material (e.g. Botanical Indigo, Pure Silver Zari)...')}
                       value={newMaterialInput}
                       onChange={(e) => setNewMaterialInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -1217,7 +1218,7 @@ export const VoiceProductCreator: React.FC = () => {
                       onClick={handleAddMaterial}
                       className="px-3.5 py-1.5 rounded-lg bg-surface border border-outline/30 text-xs font-semibold hover:bg-surface-container cursor-pointer transition"
                     >
-                      + Add
+                      + {t('Add')}
                     </button>
                   </div>
                 </div>
@@ -1225,7 +1226,7 @@ export const VoiceProductCreator: React.FC = () => {
                 {/* Technique, Suggested Fair Price, Production Time */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-on-surface">Technique</label>
+                    <label className="text-xs font-semibold text-on-surface">{t('Technique')}</label>
                     <input
                       type="text"
                       value={technique}
@@ -1236,8 +1237,8 @@ export const VoiceProductCreator: React.FC = () => {
 
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-on-surface flex items-center justify-between">
-                      <span>Suggested Fair Price (₹)</span>
-                      <span className="text-[10px] text-green-600 font-bold">100% Direct</span>
+                      <span>{t('Suggested Fair Price (₹)')}</span>
+                      <span className="text-[10px] text-green-600 font-bold">{t('100% Direct')}</span>
                     </label>
                     <input
                       type="number"
@@ -1249,7 +1250,7 @@ export const VoiceProductCreator: React.FC = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-on-surface">Production Time</label>
+                    <label className="text-xs font-semibold text-on-surface">{t('Production Time')}</label>
                     <input
                       type="text"
                       value={productionTime}
@@ -1263,10 +1264,10 @@ export const VoiceProductCreator: React.FC = () => {
                 <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-primary flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4" /> Cryptographic Digital Craft Passport
+                      <ShieldCheck className="w-4 h-4" /> {t('Cryptographic Digital Craft Passport')}
                     </span>
                     <span className="text-[10px] font-mono bg-primary/15 text-primary px-2 py-0.5 rounded-md font-semibold">
-                      ⚡ Supabase Realtime Ready
+                      {t('⚡ Supabase Realtime Ready')}
                     </span>
                   </div>
                   <p className="text-on-surface-variant text-[11px] leading-relaxed">
@@ -1281,7 +1282,7 @@ export const VoiceProductCreator: React.FC = () => {
                     onClick={() => setIsVoiceCreatorOpen(false)}
                     className="px-4 py-2 rounded-full border border-outline/30 text-xs font-semibold hover:bg-surface-container transition cursor-pointer"
                   >
-                    Cancel
+                    {t('Cancel')}
                   </button>
 
                   <button
@@ -1289,7 +1290,7 @@ export const VoiceProductCreator: React.FC = () => {
                     data-guide="publish-product-btn"
                     className="px-6 py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-md cursor-pointer flex items-center gap-2 hover:scale-[1.02]"
                   >
-                    <span>Publish Listing with Digital Craft Passport</span>
+                    <span>{t('Publish Listing with Digital Craft Passport')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -1315,10 +1316,10 @@ export const VoiceProductCreator: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-serif text-lg font-bold text-on-surface">
-                    Live Craft Camera
+                    {t('Live Craft Camera')}
                   </h3>
                   <p className="text-[11px] text-on-surface-variant">
-                    Frame your handcrafted creation clearly in good lighting
+                    {t('Frame your handcrafted creation clearly in good lighting')}
                   </p>
                 </div>
               </div>
@@ -1327,7 +1328,7 @@ export const VoiceProductCreator: React.FC = () => {
                 <button
                   type="button"
                   onClick={toggleCameraFacingMode}
-                  title="Switch Front / Back Camera"
+                  title={t('Switch Front / Back Camera')}
                   className="p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition cursor-pointer"
                 >
                   <FlipHorizontal className="w-4 h-4" />
@@ -1372,7 +1373,7 @@ export const VoiceProductCreator: React.FC = () => {
                       <div className="w-6 h-6 border-t-2 border-r-2 border-primary rounded-tr-lg" />
                     </div>
                     <div className="text-center text-[11px] text-white/80 font-medium drop-shadow-md">
-                      Center your handcrafted item
+                      {t('Center your handcrafted item')}
                     </div>
                     <div className="flex justify-between">
                       <div className="w-6 h-6 border-b-2 border-l-2 border-primary rounded-bl-lg" />
@@ -1394,7 +1395,7 @@ export const VoiceProductCreator: React.FC = () => {
                     className="px-3 sm:px-4 py-2 rounded-full border border-outline/30 text-xs font-semibold hover:bg-surface-container transition flex items-center gap-1.5 cursor-pointer"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Retake</span>
+                    <span>{t('Retake')}</span>
                   </button>
 
                   <div className="flex items-center gap-2">
@@ -1402,9 +1403,9 @@ export const VoiceProductCreator: React.FC = () => {
                       type="button"
                       onClick={applyCapturedPhoto}
                       className="px-3 sm:px-4 py-2 rounded-full border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition flex items-center gap-1 cursor-pointer"
-                      title="Apply original camera photo without AI enhancement"
+                      title={t('Apply original camera photo without AI enhancement')}
                     >
-                      <span>Use Raw</span>
+                      <span>{t('Use Raw')}</span>
                     </button>
 
                     <button
@@ -1419,7 +1420,7 @@ export const VoiceProductCreator: React.FC = () => {
                       className="px-4 sm:px-6 py-2 rounded-full bg-linear-to-r from-amber-500 via-primary to-amber-600 text-white text-xs font-bold hover:shadow-lg transition shadow-md flex items-center gap-1.5 cursor-pointer hover:scale-105"
                     >
                       <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-                      <span>✨ Deblur with AI</span>
+                      <span>{t('✨ Deblur with AI')}</span>
                     </button>
                   </div>
                 </>
@@ -1435,7 +1436,7 @@ export const VoiceProductCreator: React.FC = () => {
                     className="px-3.5 py-2 rounded-full border border-outline/30 text-xs font-semibold hover:bg-surface-container transition flex items-center gap-1.5 cursor-pointer text-on-surface"
                   >
                     <UploadCloud className="w-3.5 h-3.5 text-primary" />
-                    <span>Choose File</span>
+                    <span>{t('Choose File')}</span>
                   </button>
 
                   {/* Shutter Button */}
@@ -1454,7 +1455,7 @@ export const VoiceProductCreator: React.FC = () => {
                     onClick={stopLiveCamera}
                     className="px-4 py-2 rounded-full text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition cursor-pointer"
                   >
-                    Cancel
+                    {t('Cancel')}
                   </button>
                 </>
               )}

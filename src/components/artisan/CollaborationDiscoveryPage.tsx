@@ -125,6 +125,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
     acceptCollaborationRequest,
     declineCollaborationRequest,
     openSellerChatWith,
+    t,
   } = useApp();
 
   // Navigation Sub-tab
@@ -264,13 +265,13 @@ export const CollaborationDiscoveryPage: React.FC = () => {
         <div className="relative z-10 max-w-3xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/30">
             <Handshake className="w-4 h-4 text-amber-500" />
-            Seller-to-Seller Heritage Network
+            {t('Seller-to-Seller Heritage Network')}
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold font-serif text-on-surface tracking-tight">
-            Collaborate with Artisans
+            {t('Collaborate with Artisans')}
           </h1>
           <p className="text-sm sm:text-base text-on-surface-variant leading-relaxed">
-            Connect with creators across India and build something together. Form inter-craft capsule collections, execute bespoke commissions, and revive ancestral art fusions.
+            {t('Connect with creators across India and build something together. Form inter-craft capsule collections, execute bespoke commissions, and revive ancestral art fusions.')}
           </p>
         </div>
       </div>
@@ -286,7 +287,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
           }`}
         >
           <Search className="w-4 h-4" />
-          Discover Artisans ({filteredArtisans.length})
+          {t('Discover Artisans')} ({filteredArtisans.length})
         </button>
 
         <button
@@ -298,7 +299,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
           }`}
         >
           <Inbox className="w-4 h-4" />
-          Collaboration Requests
+          {t('Collaboration Requests')}
           {pendingReceivedCount > 0 && (
             <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-black">
               {pendingReceivedCount} new
@@ -315,7 +316,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
           }`}
         >
           <Sparkles className="w-4 h-4 text-amber-400" />
-          AI Synergy Concepts
+          {t('AI Curated Fusion Ideas')}
         </button>
       </div>
 
@@ -329,19 +330,20 @@ export const CollaborationDiscoveryPage: React.FC = () => {
               <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" />
               <input
                 type="text"
+                data-guide="collab-search-input"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by artisan name, craft (e.g. Ikat, Zari), state, skill or technique..."
+                placeholder={t('Search by artisan name, craft, state, district, or guild...')}
                 className="w-full pl-12 pr-4 py-3 rounded-2xl bg-surface-container-low border border-outline/25 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/40 font-medium"
               />
             </div>
 
             {/* 4 Interactive Dropdown Filters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            <div data-guide="collab-filters-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
               {/* Region */}
               <div className="space-y-1">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
-                  Region
+                  {t('Filter by Region')}
                 </label>
                 <select
                   value={selectedRegion}
@@ -350,7 +352,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                 >
                   {REGIONS.map((r) => (
                     <option key={r} value={r}>
-                      {r === 'All' ? 'All Regions' : `${r} India`}
+                      {r === 'All' ? t('All Regions') : `${t(r)} ${t('India')}`}
                     </option>
                   ))}
                 </select>
@@ -359,7 +361,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
               {/* Craft Type */}
               <div className="space-y-1">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
-                  Craft Category
+                  {t('Craft Category')}
                 </label>
                 <select
                   value={selectedCraftType}
@@ -368,7 +370,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                 >
                   {CRAFT_TYPES.map((c) => (
                     <option key={c} value={c}>
-                      {c === 'All' ? 'All Craft Categories' : c}
+                      {c === 'All' ? t('All Craft Categories') : t(c)}
                     </option>
                   ))}
                 </select>
@@ -377,16 +379,16 @@ export const CollaborationDiscoveryPage: React.FC = () => {
               {/* Collaboration Format */}
               <div className="space-y-1">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
-                  Collaboration Format
+                  {t('Collaboration Format')}
                 </label>
                 <select
                   value={selectedCollabType}
                   onChange={(e) => setSelectedCollabType(e.target.value as CollaborationType | 'All')}
                   className="w-full px-3 py-2 rounded-xl bg-surface-container border border-outline/20 text-xs font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
-                  {COLLAB_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t === 'All' ? 'All Formats' : t}
+                  {COLLAB_TYPES.map((ct) => (
+                    <option key={ct} value={ct}>
+                      {ct === 'All' ? t('All Formats') : t(ct)}
                     </option>
                   ))}
                 </select>
@@ -395,7 +397,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
               {/* Language */}
               <div className="space-y-1">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-on-surface-variant">
-                  Language Spoken
+                  {t('Language')}
                 </label>
                 <select
                   value={selectedLanguage}
@@ -404,7 +406,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                 >
                   {LANGUAGES.map((l) => (
                     <option key={l} value={l}>
-                      {l === 'All' ? 'All Languages' : l}
+                      {l === 'All' ? t('All') : t(l)}
                     </option>
                   ))}
                 </select>
@@ -415,13 +417,13 @@ export const CollaborationDiscoveryPage: React.FC = () => {
             {(searchQuery || selectedRegion !== 'All' || selectedCraftType !== 'All' || selectedCollabType !== 'All' || selectedLanguage !== 'All') && (
               <div className="flex items-center justify-between pt-2 border-t border-outline/10 text-xs">
                 <span className="text-on-surface-variant">
-                  Showing <strong>{filteredArtisans.length}</strong> matching master artisans
+                  {t('Showing')} <strong>{filteredArtisans.length}</strong> {t('matching master artisans')}
                 </span>
                 <button
                   onClick={resetFilters}
                   className="text-primary font-bold hover:underline flex items-center gap-1"
                 >
-                  <RefreshCw className="w-3 h-3" /> Reset all filters
+                  <RefreshCw className="w-3 h-3" /> {t('Reset all filters')}
                 </button>
               </div>
             )}
@@ -431,7 +433,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
           {filteredArtisans.length === 0 ? (
             <div className="p-12 text-center rounded-3xl bg-surface border border-outline/15 space-y-3">
               <Search className="w-12 h-12 mx-auto text-outline" />
-              <h3 className="text-base font-bold text-on-surface">No matching artisans found</h3>
+              <h3 className="text-base font-bold text-on-surface">{t('No matching artisans found')}</h3>
               <p className="text-xs text-on-surface-variant max-w-md mx-auto">
                 Try broadening your filter criteria or clearing the search query to discover master creators across India.
               </p>
@@ -439,11 +441,11 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                 onClick={resetFilters}
                 className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow hover:bg-primary-dark"
               >
-                Clear Filters
+                {t('Clear Filters')}
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div data-guide="collab-artisan-cards" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredArtisans.map((artisan) => (
                 <div
                   key={artisan.id}
@@ -461,7 +463,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                         {artisan.verification_status === 'VERIFIED' && (
                           <div
                             className="absolute -bottom-1 -right-1 p-0.5 rounded-full bg-emerald-600 text-white"
-                            title="Verified Artisan"
+                            title={t('Verified Artisan')}
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                           </div>
@@ -473,17 +475,17 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                           {artisan.name}
                         </h3>
                         <p className="text-xs text-primary font-bold truncate">
-                          {artisan.craft_name}
+                          {t(artisan.craft_name)}
                         </p>
                         <div className="flex items-center gap-2 mt-1 text-xs text-on-surface-variant flex-wrap">
                           <span className="flex items-center gap-1">
                             <MapPin className="w-3 h-3 text-secondary" />
-                            {artisan.district}, {artisan.state}
+                            {t(artisan.district)}, {t(artisan.state)}
                           </span>
                           <span>•</span>
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3 text-amber-500" />
-                            {artisan.experience_years}y
+                            {artisan.experience_years} {t('years')}
                           </span>
                         </div>
                       </div>
@@ -491,14 +493,14 @@ export const CollaborationDiscoveryPage: React.FC = () => {
 
                     {/* Bio Snippet */}
                     <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
-                      {artisan.bio}
+                      {t(artisan.bio)}
                     </p>
 
                     {/* Master Skills Chips */}
                     {artisan.skills && artisan.skills.length > 0 && (
                       <div className="space-y-1.5">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
-                          Master Skills:
+                          {t('Master Skills:')}
                         </span>
                         <div className="flex flex-wrap gap-1.5">
                           {artisan.skills.slice(0, 3).map((skill) => (
@@ -506,7 +508,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                               key={skill}
                               className="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-surface-container border border-outline/15 text-on-surface truncate max-w-[200px]"
                             >
-                              {skill}
+                              {t(skill)}
                             </span>
                           ))}
                         </div>
@@ -515,9 +517,9 @@ export const CollaborationDiscoveryPage: React.FC = () => {
 
                     {/* Collaboration Interests Tags */}
                     {artisan.collaboration_interests && artisan.collaboration_interests.length > 0 && (
-                      <div className="space-y-1.5">
+                      <div data-guide="collab-interests-section" className="space-y-1.5">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1">
-                          <Handshake className="w-3 h-3" /> Collaboration Openings:
+                          <Handshake className="w-3 h-3" /> {t('Collaboration Openings:')}
                         </span>
                         <div className="flex flex-wrap gap-1.5">
                           {artisan.collaboration_interests.map((int) => (
@@ -525,7 +527,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                               key={int}
                               className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-900 dark:text-amber-200 border border-amber-500/20"
                             >
-                              {int}
+                              {t(int)}
                             </span>
                           ))}
                         </div>
@@ -536,10 +538,11 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                   {/* Card Bottom Actions */}
                   <div className="p-4 bg-surface-container-low border-t border-outline/15 flex items-center justify-between gap-2">
                     <button
+                      data-guide="collab-view-profile-btn"
                       onClick={() => setViewingProfileArtisan(artisan)}
                       className="px-3 py-2 rounded-xl text-xs font-semibold text-on-surface hover:bg-surface-container transition-colors"
                     >
-                      View Profile
+                      {t('View Profile')}
                     </button>
 
                     <div className="flex items-center gap-2">
@@ -552,11 +555,12 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                       </button>
 
                       <button
+                        data-guide="collab-open-modal-btn"
                         onClick={() => handleOpenCollabModal(artisan)}
                         className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-primary text-white text-xs font-bold shadow hover:shadow-md transition-all flex items-center gap-1.5"
                       >
                         <Handshake className="w-3.5 h-3.5" />
-                        Collaborate
+                        {t('Collaborate')}
                       </button>
                     </div>
                   </div>
@@ -580,7 +584,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              Received Proposals ({receivedRequests.length})
+              {t('Received Proposals')} ({receivedRequests.length})
             </button>
             <button
               onClick={() => setRequestsTab('SENT')}
@@ -590,7 +594,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              Sent Proposals ({sentRequests.length})
+              {t('Sent Proposals')} ({sentRequests.length})
             </button>
             <button
               onClick={() => setRequestsTab('ACTIVE')}
@@ -600,7 +604,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              Active Collaborations ({activeCollaborations.length})
+              {t('Active Collaborations')} ({activeCollaborations.length})
             </button>
           </div>
 
@@ -610,7 +614,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
               {receivedRequests.length === 0 ? (
                 <div className="p-12 text-center rounded-3xl bg-surface border border-outline/15 space-y-2">
                   <Inbox className="w-10 h-10 mx-auto text-outline" />
-                  <h4 className="text-sm font-bold text-on-surface">No pending proposals received</h4>
+                  <h4 className="text-sm font-bold text-on-surface">{t('No pending proposals received')}</h4>
                   <p className="text-xs text-on-surface-variant max-w-sm mx-auto">
                     When other master artisans propose collaborations with your craft, their requests will appear here for review.
                   </p>
@@ -654,21 +658,21 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                         onClick={() => declineCollaborationRequest(req.id)}
                         className="px-4 py-2 rounded-xl border border-outline/30 text-xs font-semibold text-on-surface-variant hover:bg-surface-container transition-colors"
                       >
-                        Decline
+                        {t('Decline')}
                       </button>
                       <button
                         onClick={() => openSellerChatWith(req.sender_artisan_id, { id: req.id, title: req.title })}
                         className="px-4 py-2 rounded-xl border border-primary/30 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors flex items-center gap-1.5"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
-                        Message
+                        {t('Message')}
                       </button>
                       <button
                         onClick={() => acceptCollaborationRequest(req.id)}
                         className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white text-xs font-bold shadow hover:shadow-md transition-all flex items-center gap-1.5"
                       >
                         <Check className="w-3.5 h-3.5" />
-                        Accept & Start Collaboration
+                        {t('Accept & Start Collaboration')}
                       </button>
                     </div>
                   </div>
@@ -683,7 +687,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
               {sentRequests.length === 0 ? (
                 <div className="p-12 text-center rounded-3xl bg-surface border border-outline/15 space-y-2">
                   <Send className="w-10 h-10 mx-auto text-outline" />
-                  <h4 className="text-sm font-bold text-on-surface">No sent proposals</h4>
+                  <h4 className="text-sm font-bold text-on-surface">{t('No sent proposals')}</h4>
                   <p className="text-xs text-on-surface-variant max-w-sm mx-auto">
                     Propose partnerships from the Discover tab or select an AI synergy idea to launch your proposal.
                   </p>
@@ -703,7 +707,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                         />
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-bold text-on-surface">To: {req.receiver_name}</h4>
+                            <h4 className="text-sm font-bold text-on-surface">{t('To:')} {req.receiver_name}</h4>
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-surface-container text-on-surface-variant border border-outline/15">
                               {req.collaboration_type}
                             </span>
@@ -722,7 +726,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                         }`}
                       >
                         <Clock className="w-3.5 h-3.5" />
-                        {req.status}
+                        {t(req.status)}
                       </span>
                     </div>
 
@@ -737,7 +741,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                         className="px-4 py-1.5 rounded-xl border border-primary/30 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors flex items-center gap-1.5"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
-                        Message Partner
+                        {t('Message Partner')}
                       </button>
                     </div>
                   </div>
@@ -748,11 +752,11 @@ export const CollaborationDiscoveryPage: React.FC = () => {
 
           {/* Sub-tab 3: Active Collaborations */}
           {requestsTab === 'ACTIVE' && (
-            <div className="space-y-4">
+            <div data-guide="collab-active-collaborations" className="space-y-4">
               {activeCollaborations.length === 0 ? (
                 <div className="p-12 text-center rounded-3xl bg-surface border border-outline/15 space-y-2">
                   <Handshake className="w-10 h-10 mx-auto text-outline" />
-                  <h4 className="text-sm font-bold text-on-surface">No active collaborations yet</h4>
+                  <h4 className="text-sm font-bold text-on-surface">{t('No active collaborations yet')}</h4>
                   <p className="text-xs text-on-surface-variant max-w-sm mx-auto">
                     Accept a received proposal to initiate an active collaborative project.
                   </p>
@@ -784,9 +788,9 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                               </span>
                             </div>
                             <p className="text-xs text-primary font-semibold mt-0.5">
-                              Craft Fusion: {user.artisan_profile?.craft_name || 'Varanasi Brocade'} × {partnerCraft}
+                              {t('Craft Fusion:')} {t(user.artisan_profile?.craft_name || 'Varanasi Brocade')} × {t(partnerCraft)}
                             </p>
-                            <p className="text-xs text-on-surface-variant">Co-Creator: {partnerName}</p>
+                            <p className="text-xs text-on-surface-variant">{t('Co-Creator:')} {partnerName}</p>
                           </div>
                         </div>
 
@@ -795,14 +799,14 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                           className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-primary text-white text-xs font-bold shadow hover:shadow-md transition-all flex items-center justify-center gap-2"
                         >
                           <MessageSquare className="w-4 h-4" />
-                          Open Private Chat
+                          {t('Open Private Chat')}
                         </button>
                       </div>
 
                       <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/15 text-xs text-on-surface-variant flex items-center justify-between">
-                        <span>Project Status: Active Design & Loom Coordination</span>
+                        <span>{t('Project Status: Active Design & Loom Coordination')}</span>
                         <span className="font-semibold text-emerald-700 dark:text-emerald-300">
-                          {collab.collaboration_type}
+                          {t(collab.collaboration_type)}
                         </span>
                       </div>
                     </div>
@@ -821,10 +825,10 @@ export const CollaborationDiscoveryPage: React.FC = () => {
             <div className="space-y-1">
               <h3 className="text-lg font-bold font-serif text-amber-900 dark:text-amber-200 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-amber-500" />
-                DesiCraft AI Heritage Conceptualizer
+                {t('DesiCraft AI Heritage Conceptualizer')}
               </h3>
               <p className="text-xs text-on-surface-variant max-w-2xl">
-                Our algorithmic model analyzes traditional GI crafts across regions, balancing textures, ancestral materials, and commercial viability to propose unprecedented inter-craft synergies.
+                {t('Our algorithmic model analyzes traditional GI crafts across regions, balancing textures, ancestral materials, and commercial viability to propose unprecedented inter-craft synergies.')}
               </p>
             </div>
           </div>
@@ -841,24 +845,24 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-secondary/15 text-secondary border border-secondary/30">
-                        {idea.collabType}
+                        {t(idea.collabType)}
                       </span>
                       <span className="text-[11px] font-bold text-primary">
-                        Recommended Partner: {targetArtisan.name}
+                        {t('Recommended Partner:')} {targetArtisan.name}
                       </span>
                     </div>
 
                     <h4 className="text-base font-bold font-serif text-on-surface">
-                      {idea.title}
+                      {t(idea.title)}
                     </h4>
 
                     <p className="text-xs text-on-surface-variant leading-relaxed">
-                      {idea.concept}
+                      {t(idea.concept)}
                     </p>
 
                     <div className="p-3 rounded-xl bg-surface-container text-[11px] text-on-surface space-y-1">
-                      <span className="font-bold text-amber-700 dark:text-amber-300">Commercial Potential:</span>
-                      <p className="text-on-surface-variant">{idea.marketPotential}</p>
+                      <span className="font-bold text-amber-700 dark:text-amber-300">{t('Commercial Potential:')}</span>
+                      <p className="text-on-surface-variant">{t(idea.marketPotential)}</p>
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 pt-1">
@@ -867,7 +871,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                           key={tag}
                           className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-surface-container-high text-on-surface-variant"
                         >
-                          #{tag}
+                          #{t(tag)}
                         </span>
                       ))}
                     </div>
@@ -880,7 +884,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                         alt={targetArtisan.name}
                         className="w-8 h-8 rounded-full object-cover border"
                       />
-                      <span className="text-xs font-semibold text-on-surface">{targetArtisan.craft_name}</span>
+                      <span className="text-xs font-semibold text-on-surface">{t(targetArtisan.craft_name)}</span>
                     </div>
 
                     <button
@@ -888,7 +892,7 @@ export const CollaborationDiscoveryPage: React.FC = () => {
                       className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-primary text-white text-xs font-bold shadow hover:shadow-md transition-all flex items-center gap-1.5"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      Propose This Fusion
+                      {t('Propose This Fusion')}
                     </button>
                   </div>
                 </div>

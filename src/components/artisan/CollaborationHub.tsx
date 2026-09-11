@@ -20,6 +20,7 @@ export const CollaborationHub: React.FC = () => {
     sendCollaborationRequest,
     updateCollaborationStatus,
     showNotification,
+    t,
   } = useApp();
 
   const [selectedPartner, setSelectedPartner] = useState(artisans[1]?.id || '');
@@ -137,7 +138,7 @@ export const CollaborationHub: React.FC = () => {
         <form onSubmit={handleSendProposal} className="space-y-4 text-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="font-semibold text-on-surface">Select Partner Artisan</label>
+              <label className="font-semibold text-on-surface">{t('Select Partner Artisan')}</label>
               <select
                 value={selectedPartner}
                 onChange={(e) => setSelectedPartner(e.target.value)}
@@ -145,14 +146,14 @@ export const CollaborationHub: React.FC = () => {
               >
                 {artisans.map((art) => (
                   <option key={art.id} value={art.id}>
-                    {art.name} — {art.craft_name} ({art.state})
+                    {art.name} — {t(art.craft_name)} ({t(art.state)})
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="space-y-1.5">
-              <label className="font-semibold text-on-surface">Joint Product Concept Name</label>
+              <label className="font-semibold text-on-surface">{t('Joint Product Concept Name')}</label>
               <input
                 type="text"
                 required
@@ -164,7 +165,7 @@ export const CollaborationHub: React.FC = () => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="font-semibold text-on-surface">Proposal Details & Roles</label>
+            <label className="font-semibold text-on-surface">{t('Proposal Details & Roles')}</label>
             <textarea
               rows={3}
               required

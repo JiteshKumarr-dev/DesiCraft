@@ -13,6 +13,7 @@ export const FirstTimeWelcomeModal: React.FC = () => {
     setIsFirstTimeWelcomeOpen,
     startTour,
     guidedHelpEnabled,
+    t,
   } = useApp();
 
   if (!isFirstTimeWelcomeOpen || !guidedHelpEnabled) return null;
@@ -39,7 +40,7 @@ export const FirstTimeWelcomeModal: React.FC = () => {
         <button
           onClick={handleSkip}
           className="absolute top-4 right-4 p-1.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition cursor-pointer"
-          aria-label="Skip for now"
+          aria-label={t('Skip for now')}
         >
           <X className="w-5 h-5" />
         </button>

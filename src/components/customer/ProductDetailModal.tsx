@@ -14,6 +14,8 @@ import {
   CheckCircle,
   SunMedium,
   Check,
+  ShieldAlert,
+  EyeOff,
 } from 'lucide-react';
 
 import { ProductReviewsSection } from './ProductReviewsSection';
@@ -40,6 +42,7 @@ export const ProductDetailModal: React.FC = () => {
 
   if (!selectedProduct) return null;
 
+  const isPurchasable = selectedProduct.status === 'PUBLISHED';
   const isWishlisted = wishlist.includes(selectedProduct.id);
   const matchedPassport = passports.find((p) => p.id === selectedProduct.passport_id) || passports[0];
   const matchedArtisan = artisans.find((a) => a.id === selectedProduct.artisan_id) || {
@@ -49,6 +52,7 @@ export const ProductDetailModal: React.FC = () => {
   };
 
   const handleBuyNow = () => {
+    if (!isPurchasable) return;
     addToCart(selectedProduct, 1);
     setSelectedProduct(null);
     setIsCartOpen(true);
@@ -79,20 +83,20 @@ export const ProductDetailModal: React.FC = () => {
               {/* Studio Lighting AI Toggle */}
               <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md rounded-full px-3 py-1 flex items-center gap-2 text-white text-[11px] font-medium border border-white/20">
                 <SunMedium className={`w-3.5 h-3.5 ${isStudioLightingOn ? 'text-amber-400' : 'text-gray-400'}`} />
-                <span>Studio Lighting:</span>
+                <span>{t('Studio Lighting:')}</span>
                 <button
                   type="button"
                   onClick={() => setIsStudioLightingOn(!isStudioLightingOn)}
                   className="underline font-bold text-amber-300 hover:text-amber-200 transition cursor-pointer"
                 >
-                  {isStudioLightingOn ? 'ON (Studio View)' : 'OFF (Raw Loom)'}
+                  {isStudioLightingOn ? t('ON (Studio View)') : t('OFF (Raw Loom)')}
                 </button>
               </div>
 
               {/* GI Tag Badge */}
               <div className="absolute bottom-3 left-3 bg-primary/90 text-on-primary backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md">
                 <ShieldCheck className="w-4 h-4" />
-                <span>{selectedProduct.gi_tag}</span>
+                <span>{t(selectedProduct.gi_tag)}</span>
               </div>
             </div>
 
@@ -121,10 +125,10 @@ export const ProductDetailModal: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="font-serif font-bold text-xs text-on-surface">
-                    Digital Craft Passport Attached
+                    {t('Digital Craft Passport Attached')}
                   </h4>
                   <p className="text-[11px] text-on-surface-variant">
-                    Verifiable cryptographic record of master lineage
+                    {t('Verifiable cryptographic record of master lineage')}
                   </p>
                 </div>
               </div>
@@ -134,7 +138,7 @@ export const ProductDetailModal: React.FC = () => {
                 }}
                 className="px-3 py-1.5 rounded-full border border-primary text-primary text-xs font-bold hover:bg-primary/10 transition cursor-pointer"
               >
-                Inspect Passport
+                {t('Inspect Passport')}
               </button>
             </div>
           </div>
@@ -144,7 +148,7 @@ export const ProductDetailModal: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-primary uppercase tracking-wider">
-                  {selectedProduct.craft_name} • {selectedProduct.region} India
+                  {t(selectedProduct.craft_name)} • {t(selectedProduct.region)} {t('India')}
                 </span>
                 <button
                   onClick={() => toggleWishlist(selectedProduct.id)}
@@ -159,7 +163,7 @@ export const ProductDetailModal: React.FC = () => {
               </div>
 
               <h1 className="font-serif text-2xl sm:text-3xl font-bold text-on-surface leading-tight">
-                {selectedProduct.name}
+                {t(selectedProduct.name)}
               </h1>
 
               {/* Price & Fair Wage Indicator */}
@@ -168,35 +172,35 @@ export const ProductDetailModal: React.FC = () => {
                   ₹{selectedProduct.price.toLocaleString('en-IN')}
                 </span>
                 <span className="text-xs text-green-700 bg-green-50 px-2.5 py-1 rounded-md font-semibold border border-green-200">
-                  82% Direct Artisan Wage Guaranteed
+                  {t('82% Direct Artisan Wage Guaranteed')}
                 </span>
                 <span className="text-[11px] font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 px-2 py-0.5 rounded-md border border-red-200 dark:border-red-800 flex items-center gap-1">
-                  🔥 High Demand
+                  🔥 {t('High Demand')}
                 </span>
               </div>
 
               <p className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-                {selectedProduct.description}
+                {t(selectedProduct.description)}
               </p>
 
               {/* Craft Technique & Production Time Specs */}
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-3 rounded-lg bg-surface-container-low border border-outline/20">
                   <span className="text-[10px] text-on-surface-variant uppercase font-semibold block">
-                    Handcraft Technique
+                    {t('Handcraft Technique')}
                   </span>
                   <span className="font-medium text-on-surface mt-0.5 block">
-                    {selectedProduct.technique}
+                    {t(selectedProduct.technique)}
                   </span>
                 </div>
 
                 <div className="p-3 rounded-lg bg-surface-container-low border border-outline/20">
                   <span className="text-[10px] text-on-surface-variant uppercase font-semibold block">
-                    Time on Traditional Loom
+                    {t('Time on Traditional Loom')}
                   </span>
                   <span className="font-medium text-on-surface mt-0.5 block flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-primary" />
-                    {selectedProduct.production_time}
+                    {t(selectedProduct.production_time)}
                   </span>
                 </div>
               </div>
@@ -208,14 +212,14 @@ export const ProductDetailModal: React.FC = () => {
 
               {/* Indigenous Materials */}
               <div className="space-y-1.5">
-                <span className="text-xs font-semibold text-on-surface">Indigenous Pure Materials:</span>
+                <span className="text-xs font-semibold text-on-surface">{t('Indigenous Pure Materials:')}</span>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedProduct.materials.map((mat, i) => (
                     <span
                       key={i}
                       className="px-2.5 py-0.5 rounded-md text-xs bg-surface-container border border-outline/20 text-on-surface"
                     >
-                      ✦ {mat}
+                      ✦ {t(mat)}
                     </span>
                   ))}
                 </div>
@@ -231,11 +235,11 @@ export const ProductDetailModal: React.FC = () => {
                   />
                   <div>
                     <h5 className="font-serif font-bold text-xs text-on-surface flex items-center gap-1">
-                      {selectedProduct.artisan_name}
+                      {t(selectedProduct.artisan_name)}
                       <CheckCircle className="w-3.5 h-3.5 text-primary" />
                     </h5>
                     <p className="text-[11px] text-on-surface-variant">
-                      {selectedProduct.artisan_guild}
+                      {t(selectedProduct.artisan_guild)}
                     </p>
                   </div>
                 </div>
@@ -252,7 +256,7 @@ export const ProductDetailModal: React.FC = () => {
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface border border-primary/40 text-primary text-xs font-semibold hover:bg-primary/10 transition cursor-pointer"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
-                  <span>Chat in Your Language</span>
+                  <span>{t('Chat in Your Language')}</span>
                 </button>
               </div>
 
@@ -260,24 +264,45 @@ export const ProductDetailModal: React.FC = () => {
               <ProductReviewsSection />
             </div>
 
+            {/* Unavailable Notice if product is editing or unpublished */}
+            {!isPurchasable && (
+              <div className="p-3.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2.5">
+                <ShieldAlert className="w-4 h-4 shrink-0 text-amber-600" />
+                <span className="font-semibold">
+                  {t('Product temporarily unavailable while the seller updates it.')}
+                </span>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div data-guide="order-actions" className="space-y-2 pt-4 border-t border-outline/20">
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => addToCart(selectedProduct, 1)}
-                  className="py-3 px-4 rounded-full border border-primary text-primary font-bold text-xs sm:text-sm hover:bg-primary/10 transition flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>{t.addToCart}</span>
-                </button>
+              {isPurchasable ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => addToCart(selectedProduct, 1)}
+                    className="py-3 px-4 rounded-full border border-primary text-primary font-bold text-xs sm:text-sm hover:bg-primary/10 transition flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>{t.addToCart}</span>
+                  </button>
 
-                <button
-                  onClick={handleBuyNow}
-                  className="py-3 px-4 rounded-full bg-primary text-on-primary font-bold text-xs sm:text-sm hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>{t.buyNow}</span>
-                </button>
-              </div>
+                  <button
+                    onClick={handleBuyNow}
+                    className="py-3 px-4 rounded-full bg-primary text-on-primary font-bold text-xs sm:text-sm hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>{t.buyNow}</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-xl bg-surface-container-low border border-outline/20 text-center space-y-1">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-800 dark:text-amber-300 inline-block">
+                    {t('Temporarily unavailable')}
+                  </span>
+                  <p className="text-xs text-on-surface-variant">
+                    {t('Purchasing paused while the seller updates this handcrafted masterpiece.')}
+                  </p>
+                </div>
+              )}
 
               <button
                 onClick={() => {
@@ -286,7 +311,7 @@ export const ProductDetailModal: React.FC = () => {
                 }}
                 className="w-full py-2 px-3 text-center text-xs text-on-surface-variant hover:text-primary transition font-medium cursor-pointer"
               >
-                Want custom colors or sizes? <u>Request a Bespoke Commission from this Artisan</u>
+                {t('Want custom colors or sizes? Request a Bespoke Commission from this Artisan')}
               </button>
             </div>
           </div>

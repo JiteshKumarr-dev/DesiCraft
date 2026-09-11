@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
   const { t, activeMode, toggleMode } = useApp();
 
   return (
-    <footer className="bg-surface-container-high border-t border-outline/20 text-on-surface pt-12 pb-8 transition-colors">
+    <footer data-guide="desi-footer" className="bg-surface-container-high border-t border-outline/20 text-on-surface pt-12 pb-8 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Brand & Mission */}
@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
                 <Sparkles className="w-4 h-4" />
               </div>
               <span className="font-serif text-2xl font-bold tracking-tight text-on-surface">
-                Desi<span className="text-primary italic ml-1">Craft</span>
+                Desi<span className="text-primary italic ml-1">{t('Craft')}</span>
               </span>
             </div>
             <p className="text-xs text-on-surface-variant leading-relaxed">
@@ -109,7 +109,7 @@ export const Footer: React.FC = () => {
                 onClick={toggleMode}
                 className="w-full py-2 px-3 rounded-lg bg-surface border border-outline/30 text-primary font-semibold hover:bg-primary/10 transition text-left flex items-center justify-between cursor-pointer"
               >
-                <span>{activeMode === 'CUSTOMER' ? t('Go to Artisan Studio') : t('Go to Buyer Marketplace')}</span>
+                <span>{activeMode === 'CUSTOMER' ? t('Switch to Artisan Studio') : t('Switch to Buyer Marketplace')}</span>
                 <Compass className="w-4 h-4" />
               </button>
               <div className="pt-2 flex items-center gap-1 text-[11px] text-on-surface-variant/80">

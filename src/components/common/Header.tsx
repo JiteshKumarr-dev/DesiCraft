@@ -19,6 +19,7 @@ import {
   MapPin,
   HelpCircle,
 } from 'lucide-react';
+import { navigate } from '../../services/router';
 
 interface HeaderProps {
   onOpenProfile: () => void;
@@ -115,14 +116,19 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex items-center justify-between gap-4">
           {/* Logo & Brand Identity */}
-          <div className="flex items-center gap-3" data-guide="brand-logo">
-            <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-xs">
+          <div
+            className="flex items-center gap-3 cursor-pointer group"
+            data-guide="brand-logo"
+            onClick={() => navigate('/')}
+            title={t('Back to DesiCraft Home')}
+          >
+            <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-xs group-hover:scale-105 transition-transform">
               <Sparkles className="w-5 h-5 text-primary" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-serif text-2xl font-bold tracking-tight text-on-surface">
-                  Desi<span className="text-primary font-normal italic ml-1">Craft</span>
+                  Desi<span className="text-primary font-normal italic ml-1">{t('Craft')}</span>
                 </span>
                 <span
                   className={`text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full border ${
@@ -154,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                 <button
                   type="button"
-                  title="Visual Pattern Search"
+                  title={t('Visual Pattern Search')}
                   onClick={() => setIsVisualSearchOpen(true)}
                   className="p-1 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition cursor-pointer"
                 >
@@ -163,7 +169,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {activeMode === 'ARTISAN' && (
                   <button
                     type="button"
-                    title="Voice Product Creator"
+                    title={t('Voice Product Creator')}
                     onClick={() => setIsVoiceCreatorOpen(true)}
                     className="p-1 rounded-full text-primary bg-primary/10 hover:bg-primary/20 transition cursor-pointer"
                   >
@@ -185,14 +191,14 @@ export const Header: React.FC<HeaderProps> = ({
                   ? 'bg-surface-container-highest text-primary border-primary/30 hover:bg-primary/10'
                   : 'bg-primary text-on-primary border-primary hover:bg-primary/90'
               }`}
-              title="One Account: Switch seamlessly between Customer and Artisan Mode"
+              title={activeMode === 'CUSTOMER' ? t('Switch to Artisan Studio') : t('Switch to Buyer Marketplace')}
             >
               <ArrowLeftRight className="w-3.5 h-3.5 animate-pulse" />
               <span className="hidden sm:inline">
-                {activeMode === 'CUSTOMER' ? t.switchModeToArtisan : t.switchModeToCustomer}
+                {activeMode === 'CUSTOMER' ? t('Switch to Artisan Studio') : t('Switch to Buyer Marketplace')}
               </span>
               <span className="sm:hidden">
-                {activeMode === 'CUSTOMER' ? t('Studio Mode') : t('Marketplace')}
+                {activeMode === 'CUSTOMER' ? t('Switch to Artisan Studio') : t('Switch to Buyer Marketplace')}
               </span>
             </button>
 
@@ -256,8 +262,8 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => setIsHelpMenuOpen(true)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold transition shadow-2xs cursor-pointer group"
-              title="Guided Help & Voice Assistance"
-              aria-label="Guided Help"
+              title={t('Guided Help & Voice Assistance')}
+              aria-label={t('Guided Help')}
             >
               <HelpCircle className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
               <span className="hidden sm:inline font-semibold">{t('Guided Help')}</span>
@@ -269,8 +275,8 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   onClick={onOpenWishlist}
                   className="relative p-2 rounded-full text-on-surface hover:bg-surface-container-high transition cursor-pointer"
-                  title="Saved Heirlooms Wishlist"
-                  aria-label="Wishlist"
+                  title={t('Saved Heirlooms Wishlist')}
+                  aria-label={t('Wishlist')}
                 >
                   <Heart className="w-5 h-5 text-on-surface" />
                   {wishlist.length > 0 && (
@@ -283,7 +289,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   onClick={() => setIsCartOpen(true)}
                   className="relative p-2 rounded-full text-on-surface hover:bg-surface-container-high transition cursor-pointer"
-                  aria-label="Cart"
+                  aria-label={t('Cart')}
                 >
                   <ShoppingBag className="w-5 h-5 text-on-surface" />
                   {cartCount > 0 && (
@@ -298,14 +304,11 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Sign In / Join Button or Profile Avatar */}
             {!isLoggedIn ? (
               <button
-                onClick={() => {
-                  setAuthMode('SIGNUP');
-                  setIsAuthModalOpen(true);
-                }}
+                onClick={() => navigate('/login')}
                 className="px-3.5 py-1.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
               >
                 <UserIcon className="w-3.5 h-3.5" />
-                <span>{t('Join / Sign In')}</span>
+                <span>{t('Sign In')}</span>
               </button>
             ) : (
               <div className="flex items-center gap-1">

@@ -128,7 +128,7 @@ export const LearningView: React.FC = () => {
                   className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
-                  <span>View Syllabus</span>
+                  <span>{t('View Syllabus')}</span>
                 </button>
               </div>
 
@@ -136,7 +136,7 @@ export const LearningView: React.FC = () => {
                 onClick={() => setBookingArtisan(artisan)}
                 className="px-4 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs flex items-center gap-1.5 cursor-pointer"
               >
-                <span>Book Masterclass</span>
+                <span>{t('Book Masterclass')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -151,13 +151,13 @@ export const LearningView: React.FC = () => {
             <div className="flex items-center justify-between border-b border-outline/10 pb-4">
               <div>
                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                  ENROLL IN APPRENTICESHIP
+                  {t('ENROLL IN APPRENTICESHIP')}
                 </span>
                 <h3 className="font-serif text-xl font-bold text-on-surface mt-0.5">
-                  Learn {bookingArtisan.craft_name}
+                  {t('Learn')} {bookingArtisan.craft_name}
                 </h3>
                 <p className="text-xs text-on-surface-variant">
-                  With {bookingArtisan.name} ({bookingArtisan.district})
+                  {t('With')} {bookingArtisan.name} ({bookingArtisan.district})
                 </p>
               </div>
               <button
@@ -170,12 +170,12 @@ export const LearningView: React.FC = () => {
 
             <form onSubmit={handleConfirmBooking} className="space-y-4 text-xs">
               <div className="space-y-1.5">
-                <label className="font-semibold text-on-surface">Format</label>
+                <label className="font-semibold text-on-surface">{t('Format')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { id: 'WORKSHOP', label: 'Weekend Workshop' },
-                    { id: 'DEMONSTRATION', label: 'Live Demonstration' },
-                    { id: 'APPRENTICESHIP', label: 'Master Apprenticeship' },
+                    { id: 'WORKSHOP', label: t('Weekend Workshop') },
+                    { id: 'DEMONSTRATION', label: t('Live Demonstration') },
+                    { id: 'APPRENTICESHIP', label: t('Master Apprenticeship') },
                   ].map((f) => (
                     <button
                       key={f.id}
@@ -194,7 +194,7 @@ export const LearningView: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-semibold text-on-surface">Preferred Timeline / Dates</label>
+                <label className="font-semibold text-on-surface">{t('Preferred Timeline / Dates')}</label>
                 <input
                   type="text"
                   required
@@ -205,7 +205,7 @@ export const LearningView: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-semibold text-on-surface">Language of Instruction</label>
+                <label className="font-semibold text-on-surface">{t('Language of Instruction')}</label>
                 <select
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
@@ -220,7 +220,7 @@ export const LearningView: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-semibold text-on-surface">Message / Learning Objectives</label>
+                <label className="font-semibold text-on-surface">{t('Message / Learning Objectives')}</label>
                 <textarea
                   rows={3}
                   required
@@ -234,7 +234,7 @@ export const LearningView: React.FC = () => {
                 type="submit"
                 className="w-full py-3 rounded-full bg-primary text-on-primary font-bold hover:bg-primary/90 transition shadow-md cursor-pointer"
               >
-                Submit Learning Application
+                {t('Submit Learning Application')}
               </button>
             </form>
           </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useApp } from '../../context/AppContext';
 import { ArtisanProfile } from '../../types';
 import {
   BookOpen,
@@ -23,6 +24,7 @@ export const CurriculumModal: React.FC<CurriculumModalProps> = ({
   onClose,
   onApply,
 }) => {
+  const { t } = useApp();
   if (!artisan) return null;
 
   const syllabusModules = [
@@ -88,7 +90,7 @@ export const CurriculumModal: React.FC<CurriculumModalProps> = ({
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-secondary/15 text-secondary border border-secondary/30">
                 <GraduationCap className="w-3.5 h-3.5" />
-                <span>GURU-SHISHYA MASTER SYLLABUS</span>
+                <span>{t('GURU-SHISHYA MASTER SYLLABUS')}</span>
               </div>
               <h2 className="font-serif text-2xl font-bold text-on-surface mt-1">
                 {artisan.craft_name} Apprenticeship
@@ -102,16 +104,16 @@ export const CurriculumModal: React.FC<CurriculumModalProps> = ({
           {/* Highlights */}
           <div className="grid grid-cols-3 gap-2.5 text-center text-xs">
             <div className="p-3 rounded-xl bg-surface-container-low border border-outline/20">
-              <span className="text-[10px] uppercase font-bold text-on-surface-variant block">Format</span>
-              <span className="font-serif font-bold text-primary">In-Person Studio</span>
+              <span className="text-[10px] uppercase font-bold text-on-surface-variant block">{t('Format')}</span>
+              <span className="font-serif font-bold text-primary">{t('In-Person Studio')}</span>
             </div>
             <div className="p-3 rounded-xl bg-surface-container-low border border-outline/20">
-              <span className="text-[10px] uppercase font-bold text-on-surface-variant block">Duration</span>
+              <span className="text-[10px] uppercase font-bold text-on-surface-variant block">{t('Duration')}</span>
               <span className="font-serif font-bold text-on-surface">2 to 14 Days</span>
             </div>
             <div className="p-3 rounded-xl bg-surface-container-low border border-outline/20">
-              <span className="text-[10px] uppercase font-bold text-on-surface-variant block">Certification</span>
-              <span className="font-serif font-bold text-secondary">Guild Endorsed</span>
+              <span className="text-[10px] uppercase font-bold text-on-surface-variant block">{t('Certification')}</span>
+              <span className="font-serif font-bold text-secondary">{t('Guild Endorsed')}</span>
             </div>
           </div>
 
@@ -119,7 +121,7 @@ export const CurriculumModal: React.FC<CurriculumModalProps> = ({
           <div className="space-y-3">
             <h3 className="font-serif text-sm font-bold text-on-surface flex items-center gap-1.5">
               <BookOpen className="w-4 h-4 text-primary" />
-              <span>Comprehensive 4-Stage Hands-On Curriculum</span>
+              <span>{t('Comprehensive 4-Stage Hands-On Curriculum')}</span>
             </h3>
 
             <div className="space-y-2.5">
@@ -156,7 +158,7 @@ export const CurriculumModal: React.FC<CurriculumModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 text-xs font-semibold text-on-surface-variant hover:text-on-surface cursor-pointer"
             >
-              Close Syllabus
+              {t('Close')}
             </button>
 
             <button
@@ -166,7 +168,7 @@ export const CurriculumModal: React.FC<CurriculumModalProps> = ({
               }}
               className="px-6 py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-md flex items-center gap-2 cursor-pointer"
             >
-              <span>Apply for this Masterclass</span>
+              <span>{t('Apply for this Masterclass')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

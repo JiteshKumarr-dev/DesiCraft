@@ -19,6 +19,7 @@ export const SignupSuccessModal: React.FC = () => {
     setMode,
     setIsVoiceArtisanSetupOpen,
     showNotification,
+    t,
   } = useApp();
 
   if (!isSignupSuccessModalOpen) return null;
@@ -47,16 +48,16 @@ export const SignupSuccessModal: React.FC = () => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-green-900/15 text-green-700 border border-green-700/30">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>UNIVERSAL ACCOUNT READY</span>
+            <span>{t('UNIVERSAL ACCOUNT READY')}</span>
           </div>
 
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-on-surface">
-            Welcome to Desi Craft, <br />
+            {t('Welcome to Desi Craft,')} <br />
             <span className="text-primary">{user.name}</span>!
           </h2>
 
           <p className="text-xs sm:text-sm text-on-surface-variant max-w-md mx-auto leading-relaxed">
-            Your single universal account has been created. You can buy authentic crafts, book guru-shishya apprenticeships, or manage your loom studio.
+            {t('Your single universal account has been created. You can buy authentic crafts, book guru-shishya apprenticeships, or manage your loom studio.')}
           </p>
         </div>
 
@@ -64,14 +65,14 @@ export const SignupSuccessModal: React.FC = () => {
         <div className="p-3.5 rounded-2xl bg-surface-container border border-primary/20 flex items-center gap-2.5 text-left">
           <ArrowLeftRight className="w-5 h-5 text-primary shrink-0 animate-pulse" />
           <p className="text-[11px] text-on-surface leading-tight">
-            <strong>One Account. Two Modes.</strong> This is <em>not a permanent role choice</em>. You can freely switch between Customer & Artisan modes anytime in 1 click from the header.
+            <strong>{t('One Account. Two Modes.')}</strong> {t('This is')} <em>{t('not a permanent role choice')}</em>. {t('You can freely switch between Customer & Artisan modes anytime in 1 click from the header.')}
           </p>
         </div>
 
         {/* Two Choices */}
         <div className="space-y-3 pt-1">
           <span className="text-xs font-serif font-bold text-on-surface uppercase tracking-wider block">
-            How would you like to explore today?
+            {t('How would you like to explore today?')}
           </span>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-left">
@@ -87,15 +88,15 @@ export const SignupSuccessModal: React.FC = () => {
 
               <div>
                 <h4 className="font-serif font-bold text-sm text-on-surface">
-                  🛍️ Explore as Customer
+                  🛍️ {t('Explore as Customer')}
                 </h4>
                 <p className="text-[11px] text-on-surface-variant mt-1 leading-relaxed">
-                  Discover certified GI crafts, listen to oral weaver stories, and gift handcrafted heirlooms.
+                  {t('Discover certified GI crafts, listen to oral weaver stories, and gift handcrafted heirlooms.')}
                 </p>
               </div>
 
               <span className="text-xs font-bold text-primary flex items-center gap-1">
-                <span>Enter Marketplace</span>
+                <span>{t('Enter Marketplace')}</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition" />
               </span>
             </button>
@@ -112,15 +113,15 @@ export const SignupSuccessModal: React.FC = () => {
 
               <div>
                 <h4 className="font-serif font-bold text-sm text-on-surface">
-                  🧑‍🎨 Start Artisan Mode
+                  🧑‍🎨 {t('Start Artisan Mode')}
                 </h4>
                 <p className="text-[11px] text-on-surface-variant mt-1 leading-relaxed">
-                  Set up your studio via voice, calculate fair prices, and mint digital craft passports.
+                  {t('Set up your studio via voice, calculate fair prices, and mint digital craft passports.')}
                 </p>
               </div>
 
               <span className="text-xs font-bold text-secondary flex items-center gap-1">
-                <span>Set Up Studio</span>
+                <span>{t('Set Up Studio')}</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition" />
               </span>
             </button>

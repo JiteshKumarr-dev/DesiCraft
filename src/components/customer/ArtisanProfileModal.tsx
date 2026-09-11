@@ -32,8 +32,9 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
 
   const artisanProducts = products.filter(
     (p) =>
-      p.artisan_name.toLowerCase().includes(artisan.name.toLowerCase().split(' ')[0]) ||
-      p.craft_name.toLowerCase().includes(artisan.craftName.toLowerCase().split(' ')[0])
+      p.status === 'PUBLISHED' &&
+      (p.artisan_name.toLowerCase().includes(artisan.name.toLowerCase().split(' ')[0]) ||
+        p.craft_name.toLowerCase().includes(artisan.craftName.toLowerCase().split(' ')[0]))
   );
 
   const toggleStoryAudio = () => {
@@ -97,7 +98,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
       <div className="relative w-full max-w-2xl bg-surface rounded-3xl shadow-2xl border border-outline/30 max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 text-on-surface">
         <button
           onClick={onClose}
-          aria-label="Close artisan profile"
+          aria-label={t('Close')}
           className="absolute top-4 right-4 z-10 p-2 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface transition cursor-pointer"
         >
           <X className="w-5 h-5" />
@@ -118,13 +119,13 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
 
           <div className="space-y-1.5 text-center sm:text-left flex-1">
             <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
-                VERIFIED MASTER ARTISAN
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 uppercase">
+                {t('Verified Master Artisan')}
               </span>
               <div className="flex items-center gap-1 text-xs">
                 <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                 <span className="font-bold text-on-surface">{artisan.rating.toFixed(1)}</span>
-                <span className="text-on-surface-variant text-[11px]">({artisan.reviewsCount} reviews)</span>
+                <span className="text-on-surface-variant text-[11px]">({artisan.reviewsCount} {t('reviews')})</span>
               </div>
             </div>
 
@@ -138,7 +139,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             </p>
 
             <p className="text-xs text-on-surface-variant">
-              {artisan.experienceYears || 25}+ Years Generational Mastery • Speaks: {artisan.languages?.join(', ') || 'Telugu, Hindi, English'}
+              {artisan.experienceYears || 25}+ {t('Years Generational Mastery')} • {t('Speaks')}: {artisan.languages?.join(', ') || 'Telugu, Hindi, English'}
             </p>
           </div>
         </div>
@@ -147,7 +148,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
         <div className="p-4 sm:p-5 rounded-2xl bg-surface-container-low border border-outline/20 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-primary flex items-center gap-1.5 uppercase tracking-wide">
-              <Volume2 className="w-4 h-4" /> Living Oral Craft Lineage
+              <Volume2 className="w-4 h-4" /> {t('Living Oral Craft Lineage')}
             </span>
             <button
               onClick={toggleStoryAudio}
@@ -160,12 +161,12 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
               {isPlayingAudio ? (
                 <>
                   <VolumeX className="w-3.5 h-3.5" />
-                  <span>Pause Voice</span>
+                  <span>{t('Pause Voice')}</span>
                 </>
               ) : (
                 <>
                   <Volume2 className="w-3.5 h-3.5" />
-                  <span>Listen in Mother Tongue</span>
+                  <span>{t('Listen in Mother Tongue')}</span>
                 </>
               )}
             </button>
@@ -180,7 +181,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
         {artisanProducts.length > 0 && (
           <div className="space-y-3">
             <h4 className="font-serif font-bold text-sm text-on-surface">
-              Handcrafted Creations from this Studio
+              {t('Handcrafted Creations from this Studio')}
             </h4>
             <div className="grid grid-cols-2 gap-3">
               {artisanProducts.slice(0, 2).map((prod) => (
@@ -218,7 +219,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             className="w-full py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>Start Direct Chat</span>
+            <span>{t('Start Direct Chat')}</span>
           </button>
 
           <button
@@ -229,7 +230,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             className="w-full py-2.5 rounded-full border border-primary text-primary hover:bg-primary/10 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Custom Commission</span>
+            <span>{t('Custom Commission')}</span>
           </button>
 
           <button
@@ -237,7 +238,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
             className="w-full py-2.5 rounded-full bg-secondary/15 text-secondary hover:bg-secondary/25 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5"
           >
             <GraduationCap className="w-4 h-4" />
-            <span>Book Workshop</span>
+            <span>{t('Book Workshop')}</span>
           </button>
         </div>
       </div>

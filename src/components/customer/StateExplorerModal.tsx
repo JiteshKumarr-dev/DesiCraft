@@ -38,7 +38,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
   onSelectCraftForLineage,
   onOpenArtisanProfile,
 }) => {
-  const { crafts, setSelectedCraft, openChatWith, t } = useApp();
+  const { crafts, setSelectedCraft, openChatWith, t, language } = useApp();
 
   // Active sub-tab
   const [activeTab, setActiveTab] = useState<'CRAFTS' | 'EXPLORE' | 'ARTISANS' | 'STORIES' | 'EVENTS'>('CRAFTS');
@@ -125,7 +125,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          aria-label="Close state exploration modal"
+          aria-label={t('Close state exploration modal')}
           className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-surface/80 hover:bg-surface-container text-on-surface shadow-md backdrop-blur-xs transition cursor-pointer"
         >
           <X className="w-5 h-5" />
@@ -142,19 +142,19 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                   id="state-explorer-title"
                   className="font-serif text-3xl sm:text-4xl font-bold text-on-surface tracking-tight"
                 >
-                  {stateData.name}
+                  {t(stateData.name)}
                 </h1>
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                  {stateData.region}
+                  {t(stateData.region)}
                 </span>
               </div>
 
               <h2 className="text-base sm:text-lg font-semibold text-on-surface/90">
-                {stateData.tagline}
+                {t(stateData.tagline)}
               </h2>
 
               <p className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-                {stateData.description}
+                {t(stateData.description)}
               </p>
 
               {/* Stats Row */}
@@ -166,7 +166,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                       {stateData.stats.uniqueCrafts}
                     </span>
                     <span className="text-[11px] text-on-surface-variant">
-                      Unique Crafts
+                      {t('Unique Crafts')}
                     </span>
                   </div>
                 </div>
@@ -178,7 +178,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                       {stateData.stats.artisans}
                     </span>
                     <span className="text-[11px] text-on-surface-variant">
-                      Artisans
+                      {t('Artisans')}
                     </span>
                   </div>
                 </div>
@@ -190,7 +190,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                       {stateData.stats.districts}
                     </span>
                     <span className="text-[11px] text-on-surface-variant">
-                      Districts
+                      {t('Districts')}
                     </span>
                   </div>
                 </div>
@@ -201,7 +201,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
             <div className="w-full lg:w-80 h-52 sm:h-60 rounded-2xl overflow-hidden relative shadow-md shrink-0 group">
               <img
                 src={stateData.heroImage}
-                alt={stateData.heroImageCaption}
+                alt={t(stateData.heroImageCaption)}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -210,14 +210,14 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
               {stateData.heroQuote && (
                 <div className="absolute top-4 right-4 max-w-[200px] text-right pointer-events-none">
                   <p className="font-serif italic text-amber-100 text-xs sm:text-sm font-medium leading-tight drop-shadow-md">
-                    "{stateData.heroQuote}"
+                    "{t(stateData.heroQuote)}"
                   </p>
                 </div>
               )}
 
               {/* Caption */}
               <div className="absolute bottom-3 right-3 text-white/90 text-[11px] font-medium backdrop-blur-xs bg-black/40 px-2.5 py-0.5 rounded-md">
-                {stateData.heroImageCaption}
+                {t(stateData.heroImageCaption)}
               </div>
             </div>
           </div>
@@ -235,7 +235,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                   : 'bg-surface-container text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              Famous Crafts
+              {t('Famous Crafts')}
             </button>
 
             <button
@@ -250,7 +250,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
               }`}
             >
               <Landmark className="w-3.5 h-3.5" />
-              <span>Explore</span>
+              <span>{t('Explore')}</span>
             </button>
 
             <button
@@ -265,7 +265,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Artisans</span>
+              <span>{t('Artisans')}</span>
             </button>
 
             <button
@@ -280,7 +280,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Stories</span>
+              <span>{t('Stories')}</span>
             </button>
 
             <button
@@ -295,7 +295,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
-              <span>Events & Opportunities</span>
+              <span>{t('Events & Opportunities')}</span>
             </button>
           </div>
 
@@ -303,23 +303,25 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
           <div className="space-y-3" data-guide="state-crafts-list">
             <div className="flex items-center justify-between">
               <h3 className="font-serif text-lg sm:text-xl font-bold text-on-surface">
-                Famous Crafts of {stateData.name}
+                {language === 'en'
+                  ? `${t('Famous Crafts of')} ${t(stateData.name)}`
+                  : `${t(stateData.name)} ${t('Famous Crafts of')}`}
               </h3>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-primary">
-                  View All ({stateData.crafts.length}) →
+                  {t('View All')} ({stateData.crafts.length}) →
                 </span>
                 <div className="hidden sm:flex items-center gap-1">
                   <button
                     onClick={() => handleScrollCarousel('left')}
-                    aria-label="Previous crafts"
+                    aria-label={t('Previous crafts')}
                     className="p-1 rounded-full border border-outline/20 hover:bg-surface-container text-on-surface transition cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleScrollCarousel('right')}
-                    aria-label="Next crafts"
+                    aria-label={t('Next crafts')}
                     className="p-1 rounded-full border border-outline/20 hover:bg-surface-container text-on-surface transition cursor-pointer"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -347,14 +349,14 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                   >
                     <img
                       src={craft.image}
-                      alt={craft.name}
+                      alt={t(craft.name)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
 
                     <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between gap-1 text-white">
                       <span className="font-serif font-bold text-xs sm:text-sm line-clamp-2 leading-tight">
-                        {craft.name}
+                        {t(craft.name)}
                       </span>
                       <ChevronRight
                         className={`w-4 h-4 text-primary shrink-0 transition-transform ${
@@ -376,7 +378,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                 <div className="lg:col-span-3 w-full aspect-square rounded-2xl overflow-hidden relative shadow-md">
                   <img
                     src={currentCraft.image}
-                    alt={currentCraft.name}
+                    alt={t(currentCraft.name)}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-2xl" />
@@ -386,28 +388,36 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                 <div className="lg:col-span-5 space-y-3">
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <h4 className="font-serif text-xl sm:text-2xl font-bold text-on-surface">
-                      {currentCraft.name}
+                      {t(currentCraft.name)}
                     </h4>
                     {currentCraft.isGI && (
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary text-on-primary">
-                        GI Tagged
+                        {t('GI Tagged')}
                       </span>
                     )}
                   </div>
 
                   <p className="text-xs font-semibold text-primary">
-                    The Pride of {stateData.name}
+                    {t(`The Pride of ${stateData.name}`) !== `The Pride of ${stateData.name}`
+                      ? t(`The Pride of ${stateData.name}`)
+                      : (language === 'en'
+                          ? `${t('The Pride of')} ${t(stateData.name)}`
+                          : `${t(stateData.name)} ${t('The Pride of')}`)}
                   </p>
 
                   <p className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-                    {currentCraft.description}
+                    {t(currentCraft.description)}
                   </p>
 
                   <button
                     onClick={handleOpenCraftDetail}
                     className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs cursor-pointer"
                   >
-                    <span>Explore All About {currentCraft.name.split(' ')[0]} Ikat</span>
+                    <span>
+                      {t(`Explore All About ${currentCraft.name}`) !== `Explore All About ${currentCraft.name}`
+                        ? t(`Explore All About ${currentCraft.name}`)
+                        : `${t('Explore All About')} ${t(currentCraft.name)}`}
+                    </span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -416,37 +426,37 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                 <div className="lg:col-span-4 p-4 rounded-xl bg-surface border border-outline/20 space-y-3.5 text-xs">
                   <div>
                     <span className="text-[10px] uppercase tracking-wider font-bold text-primary flex items-center gap-1.5">
-                      <span>🪢</span> Technique
+                      <span>🪢</span> {t('Technique')}
                     </span>
                     <p className="font-semibold text-on-surface mt-0.5">
-                      {currentCraft.technique}
+                      {t(currentCraft.technique)}
                     </p>
                   </div>
 
                   <div>
                     <span className="text-[10px] uppercase tracking-wider font-bold text-primary flex items-center gap-1.5">
-                      <span>🧶</span> Materials
+                      <span>🧶</span> {t('Materials')}
                     </span>
                     <p className="font-semibold text-on-surface mt-0.5">
-                      {currentCraft.materials.join(', ')}
+                      {currentCraft.materials.map((m) => t(m)).join(', ')}
                     </p>
                   </div>
 
                   <div>
                     <span className="text-[10px] uppercase tracking-wider font-bold text-primary flex items-center gap-1.5">
-                      <span>🎨</span> Known For
+                      <span>🎨</span> {t('Known For')}
                     </span>
                     <p className="font-semibold text-on-surface mt-0.5">
-                      {currentCraft.knownFor.join(', ')}
+                      {currentCraft.knownFor.map((k) => t(k)).join(', ')}
                     </p>
                   </div>
 
                   <div>
                     <span className="text-[10px] uppercase tracking-wider font-bold text-primary flex items-center gap-1.5">
-                      <span>🏛️</span> Cultural Significance
+                      <span>🏛️</span> {t('Cultural Significance')}
                     </span>
                     <p className="text-on-surface-variant mt-0.5 text-[11px] leading-relaxed">
-                      {currentCraft.culturalSignificance}
+                      {t(currentCraft.culturalSignificance)}
                     </p>
                   </div>
                 </div>
@@ -458,10 +468,10 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
           <div className="space-y-4" data-guide="explore-artisans-action">
             <div className="flex items-center justify-between">
               <h3 className="font-serif text-lg sm:text-xl font-bold text-on-surface">
-                Suggested Artisans
+                {t('Suggested Artisans')}
               </h3>
               <span className="text-xs font-semibold text-primary">
-                View All Artisans →
+                {t('View All Artisans →')}
               </span>
             </div>
 
@@ -489,7 +499,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                       <div className="relative aspect-square rounded-xl overflow-hidden bg-surface-container">
                         <img
                           src={artisan.avatar}
-                          alt={artisan.name}
+                          alt={t(artisan.name)}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <button
@@ -510,10 +520,10 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                       {/* Info */}
                       <div>
                         <h4 className="font-serif font-bold text-sm text-on-surface group-hover:text-primary transition truncate">
-                          {artisan.name}
+                          {t(artisan.name)}
                         </h4>
                         <p className="text-[11px] text-on-surface-variant truncate">
-                          {artisan.location}
+                          {t(artisan.location)}
                         </p>
                       </div>
 
@@ -524,7 +534,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                           {artisan.rating.toFixed(1)}
                         </span>
                         <span className="text-[10px] text-on-surface-variant">
-                          ({artisan.reviewsCount} reviews)
+                          ({artisan.reviewsCount} {t('reviews')})
                         </span>
                       </div>
 
@@ -535,7 +545,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                             key={tIdx}
                             className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-primary/10 text-primary"
                           >
-                            {tag}
+                            {t(tag)}
                           </span>
                         ))}
                       </div>
@@ -543,7 +553,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
 
                     {/* Chat / Connect trigger */}
                     <div className="pt-3 mt-3 border-t border-outline/10 flex items-center justify-between text-xs font-bold text-primary">
-                      <span>Meet Artisan</span>
+                      <span>{t('Meet Artisan')}</span>
                       <MessageCircle className="w-3.5 h-3.5 group-hover:scale-110 transition" />
                     </div>
                   </div>
@@ -555,7 +565,9 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
           {/* 6. MORE TO EXPLORE IN [STATE] (CRITICAL: No Food & Culture) */}
           <div className="space-y-4 pt-2 border-t border-outline/10">
             <h3 className="font-serif text-lg sm:text-xl font-bold text-on-surface">
-              More to Explore in {stateData.name}
+              {language === 'en'
+                ? `${t('More to Explore in')} ${t(stateData.name)}`
+                : `${t(stateData.name)} ${t('More to Explore in')}`}
             </h3>
 
             {/* 3 Interactive Exploration Tiles */}
@@ -577,10 +589,10 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                   </div>
                   <div>
                     <h4 className="font-serif font-bold text-sm text-on-surface">
-                      Tourist Places
+                      {t('Tourist Places')}
                     </h4>
                     <p className="text-[11px] text-on-surface-variant">
-                      Forts, Temples, Lakes...
+                      {t('Forts, Temples, Lakes...')}
                     </p>
                   </div>
                 </div>
@@ -608,10 +620,10 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                   </div>
                   <div>
                     <h4 className="font-serif font-bold text-sm text-on-surface">
-                      Workshops & Learning
+                      {t('Workshops & Learning')}
                     </h4>
                     <p className="text-[11px] text-on-surface-variant">
-                      Learn from Artisans
+                      {t('Learn from Artisans')}
                     </p>
                   </div>
                 </div>
@@ -639,10 +651,10 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                   </div>
                   <div>
                     <h4 className="font-serif font-bold text-sm text-on-surface">
-                      Upcoming Events
+                      {t('Upcoming Events')}
                     </h4>
                     <p className="text-[11px] text-on-surface-variant">
-                      Exhibitions, Fairs, Melas
+                      {t('Exhibitions, Fairs, Melas')}
                     </p>
                   </div>
                 </div>
@@ -659,7 +671,9 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
               <div className="p-5 rounded-2xl bg-surface border border-primary/30 space-y-3 animate-fadeIn">
                 <h4 className="font-serif font-bold text-sm text-on-surface flex items-center gap-2">
                   <Landmark className="w-4 h-4 text-primary" />
-                  Heritage & Craft Tourism in {stateData.name}
+                  {language === 'en'
+                    ? `${t('Heritage & Craft Tourism in')} ${t(stateData.name)}`
+                    : `${t(stateData.name)} ${t('Heritage & Craft Tourism in')}`}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {stateData.touristPlaces.map((place, pIdx) => (
@@ -669,14 +683,14 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-xs text-on-surface">
-                          {place.name}
+                          {t(place.name)}
                         </span>
                         <span className="text-[10px] font-semibold text-primary px-2 py-0.5 rounded-md bg-primary/10">
-                          {place.district}
+                          {t(place.district)}
                         </span>
                       </div>
                       <p className="text-[11px] text-on-surface-variant">
-                        {place.description}
+                        {t(place.description)}
                       </p>
                     </div>
                   ))}
@@ -688,7 +702,9 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
               <div className="p-5 rounded-2xl bg-surface border border-primary/30 space-y-3 animate-fadeIn">
                 <h4 className="font-serif font-bold text-sm text-on-surface flex items-center gap-2">
                   <GraduationCap className="w-4 h-4 text-primary" />
-                  Hands-on Master Classes & Workshops in {stateData.name}
+                  {language === 'en'
+                    ? `${t('Hands-on Master Classes & Workshops in')} ${t(stateData.name)}`
+                    : `${t(stateData.name)} ${t('Hands-on Master Classes & Workshops in')}`}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {stateData.workshops.map((ws, wIdx) => (
@@ -697,15 +713,15 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                       className="p-3.5 rounded-xl bg-surface-container-low border border-outline/20 space-y-1.5"
                     >
                       <h5 className="font-serif font-bold text-xs text-on-surface">
-                        {ws.title}
+                        {t(ws.title)}
                       </h5>
                       <p className="text-[11px] text-primary font-medium">
-                        Instructor: {ws.artisan}
+                        {t('Instructor')}: {t(ws.artisan)}
                       </p>
                       <div className="flex items-center justify-between text-[10px] text-on-surface-variant pt-1">
-                        <span>Duration: {ws.duration}</span>
+                        <span>{t('Duration')}: {t(ws.duration)}</span>
                         <span className="text-amber-700 dark:text-amber-400 font-semibold">
-                          {ws.spotsLeft} spots remaining
+                          {ws.spotsLeft} {t('spots remaining')}
                         </span>
                       </div>
                     </div>
@@ -718,7 +734,7 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
               <div className="p-5 rounded-2xl bg-surface border border-primary/30 space-y-3 animate-fadeIn">
                 <h4 className="font-serif font-bold text-sm text-on-surface flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
-                  Upcoming Craft Exhibitions & Artisan Melas
+                  {t('Upcoming Craft Exhibitions & Artisan Melas')}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {stateData.events.map((evt, eIdx) => (
@@ -728,14 +744,14 @@ export const StateExplorerModal: React.FC<StateExplorerModalProps> = ({
                     >
                       <div className="flex items-center justify-between">
                         <h5 className="font-serif font-bold text-xs text-on-surface">
-                          {evt.title}
+                          {t(evt.title)}
                         </h5>
                         <span className="text-[10px] font-bold text-primary">
-                          {evt.date}
+                          {t(evt.date)}
                         </span>
                       </div>
                       <p className="text-[11px] text-on-surface-variant">
-                        📍 {evt.location}
+                        📍 {t(evt.location)}
                       </p>
                     </div>
                   ))}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useApp } from '../../context/AppContext';
 import {
   TrendingUp,
   Flame,
@@ -27,6 +28,7 @@ interface DemandPredictorWidgetProps {
 }
 
 export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ product }) => {
+  const { t } = useApp();
   const [prediction, setPrediction] = useState<ProductDemandPrediction>(() =>
     calculateProductDemand(product)
   );
@@ -72,17 +74,17 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
           <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-linear-to-r from-red-500 to-amber-600 text-white shadow-xs animate-pulse">
               <Flame className="w-3 h-3" />
-              LIVE DEMAND PREDICTOR
+              {t('LIVE DEMAND PREDICTOR')}
             </span>
 
             <span className="text-[11px] font-semibold text-primary">
-              AI Market Velocity Engine
+              {t('AI Market Velocity Engine')}
             </span>
           </div>
 
           <h4 className="font-serif text-base sm:text-lg font-bold text-on-surface flex items-center gap-1.5">
-            <span>{product.craft_name}</span>
-            <span className="text-xs font-normal text-on-surface-variant">• Market Intelligence</span>
+            <span>{t(product.craft_name)}</span>
+            <span className="text-xs font-normal text-on-surface-variant">• {t('Market Intelligence')}</span>
           </h4>
         </div>
 
@@ -90,10 +92,10 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
         <div className="flex items-center gap-2 bg-surface px-3 py-1.5 rounded-xl border border-outline/25 shadow-xs">
           <div className="text-right">
             <span className="text-[10px] uppercase font-bold text-on-surface-variant block leading-tight">
-              Predicted Demand
+              {t('Predicted Demand')}
             </span>
             <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block">
-              Top 5% Nationwide
+              {t('Top 5% Nationwide')}
             </span>
           </div>
           <div className="w-11 h-11 rounded-xl bg-linear-to-br from-amber-500 to-primary text-white flex items-center justify-center font-bold text-base shadow-sm">
@@ -106,7 +108,7 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
       {isRecalculating && (
         <div className="p-3 rounded-xl bg-primary/10 border border-primary/30 flex items-center gap-2.5 text-xs text-primary font-medium animate-fadeIn">
           <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
-          <span>{recalcStep || 'Computing real-time demand...'}</span>
+          <span>{recalcStep ? t(recalcStep) : t('Computing real-time demand...')}</span>
         </div>
       )}
 
@@ -115,52 +117,52 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
         {/* Metric 1: Search & Interest Velocity */}
         <div className="p-2.5 rounded-xl bg-surface border border-outline/20 space-y-1">
           <span className="text-[10px] text-on-surface-variant uppercase font-bold flex items-center gap-1">
-            <TrendingUp className="w-3 h-3 text-red-500" /> Market Velocity
+            <TrendingUp className="w-3 h-3 text-red-500" /> {t('Market Velocity')}
           </span>
           <div className="font-bold text-xs sm:text-[13px] text-on-surface">
             {prediction.growthRate.split(' ')[0]}
           </div>
           <p className="text-[10px] text-on-surface-variant line-clamp-1">
-            Buyer search surge
+            {t('Buyer search surge')}
           </p>
         </div>
 
         {/* Metric 2: Loom Scarcity */}
         <div className="p-2.5 rounded-xl bg-surface border border-outline/20 space-y-1">
           <span className="text-[10px] text-on-surface-variant uppercase font-bold flex items-center gap-1">
-            <Layers className="w-3 h-3 text-amber-500" /> Loom Scarcity
+            <Layers className="w-3 h-3 text-amber-500" /> {t('Loom Scarcity')}
           </span>
           <div className="font-bold text-xs sm:text-[13px] text-on-surface">
-            {product.production_time || '35 Days'}
+            {product.production_time ? t(product.production_time) : t('35 Days')}
           </div>
           <p className="text-[10px] text-on-surface-variant line-clamp-1">
-            Loom time per unit
+            {t('Loom time per unit')}
           </p>
         </div>
 
         {/* Metric 3: Peak Buying Window */}
         <div className="p-2.5 rounded-xl bg-surface border border-outline/20 space-y-1">
           <span className="text-[10px] text-on-surface-variant uppercase font-bold flex items-center gap-1">
-            <Calendar className="w-3 h-3 text-emerald-500" /> Peak Window
+            <Calendar className="w-3 h-3 text-emerald-500" /> {t('Peak Window')}
           </span>
           <div className="font-bold text-xs sm:text-[13px] text-on-surface">
-            Oct – Feb
+            {t('Oct – Feb')}
           </div>
           <p className="text-[10px] text-on-surface-variant line-clamp-1">
-            Bridal & festive peak
+            {t('Bridal & festive peak')}
           </p>
         </div>
 
         {/* Metric 4: Investment Appraisal */}
         <div className="p-2.5 rounded-xl bg-surface border border-outline/20 space-y-1">
           <span className="text-[10px] text-on-surface-variant uppercase font-bold flex items-center gap-1">
-            <Building2 className="w-3 h-3 text-primary" /> City Retail
+            <Building2 className="w-3 h-3 text-primary" /> {t('City Retail')}
           </span>
           <div className="font-bold text-xs sm:text-[13px] text-primary">
             ₹{prediction.appraisedMarketValue.toLocaleString('en-IN')}
           </div>
           <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold line-clamp-1">
-            Save {prediction.savingsPercent}% Direct
+            {t('Save')} {prediction.savingsPercent}% {t('Direct')}
           </p>
         </div>
       </div>
@@ -169,8 +171,8 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
           <span className="font-semibold text-on-surface flex items-center gap-1">
-            <span>Overall Demand Velocity:</span>
-            <span className="font-bold text-primary">{getScoreBadge(prediction.demandScore)}</span>
+            <span>{t('Overall Demand Velocity:')}</span>
+            <span className="font-bold text-primary">{t(getScoreBadge(prediction.demandScore))}</span>
           </span>
           <span className="text-[11px] font-mono text-on-surface-variant font-bold">
             {prediction.demandScore}/100
@@ -191,14 +193,14 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
         <div className="flex items-center gap-2 text-on-surface">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
           <span className="font-medium text-[11px]">
-            <strong>{prediction.inquiriesThisWeek} collectors</strong> inquired this week
+            <strong>{prediction.inquiriesThisWeek} {t('collectors')}</strong> {t('inquired this week')}
           </span>
         </div>
 
         <div className="flex items-center gap-3">
           <span className="text-[11px] text-on-surface-variant flex items-center gap-1">
             <Users className="w-3.5 h-3.5 text-primary" />
-            <strong>{prediction.activeCartIntent}</strong> in carts & wishlists
+            <strong>{prediction.activeCartIntent}</strong> {t('in carts & wishlists')}
           </span>
 
           <button
@@ -206,10 +208,10 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
             onClick={handleRecalculate}
             disabled={isRecalculating}
             className="text-[11px] text-primary hover:underline font-bold flex items-center gap-1 cursor-pointer"
-            title="Re-run real-time AI demand calculation"
+            title={t('Re-run real-time AI demand calculation')}
           >
             <RefreshCw className={`w-3 h-3 ${isRecalculating ? 'animate-spin' : ''}`} />
-            <span>Recalculate</span>
+            <span>{t('Recalculate')}</span>
           </button>
         </div>
       </div>
@@ -224,7 +226,7 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
           <span className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
             <span>
-              {isExpanded ? 'Hide In-Depth Demand Breakdown' : 'View In-Depth Demand Drivers & Regional Hotspots'}
+              {isExpanded ? t('Hide In-Depth Demand Breakdown') : t('View In-Depth Demand Drivers & Regional Hotspots')}
             </span>
           </span>
           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -234,21 +236,21 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
           <div className="mt-3 p-4 rounded-xl bg-surface border border-outline/20 space-y-4 animate-fadeIn text-xs">
             {/* AI Narrative Summary */}
             <div className="p-3 rounded-lg bg-surface-container-low border border-outline/15 text-[11px] text-on-surface leading-relaxed">
-              <strong className="text-primary block mb-0.5">AI Market Analysis Summary:</strong>
-              {prediction.analysisSummary}
+              <strong className="text-primary block mb-0.5">{t('AI Market Analysis Summary:')}</strong>
+              {t(prediction.analysisSummary)}
             </div>
 
             {/* Demand Drivers Breakdown */}
             <div className="space-y-2.5">
               <span className="font-bold text-on-surface text-xs uppercase tracking-wider block">
-                Calculated Demand Drivers
+                {t('Calculated Demand Drivers')}
               </span>
 
               <div className="space-y-2">
                 {prediction.drivers.map((d, i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-semibold text-on-surface">{d.label}</span>
+                      <span className="font-semibold text-on-surface">{t(d.label)}</span>
                       <span className="font-mono font-bold text-primary">{d.score}/100</span>
                     </div>
                     <div className="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
@@ -257,7 +259,7 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
                         style={{ width: `${d.score}%` }}
                       />
                     </div>
-                    <p className="text-[10px] text-on-surface-variant">{d.detail}</p>
+                    <p className="text-[10px] text-on-surface-variant">{t(d.detail)}</p>
                   </div>
                 ))}
               </div>
@@ -266,7 +268,7 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
             {/* Regional Demand Hotspots */}
             <div className="space-y-2 pt-2 border-t border-outline/15">
               <span className="font-bold text-on-surface text-xs uppercase tracking-wider block">
-                Regional Demand Hotspots
+                {t('Regional Demand Hotspots')}
               </span>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -274,7 +276,7 @@ export const DemandPredictorWidget: React.FC<DemandPredictorWidgetProps> = ({ pr
                   <div key={i} className="p-2 rounded-lg bg-surface-container-low border border-outline/15 text-center">
                     <span className="font-bold text-primary text-xs block">{h.sharePercent}%</span>
                     <span className="text-[10px] text-on-surface-variant block mt-0.5 leading-tight line-clamp-2">
-                      {h.region}
+                      {t(h.region)}
                     </span>
                   </div>
                 ))}

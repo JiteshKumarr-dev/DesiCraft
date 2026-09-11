@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useApp } from '../../context/AppContext';
 import { Star, ShieldCheck, CheckCircle2, User, Send } from 'lucide-react';
 
 interface Review {
@@ -12,6 +13,7 @@ interface Review {
 }
 
 export const ProductReviewsSection: React.FC = () => {
+  const { t } = useApp();
   const [reviews, setReviews] = useState<Review[]>([
     {
       id: 'rev-1',
@@ -64,12 +66,12 @@ export const ProductReviewsSection: React.FC = () => {
     <div className="space-y-4 pt-4 border-t border-outline/20">
       <div className="flex items-center justify-between">
         <h3 className="font-serif font-bold text-sm text-on-surface flex items-center gap-1.5">
-          <span>Verified Patron Reviews</span>
+          <span>{t('Verified Patron Reviews')}</span>
           <span className="text-xs text-primary font-bold">({reviews.length})</span>
         </h3>
         <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
           <Star className="w-3.5 h-3.5 fill-amber-500" />
-          <span>4.95 / 5 Authenticity Rating</span>
+          <span>{t('4.95 / 5 Authenticity Rating')}</span>
         </div>
       </div>
 
@@ -82,8 +84,8 @@ export const ProductReviewsSection: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-on-surface">{rev.author}</span>
-                <span className="text-[10px] text-on-surface-variant">({rev.location})</span>
+                <span className="font-bold text-on-surface">{t(rev.author)}</span>
+                <span className="text-[10px] text-on-surface-variant">({t(rev.location)})</span>
               </div>
               <div className="flex items-center gap-0.5 text-amber-500">
                 {Array.from({ length: rev.rating }).map((_, i) => (
@@ -93,14 +95,14 @@ export const ProductReviewsSection: React.FC = () => {
             </div>
 
             <p className="text-on-surface-variant leading-relaxed">
-              "{rev.comment}"
+              "{t(rev.comment)}"
             </p>
 
             <div className="flex items-center justify-between text-[10px] text-on-surface-variant/80 pt-1">
               <span className="flex items-center gap-1 text-green-700 font-semibold">
-                <CheckCircle2 className="w-3 h-3" /> Verified GI Tag Lineage Patron
+                <CheckCircle2 className="w-3 h-3" /> {t('Verified GI Tag Lineage Patron')}
               </span>
-              <span>{rev.date}</span>
+              <span>{t(rev.date)}</span>
             </div>
           </div>
         ))}
@@ -108,11 +110,11 @@ export const ProductReviewsSection: React.FC = () => {
 
       {/* Add Review Form */}
       <form onSubmit={handleAddReview} className="space-y-2 pt-2 border-t border-outline/10">
-        <span className="text-xs font-semibold text-on-surface block">Leave Heirloom Feedback</span>
+        <span className="text-xs font-semibold text-on-surface block">{t('Leave Heirloom Feedback')}</span>
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="Your name & city..."
+            placeholder={t('Your name & city...')}
             value={authorName}
             onChange={(e) => setAuthorName(e.target.value)}
             className="w-1/3 px-3 py-1.5 text-xs bg-surface-container-low border border-outline/30 rounded-lg"
@@ -120,7 +122,7 @@ export const ProductReviewsSection: React.FC = () => {
           <input
             type="text"
             required
-            placeholder="Review weft texture, craftsmanship, GI verification..."
+            placeholder={t('Review weft texture, craftsmanship, GI verification...')}
             value={userComment}
             onChange={(e) => setUserComment(e.target.value)}
             className="flex-1 px-3 py-1.5 text-xs bg-surface-container-low border border-outline/30 rounded-lg"
@@ -131,7 +133,7 @@ export const ProductReviewsSection: React.FC = () => {
             className="px-3 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition flex items-center gap-1 cursor-pointer disabled:opacity-50"
           >
             <Send className="w-3 h-3" />
-            <span>Post</span>
+            <span>{t('Post')}</span>
           </button>
         </div>
       </form>

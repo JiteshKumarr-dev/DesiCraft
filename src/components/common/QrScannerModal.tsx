@@ -17,7 +17,7 @@ interface QrScannerModalProps {
 }
 
 export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose }) => {
-  const { passports, setSelectedPassport, showNotification } = useApp();
+  const { passports, setSelectedPassport, showNotification, t } = useApp();
   const [manualCode, setManualCode] = useState('');
   const [isScanning, setIsScanning] = useState(false);
 
@@ -95,9 +95,9 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose 
 
             <div className="text-center space-y-2 p-4 text-white z-10">
               <Camera className="w-8 h-8 text-primary mx-auto animate-pulse" />
-              <p className="text-xs font-medium">Align QR code within frame</p>
+              <p className="text-xs font-medium">{t('Align QR code within frame')}</p>
               <span className="text-[10px] text-white/70 block">
-                {isScanning ? 'Decoding cryptographic hash...' : 'Camera Active'}
+                {isScanning ? t('Decoding cryptographic hash...') : t('Camera Active')}
               </span>
             </div>
           </div>
@@ -105,7 +105,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose 
           {/* Quick Scan Presets */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-on-surface">
-              Or tap a sample physical craft certificate to simulate scan:
+              {t('Or tap a sample physical craft certificate to simulate scan:')}
             </label>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
@@ -113,7 +113,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose 
                 onClick={() => handleVerifyPreset('pass-varanasi-kadwa-01')}
                 className="p-2.5 rounded-xl border border-outline/20 bg-surface-container-low hover:border-primary text-left transition cursor-pointer"
               >
-                <span className="font-serif font-bold text-on-surface block">Varanasi Katan Saree</span>
+                <span className="font-serif font-bold text-on-surface block">{t('Varanasi Katan Saree')}</span>
                 <span className="text-[10px] text-primary font-mono">GI-2009-UP-0044</span>
               </button>
 
@@ -122,7 +122,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose 
                 onClick={() => handleVerifyPreset('pass-pochampally-ikat-02')}
                 className="p-2.5 rounded-xl border border-outline/20 bg-surface-container-low hover:border-primary text-left transition cursor-pointer"
               >
-                <span className="font-serif font-bold text-on-surface block">Pochampally Double Ikat</span>
+                <span className="font-serif font-bold text-on-surface block">{t('Pochampally Double Ikat')}</span>
                 <span className="text-[10px] text-primary font-mono">GI-2005-TS-0004</span>
               </button>
             </div>
@@ -131,12 +131,12 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose 
           {/* Manual Input Fallback */}
           <form onSubmit={handleManualSearch} className="space-y-2 pt-2 border-t border-outline/10">
             <label className="text-xs font-semibold text-on-surface">
-              Manual Verification Code / GI Tag Search:
+              {t('Manual Verification Code / GI Tag Search:')}
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Enter GI Tag (e.g. GI-2009-UP-0044)"
+                placeholder={t('Enter GI Tag (e.g. GI-2009-UP-0044)')}
                 value={manualCode}
                 onChange={(e) => setManualCode(e.target.value)}
                 className="flex-1 px-3 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-lg font-mono text-on-surface"
@@ -145,7 +145,7 @@ export const QrScannerModal: React.FC<QrScannerModalProps> = ({ isOpen, onClose 
                 type="submit"
                 className="px-4 py-2 rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition cursor-pointer"
               >
-                Verify
+                {t('Verify')}
               </button>
             </div>
           </form>

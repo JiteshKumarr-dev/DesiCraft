@@ -124,6 +124,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
     deleteSellerMessage,
     markConversationAsRead,
     setActiveProfileArtisan,
+    t,
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -357,7 +358,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
       if (diffDays === 0) {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       } else if (diffDays === 1) {
-        return 'Yesterday';
+        return t('Yesterday');
       } else {
         return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
       }
@@ -373,10 +374,10 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold font-serif text-on-surface flex items-center gap-2.5">
             <MessageSquare className="w-7 h-7 text-primary" />
-            Messages
+            {t('Messages')}
           </h2>
           <p className="text-xs sm:text-sm text-on-surface-variant">
-            Direct real-time conversations with fellow master craftspersons & collaborative partners.
+            {t('Direct real-time conversations with fellow master craftspersons & collaborative partners.')}
           </p>
         </div>
       </div>
@@ -397,7 +398,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search conversations..."
+                placeholder={t('Search conversations...')}
                 className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface-container border border-outline/20 text-xs sm:text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
@@ -408,7 +409,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
             {filteredConversations.length === 0 ? (
               <div className="p-8 text-center text-on-surface-variant space-y-2">
                 <MessageSquare className="w-8 h-8 mx-auto text-outline" />
-                <p className="text-xs sm:text-sm">No conversations found.</p>
+                <p className="text-xs sm:text-sm">{t('No conversations found.')}</p>
               </div>
             ) : (
               filteredConversations.map((conv) => {
@@ -451,19 +452,19 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                       </div>
 
                       <p className="text-xs text-primary font-medium truncate mt-0.5">
-                        {partner?.craft || 'Craft Master'}
+                        {t(partner?.craft || 'Craft Master')}
                       </p>
 
                       {conv.collaboration_title && (
                         <div className="mt-1 flex items-center gap-1 text-[10px] text-secondary font-semibold truncate">
                           <Handshake className="w-3 h-3 flex-shrink-0" />
-                          <span className="truncate">{conv.collaboration_title}</span>
+                          <span className="truncate">{t(conv.collaboration_title)}</span>
                         </div>
                       )}
 
                       <div className="flex items-center justify-between gap-2 mt-1">
                         <p className="text-xs text-on-surface-variant truncate font-normal">
-                          {conv.last_message || 'Start conversation...'}
+                          {t(conv.last_message) || t('Start conversation...')}
                         </p>
                         {unreadCount > 0 && (
                           <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-primary text-white flex-shrink-0 animate-pulse">
@@ -513,11 +514,11 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                         {otherParticipant.name}
                       </h3>
                       <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
-                        Online
+                        {t('Online')}
                       </span>
                     </div>
                     <p className="text-xs text-on-surface-variant">
-                      {otherParticipant.craft} • {otherParticipant.region}
+                      {t(otherParticipant.craft)} • {t(otherParticipant.region)}
                     </p>
                   </div>
                 </div>
@@ -529,7 +530,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                       className="px-3 py-1.5 rounded-xl border border-primary/30 text-xs font-bold text-primary hover:bg-primary/10 transition-colors flex items-center gap-1.5"
                     >
                       <UserIcon className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">View Profile</span>
+                      <span className="hidden sm:inline">{t('View Profile')}</span>
                     </button>
                   )}
                 </div>
@@ -541,11 +542,11 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                   <div className="flex items-center gap-2 font-medium truncate">
                     <Handshake className="w-4 h-4 text-amber-600 flex-shrink-0" />
                     <span>
-                      Project: <strong>{activeConversation.collaboration_title}</strong>
+                      {t('Project')}: <strong>{t(activeConversation.collaboration_title)}</strong>
                     </span>
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-800 dark:text-amber-200">
-                    Active Collab
+                    {t('Active Collab')}
                   </span>
                 </div>
               )}
@@ -556,10 +557,10 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                   <div className="h-full flex flex-col items-center justify-center text-center p-6 text-on-surface-variant">
                     <Sparkles className="w-10 h-10 text-primary mb-2 opacity-60" />
                     <h4 className="text-sm font-bold text-on-surface">
-                      Say Namaste to start the collaboration
+                      {t('Say Namaste to start the collaboration')}
                     </h4>
                     <p className="text-xs max-w-xs mt-1">
-                      Share loom drafts, design swatches, materials, and workshop locations.
+                      {t('Share loom drafts, design swatches, materials, and workshop locations.')}
                     </p>
                   </div>
                 ) : (
@@ -587,7 +588,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                         >
                           {/* Text Message Content */}
                           {!isLocationOnly && !isFileOnly && msg.content && (
-                            <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                            <p className="whitespace-pre-wrap leading-relaxed">{t(msg.content)}</p>
                           )}
 
                           {/* Image Attachment Rendering */}
@@ -609,7 +610,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-semibold">
                                   <Maximize2 className="w-4 h-4" />
-                                  <span>View Full Image</span>
+                                  <span>{t('View Full Image')}</span>
                                 </div>
                               </div>
                               <div
@@ -663,7 +664,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                                     ? 'bg-white/20 hover:bg-white/30 text-white'
                                     : 'bg-primary/15 hover:bg-primary/25 text-primary'
                                 }`}
-                                title="Download File"
+                                title={t('Download File')}
                               >
                                 <Download className="w-4 h-4" />
                               </a>
@@ -691,14 +692,14 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h5 className="text-xs font-bold truncate">
-                                    {msg.location_data.title}
+                                    {t(msg.location_data.title)}
                                   </h5>
                                   <p
                                     className={`text-[11px] leading-relaxed mt-0.5 ${
                                       isMine ? 'text-white/80' : 'text-on-surface-variant'
                                     }`}
                                   >
-                                    {msg.location_data.address}
+                                    {t(msg.location_data.address)}
                                   </p>
                                 </div>
                               </div>
@@ -715,7 +716,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                                   }`}
                                 >
                                   <ExternalLink className="w-3.5 h-3.5" />
-                                  <span>Open in Google Maps</span>
+                                  <span>{t('Open in Google Maps')}</span>
                                 </a>
                               )}
                             </div>
@@ -748,7 +749,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                                   ? 'hover:bg-white/15 text-white/75 hover:text-white'
                                   : 'hover:bg-error/10 text-on-surface-variant/75 hover:text-error'
                               }`}
-                              title={isMine ? 'Unsend message' : 'Delete message'}
+                              title={isMine ? t('Unsend message') : t('Delete message')}
                             >
                               <Trash2 className="w-3 h-3" />
                             </button>
@@ -799,7 +800,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                       <div className="flex items-center gap-2 text-[10px] text-on-surface-variant">
                         <span>{stagedAttachment.size}</span>
                         <span>•</span>
-                        <span className="text-primary font-medium">Ready to send</span>
+                        <span className="text-primary font-medium">{t('Ready to send')}</span>
                       </div>
                     </div>
                   </div>
@@ -808,7 +809,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                     type="button"
                     onClick={() => setStagedAttachment(null)}
                     className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-error transition-colors"
-                    title="Remove attachment"
+                    title={t('Remove attachment')}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -829,7 +830,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                       ? 'bg-primary/20 text-primary'
                       : 'text-on-surface-variant hover:bg-surface-container'
                   }`}
-                  title="Insert emoji"
+                  title={t('Insert emoji')}
                 >
                   <Smile className="w-5 h-5" />
                 </button>
@@ -852,7 +853,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                       ? 'bg-primary/20 text-primary'
                       : 'text-on-surface-variant hover:bg-surface-container'
                   }`}
-                  title="Attach design file, invoice or image"
+                  title={t('Attach design file, invoice or image')}
                 >
                   <Paperclip className="w-5 h-5" />
                 </button>
@@ -862,7 +863,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                   type="button"
                   onClick={() => setIsLocationModalOpen(true)}
                   className="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container transition-colors"
-                  title="Share workshop or artisan cluster location"
+                  title={t('Share workshop or artisan cluster location')}
                 >
                   <MapPin className="w-5 h-5" />
                 </button>
@@ -870,12 +871,13 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                 {/* Text Input */}
                 <input
                   type="text"
+                  data-guide="seller-chat-input"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder={
                     stagedAttachment
-                      ? 'Add a message or caption (optional)...'
-                      : 'Write a message...'
+                      ? t('Add a message or caption (optional)...')
+                      : t('Write a message...')
                   }
                   className="flex-1 px-4 py-2.5 rounded-2xl bg-surface-container border border-outline/20 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/40 font-normal"
                 />
@@ -885,7 +887,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                   type="submit"
                   disabled={!inputText.trim() && !stagedAttachment}
                   className="p-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-primary text-white disabled:opacity-40 transition-opacity shadow-md hover:shadow-lg flex-shrink-0"
-                  aria-label="Send message"
+                  aria-label={t('Send message')}
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -894,9 +896,9 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
           ) : (
             <div className="h-full flex flex-col items-center justify-center p-8 text-center text-on-surface-variant">
               <MessageSquare className="w-12 h-12 text-outline mb-3" />
-              <h3 className="text-base font-bold text-on-surface">Select a conversation</h3>
+              <h3 className="text-base font-bold text-on-surface">{t('Select a conversation')}</h3>
               <p className="text-xs max-w-sm mt-1">
-                Choose a conversation from the left to coordinate joint productions and design schedules.
+                {t('Choose a conversation from the left to coordinate joint productions and design schedules.')}
               </p>
             </div>
           )}
@@ -915,10 +917,10 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-on-surface">
-                    Share Workshop Location
+                    {t('Share Workshop Location')}
                   </h3>
                   <p className="text-xs text-on-surface-variant">
-                    Send real-time GPS or choose an artisan craft cluster
+                    {t('Send real-time GPS or choose an artisan craft cluster')}
                   </p>
                 </div>
               </div>
@@ -936,7 +938,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
               <div>
                 <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <Navigation className="w-3.5 h-3.5 text-primary" />
-                  Live Device GPS
+                  {t('Live Device GPS')}
                 </h4>
                 <button
                   onClick={handleShareCurrentGPS}
@@ -946,12 +948,12 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                   {isLocatingUser ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Fetching live coordinates...</span>
+                      <span>{t('Fetching live coordinates...')}</span>
                     </>
                   ) : (
                     <>
                       <Navigation className="w-4 h-4" />
-                      <span>Share Current Workshop GPS Coordinates</span>
+                      <span>{t('Share Current Workshop GPS Coordinates')}</span>
                     </>
                   )}
                 </button>
@@ -961,7 +963,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
               <div>
                 <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <Compass className="w-3.5 h-3.5 text-secondary" />
-                  India's Artisan Craft Clusters
+                  {t("India's Artisan Craft Clusters")}
                 </h4>
                 <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
                   {ARTISAN_CRAFT_CLUSTERS.map((cluster) => (
@@ -972,17 +974,17 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                     >
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-on-surface group-hover:text-primary transition-colors truncate">
-                          {cluster.name}
+                          {t(cluster.name)}
                         </p>
                         <p className="text-[11px] text-on-surface-variant truncate mt-0.5">
-                          {cluster.craft}
+                          {t(cluster.craft)}
                         </p>
                         <p className="text-[10px] text-on-surface-variant/70 truncate">
-                          {cluster.address}
+                          {t(cluster.address)}
                         </p>
                       </div>
                       <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors flex-shrink-0 mt-1">
-                        Select
+                        {t('Select')}
                       </span>
                     </button>
                   ))}
@@ -992,14 +994,14 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
               {/* Option 3: Custom Address Input */}
               <div>
                 <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">
-                  Or Enter Workshop Landmark
+                  {t('Or Enter Workshop Landmark')}
                 </h4>
                 <form onSubmit={handleShareCustomAddress} className="flex gap-2">
                   <input
                     type="text"
                     value={customAddressInput}
                     onChange={(e) => setCustomAddressInput(e.target.value)}
-                    placeholder="e.g. Madanpura Weaver Lane, Varanasi"
+                    placeholder={t('e.g. Madanpura Weaver Lane, Varanasi')}
                     className="flex-1 px-3.5 py-2 rounded-xl bg-surface-container border border-outline/20 text-xs sm:text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/40"
                   />
                   <button
@@ -1007,7 +1009,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                     disabled={!customAddressInput.trim()}
                     className="px-4 py-2 rounded-xl bg-primary text-white font-bold text-xs disabled:opacity-40 hover:bg-primary/90 transition-colors flex-shrink-0"
                   >
-                    Share
+                    {t('Share')}
                   </button>
                 </form>
               </div>
@@ -1035,15 +1037,15 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                 href={expandedImage.url}
                 download={expandedImage.title}
                 className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors flex items-center gap-1 text-xs font-semibold"
-                title="Download Image"
+                title={t('Download Image')}
               >
                 <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Download</span>
+                <span className="hidden sm:inline">{t('Download')}</span>
               </a>
               <button
                 onClick={() => setExpandedImage(null)}
                 className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
-                title="Close Lightbox"
+                title={t('Close Lightbox')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1079,12 +1081,12 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
             </div>
             <div className="text-center space-y-1.5">
               <h4 className="font-serif font-bold text-base text-on-surface">
-                {isMe(messageToUnsend.sender_id) ? 'Unsend Message?' : 'Delete Message?'}
+                {isMe(messageToUnsend.sender_id) ? t('Unsend Message?') : t('Delete Message?')}
               </h4>
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 {isMe(messageToUnsend.sender_id)
-                  ? 'This will remove the message, file attachment, or shared location for all artisans in this collaboration chat.'
-                  : 'This will remove this message from your conversation view.'}
+                  ? t('This will remove the message, file attachment, or shared location for all artisans in this collaboration chat.')
+                  : t('This will remove this message from your conversation view.')}
               </p>
             </div>
             <div className="flex items-center gap-2 pt-1">
@@ -1093,7 +1095,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                 onClick={() => setMessageToUnsend(null)}
                 className="flex-1 py-2 px-3 rounded-xl border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition cursor-pointer"
               >
-                Cancel
+                {t('Cancel')}
               </button>
               <button
                 type="button"
@@ -1104,7 +1106,7 @@ export const SellerMessagesPage: React.FC<SellerMessagesPageProps> = ({ onViewPr
                 className="flex-1 py-2 px-3 rounded-xl bg-error text-white text-xs font-semibold hover:bg-error/90 transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>{isMe(messageToUnsend.sender_id) ? 'Unsend' : 'Delete'}</span>
+                <span>{isMe(messageToUnsend.sender_id) ? t('Unsend') : t('Delete')}</span>
               </button>
             </div>
           </div>

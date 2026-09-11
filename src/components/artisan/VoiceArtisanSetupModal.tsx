@@ -75,6 +75,7 @@ export const VoiceArtisanSetupModal: React.FC = () => {
     setMode,
     showNotification,
     language,
+    t,
   } = useApp();
 
   const [isRecording, setIsRecording] = useState(false);
@@ -268,7 +269,7 @@ export const VoiceArtisanSetupModal: React.FC = () => {
         <div className="bg-surface-container-high p-6 border-b border-outline/20 relative">
           <button
             onClick={() => setIsVoiceArtisanSetupOpen(false)}
-            aria-label="Close modal"
+            aria-label={t('Close modal')}
             className="absolute top-4 right-4 p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface transition cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -475,7 +476,7 @@ export const VoiceArtisanSetupModal: React.FC = () => {
                   <input
                     type="text"
                     required
-                    placeholder="District"
+                    placeholder={t('District')}
                     value={districtName}
                     onChange={(e) => setDistrictName(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-xl text-on-surface focus:ring-1 focus:ring-primary"
@@ -483,7 +484,7 @@ export const VoiceArtisanSetupModal: React.FC = () => {
                   <input
                     type="text"
                     required
-                    placeholder="State"
+                    placeholder={t('State')}
                     value={stateName}
                     onChange={(e) => setStateName(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-surface-container-low border border-outline/30 rounded-xl text-on-surface focus:ring-1 focus:ring-primary"
@@ -493,7 +494,7 @@ export const VoiceArtisanSetupModal: React.FC = () => {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-on-surface">Artisan Biography & Craft Story</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Artisan Biography & Craft Story')}</label>
               <textarea
                 rows={2}
                 required
@@ -511,7 +512,7 @@ export const VoiceArtisanSetupModal: React.FC = () => {
                   onChange={(e) => setLearningAvailable(e.target.checked)}
                   className="rounded text-primary focus:ring-primary"
                 />
-                <span>Open for Apprenticeship Workshops</span>
+                <span>{t('Open for Apprenticeship Workshops')}</span>
               </label>
 
               <label className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low border border-outline/20 text-xs font-semibold cursor-pointer">
@@ -521,7 +522,7 @@ export const VoiceArtisanSetupModal: React.FC = () => {
                   onChange={(e) => setCollaborationAvailable(e.target.checked)}
                   className="rounded text-primary focus:ring-primary"
                 />
-                <span>Open for Inter-Craft Collaborations</span>
+                <span>{t('Open for Inter-Craft Collaborations')}</span>
               </label>
             </div>
 
@@ -532,14 +533,14 @@ export const VoiceArtisanSetupModal: React.FC = () => {
                 onClick={() => setIsVoiceArtisanSetupOpen(false)}
                 className="px-5 py-2.5 rounded-full border border-outline/30 text-xs font-bold hover:bg-surface-container transition cursor-pointer"
               >
-                Skip For Now
+                {t('Skip for now')}
               </button>
 
               <button
                 type="submit"
                 className="px-6 py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-md cursor-pointer flex items-center gap-2"
               >
-                <span>Save Artisan Profile & Enter Studio</span>
+                <span>{t('Save Artisan Profile & Enter Studio')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

@@ -15,7 +15,7 @@ interface WishlistDrawerProps {
 }
 
 export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({ isOpen, onClose }) => {
-  const { wishlist, toggleWishlist, products, addToCart, setSelectedProduct, setIsCartOpen } = useApp();
+  const { wishlist, toggleWishlist, products, addToCart, setSelectedProduct, setIsCartOpen, t } = useApp();
 
   if (!isOpen) return null;
 
@@ -34,7 +34,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({ isOpen, onClose 
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-red-600 fill-red-600" />
             <h3 className="font-serif font-bold text-lg text-on-surface">
-              Saved Heirlooms ({wishlistedProducts.length})
+              {t('Saved Heirlooms')} ({wishlistedProducts.length})
             </h3>
           </div>
           <button
@@ -52,9 +52,9 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({ isOpen, onClose 
               <div className="w-16 h-16 rounded-full bg-red-50 text-red-600 mx-auto flex items-center justify-center">
                 <Heart className="w-8 h-8" />
               </div>
-              <p className="font-serif text-lg text-on-surface font-semibold">Your Wishlist is Empty</p>
+              <p className="font-serif text-lg text-on-surface font-semibold">{t('Your Wishlist is Empty')}</p>
               <p className="text-xs text-on-surface-variant max-w-xs mx-auto">
-                Explore handloom sarees, bronze sculptures, and GI certified treasures and save your favorite living art.
+                {t('Explore handloom sarees, bronze sculptures, and GI certified treasures and save your favorite living art.')}
               </p>
             </div>
           ) : (
@@ -87,13 +87,13 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({ isOpen, onClose 
                     <button
                       onClick={() => toggleWishlist(product.id)}
                       className="text-on-surface-variant hover:text-red-600 transition p-1 cursor-pointer"
-                      title="Remove from saved"
+                      title={t('Remove from saved')}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  <p className="text-[11px] text-primary">By {product.artisan_name}</p>
+                  <p className="text-[11px] text-primary">{t('By')} {product.artisan_name}</p>
 
                   <div className="flex items-center justify-between pt-1">
                     <span className="font-bold text-sm text-on-surface">
@@ -105,7 +105,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({ isOpen, onClose 
                       className="px-3 py-1 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs flex items-center gap-1 cursor-pointer"
                     >
                       <ShoppingBag className="w-3 h-3" />
-                      <span>Move to Cart</span>
+                      <span>{t('Move to Cart')}</span>
                     </button>
                   </div>
                 </div>
@@ -123,7 +123,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({ isOpen, onClose 
               }}
               className="w-full py-2.5 rounded-full border border-primary text-primary font-bold text-xs hover:bg-primary/10 transition flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>View Cart & Checkout</span>
+              <span>{t('View Cart & Checkout')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

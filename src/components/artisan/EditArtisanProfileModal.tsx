@@ -18,7 +18,7 @@ interface EditArtisanProfileModalProps {
 }
 
 export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = ({ isOpen, onClose }) => {
-  const { user, showNotification } = useApp();
+  const { user, showNotification, t } = useApp();
 
   const artisan = user.artisan_profile;
 
@@ -57,13 +57,13 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
             </div>
             <div>
               <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
-                STUDIO CREDENTIALS
+                {t('STUDIO CREDENTIALS')}
               </span>
               <h2 className="font-serif text-2xl font-bold text-on-surface">
-                Edit Artisan Profile & Pehchan Card
+                {t('Edit Artisan Studio Profile')}
               </h2>
               <p className="text-xs text-on-surface-variant">
-                Manage your government credentials, guild registration, and direct DBT bank accounts.
+                {t('Update your verified master artisan credentials, guild affiliation, and direct UPI payment details.')}
               </p>
             </div>
           </div>
@@ -71,7 +71,7 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
           {/* Name & Experience */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="sm:col-span-2 space-y-1">
-              <label className="text-xs font-semibold text-on-surface">Master Artisan Name</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Master Artisan Name')}</label>
               <input
                 type="text"
                 required
@@ -81,7 +81,7 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-on-surface">Years of Mastery</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Years of Mastery')}</label>
               <input
                 type="number"
                 required
@@ -94,7 +94,7 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
 
           {/* Bio */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-on-surface">Artisan Studio Narrative & Lineage</label>
+            <label className="text-xs font-semibold text-on-surface">{t('Artisan Studio Narrative & Lineage')}</label>
             <textarea
               rows={3}
               required
@@ -107,7 +107,7 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
           {/* Guild & Location */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-on-surface">Registered Guild / SHG Name</label>
+              <label className="text-xs font-semibold text-on-surface">{t('Heritage Craft Guild / Cooperative')}</label>
               <input
                 type="text"
                 required
@@ -117,7 +117,7 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-on-surface">District & Cluster</label>
+              <label className="text-xs font-semibold text-on-surface">{t('District & Cluster')}</label>
               <input
                 type="text"
                 required
@@ -132,13 +132,13 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
           <div className="p-4 rounded-xl bg-surface-container-low border border-outline/20 space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold text-on-surface">
               <ShieldCheck className="w-4 h-4 text-secondary" />
-              <span>Government Identity & Direct DBT Transfer Settings</span>
+              <span>{t('Government Identity & Direct DBT Transfer Settings')}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="space-y-1">
                 <label className="text-[11px] font-semibold text-on-surface-variant">
-                  Ministry of Textiles Pehchan Card Number
+                  {t('Ministry of Textiles Pehchan Card Number')}
                 </label>
                 <input
                   type="text"
@@ -151,7 +151,7 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
 
               <div className="space-y-1">
                 <label className="text-[11px] font-semibold text-on-surface-variant">
-                  Direct Payment UPI VPA ID
+                  {t('Direct Payment UPI VPA ID')}
                 </label>
                 <input
                   type="text"
@@ -167,9 +167,9 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
           {/* Tourism & Visitation Toggle */}
           <div className="flex items-center justify-between p-3 rounded-xl bg-surface border border-outline/20 text-xs">
             <div>
-              <span className="font-semibold text-on-surface block">Cultural Heritage Loom Tourism</span>
+              <span className="font-semibold text-on-surface block">{t('Cultural Heritage Loom Tourism')}</span>
               <span className="text-[11px] text-on-surface-variant">
-                Allow patrons to book verified studio visits and live loom demonstrations.
+                {t('Allow patrons to book verified studio visits and live loom demonstrations.')}
               </span>
             </div>
             <input
@@ -185,7 +185,7 @@ export const EditArtisanProfileModal: React.FC<EditArtisanProfileModalProps> = (
             className="w-full py-3 rounded-full bg-primary text-on-primary text-xs sm:text-sm font-bold hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
             <Save className="w-4 h-4" />
-            <span>Save Artisan Studio Profile & Credentials</span>
+            <span>{t('Save Artisan Studio Profile & Credentials')}</span>
           </button>
         </form>
       </div>

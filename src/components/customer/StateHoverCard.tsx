@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronRight, Sparkles } from 'lucide-react';
 import { StateHeritageData } from '../../data/heritageMapData';
+import { useApp } from '../../context/AppContext';
 
 interface StateHoverCardProps {
   stateData: StateHeritageData;
@@ -17,8 +18,9 @@ export const StateHoverCard: React.FC<StateHoverCardProps> = ({
   onMouseEnter,
   onMouseLeave,
 }) => {
+  const { t } = useApp();
   const representativeCraft = stateData.crafts[0];
-  const famousCraftsNames = stateData.crafts.slice(0, 3).map((c) => c.name).join(', ');
+  const famousCraftsNames = stateData.crafts.slice(0, 3).map((c) => t(c.name)).join(', ');
 
   return (
     <div
@@ -49,13 +51,13 @@ export const StateHoverCard: React.FC<StateHoverCardProps> = ({
         <div className="flex-1 min-w-0 pr-1">
           <div className="flex items-center justify-between gap-1">
             <h4 className="font-serif font-bold text-base text-on-surface group-hover:text-primary transition-colors truncate">
-              {stateData.name}
+              {t(stateData.name)}
             </h4>
             <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform shrink-0" />
           </div>
 
           <p className="text-[11px] font-semibold text-primary/90 mt-0.5">
-            Famous For:
+            {t('Famous For:')}
           </p>
 
           <p className="text-[11px] text-on-surface-variant leading-snug line-clamp-2 mt-0.5">

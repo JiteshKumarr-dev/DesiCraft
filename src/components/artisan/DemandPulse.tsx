@@ -1,4 +1,5 @@
 import React from 'react';
+import { useApp } from '../../context/AppContext';
 import { aiServices, DemandInsight } from '../../services/aiServices';
 import {
   TrendingUp,
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 
 export const DemandPulse: React.FC = () => {
+  const { t } = useApp();
   const insights: DemandInsight[] = aiServices.getDemandInsights();
 
   return (
@@ -20,13 +22,13 @@ export const DemandPulse: React.FC = () => {
         <div className="max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
             <TrendingUp className="w-4 h-4" />
-            <span>MARKET PULSE INTELLIGENCE</span>
+            <span>{t('MARKET PULSE INTELLIGENCE')}</span>
           </div>
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-on-surface">
-            What Should I Make Next?
+            {t('What Should I Make Next?')}
           </h2>
           <p className="text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-            Real-time search trends, upcoming festival cycles, and domestic/export buyer requests translated into actionable production guidance for your loom or workshop.
+            {t('Real-time search trends, upcoming festival cycles, and domestic/export buyer requests translated into actionable production guidance for your loom or workshop.')}
           </p>
         </div>
       </div>
@@ -41,7 +43,7 @@ export const DemandPulse: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] uppercase font-bold text-primary px-2.5 py-0.5 rounded-full bg-primary/10">
-                  {item.category}
+                  {t(item.category)}
                 </span>
 
                 <span
@@ -52,30 +54,30 @@ export const DemandPulse: React.FC = () => {
                   }`}
                 >
                   <Flame className="w-3 h-3" />
-                  {item.trend} ({item.growth_rate})
+                  {t(item.trend)} ({item.growth_rate})
                 </span>
               </div>
 
               <h3 className="font-serif text-base font-bold text-on-surface leading-snug">
-                {item.insight_title}
+                {t(item.insight_title)}
               </h3>
 
               <div className="p-3 rounded-xl bg-surface-container-low border border-outline/10 text-xs space-y-1.5">
                 <div className="flex items-center gap-1 text-[11px] font-semibold text-on-surface">
                   <Lightbulb className="w-3.5 h-3.5 text-secondary" />
-                  <span>Actionable Studio Recommendation:</span>
+                  <span>{t('Actionable Studio Recommendation:')}</span>
                 </div>
                 <p className="text-on-surface-variant leading-relaxed">
-                  {item.recommendation}
+                  {t(item.recommendation)}
                 </p>
               </div>
             </div>
 
             <div className="pt-2 border-t border-outline/10 flex items-center justify-between text-xs text-on-surface-variant">
               <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-primary" /> {item.peak_season}
+                <Calendar className="w-3.5 h-3.5 text-primary" /> {t(item.peak_season)}
               </span>
-              <span className="font-semibold text-primary">High Conversion Potential</span>
+              <span className="font-semibold text-primary">{t('High Conversion Potential')}</span>
             </div>
           </div>
         ))}

@@ -10,6 +10,7 @@ import {
   Lock,
   Truck,
   ArrowRight,
+  AlertCircle,
 } from 'lucide-react';
 
 export const CheckoutModal: React.FC = () => {
@@ -21,6 +22,7 @@ export const CheckoutModal: React.FC = () => {
     user,
     setSelectedPassport,
     passports,
+    t,
   } = useApp();
 
   const [fullName, setFullName] = useState(user.name || 'Devi Prasad Sharma');
@@ -34,15 +36,17 @@ export const CheckoutModal: React.FC = () => {
   const [upiId, setUpiId] = useState('deviprasad@okaxis');
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   if (!isCheckoutOpen) return null;
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
+    setErrorMessage(null);
 
-    setTimeout(() => {
-      const order = createOrder({
+    try {
+      const res = await createOrder({
         customer_name: fullName,
         customer_email: email,
         payment_method: paymentMethod,
@@ -55,14 +59,24 @@ export const CheckoutModal: React.FC = () => {
           phone,
         },
       });
+
+      if (res.success && res.order) {
+        setConfirmedOrder(res.order);
+      } else {
+        setErrorMessage(res.error || t('Sorry, this product is temporarily unavailable.'));
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setErrorMessage(msg || t('Sorry, this product is temporarily unavailable.'));
+    } finally {
       setIsProcessing(false);
-      setConfirmedOrder(order);
-    }, 1200);
+    }
   };
 
   const handleClose = () => {
     setIsCheckoutOpen(false);
     setConfirmedOrder(null);
+    setErrorMessage(null);
   };
 
   return (
@@ -118,9 +132,9 @@ export const CheckoutModal: React.FC = () => {
             <div className="p-3 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center gap-3 text-xs text-secondary-container">
               <ShieldCheck className="w-5 h-5 text-secondary shrink-0" />
               <div className="text-left">
-                <p className="font-semibold text-on-surface">Digital Craft Passport Issued</p>
+                <p className="font-semibold text-on-surface">{t('Digital Craft Passport Issued')}</p>
                 <p className="text-[11px] text-on-surface-variant">
-                  A tamper-proof certificate of authenticity and GI Tag registration has been linked to your account.
+                  {t('A tamper-proof certificate of authenticity and GI Tag registration has been linked to your account.')}
                 </p>
               </div>
             </div>
@@ -133,13 +147,13 @@ export const CheckoutModal: React.FC = () => {
                 }}
                 className="px-4 py-2.5 rounded-full border border-primary text-primary text-xs font-bold hover:bg-primary/10 transition cursor-pointer"
               >
-                View Digital Craft Passport
+                {t('View Digital Craft Passport')}
               </button>
               <button
                 onClick={handleClose}
                 className="px-6 py-2.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs cursor-pointer"
               >
-                Return to Marketplace
+                {t('Return to Marketplace')}
               </button>
             </div>
           </div>
@@ -149,15 +163,22 @@ export const CheckoutModal: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-wider">
                 <Lock className="w-3.5 h-3.5" />
-                <span>Direct Artisan Checkout</span>
+                <span>{t('Direct Artisan Checkout')}</span>
               </div>
               <h2 className="font-serif text-2xl font-bold text-on-surface mt-1">
-                Complete Your Heritage Order
+                {t('Complete Your Heritage Order')}
               </h2>
               <p className="text-xs text-on-surface-variant">
-                100% of proceeds directly support indigenous craft lineages without marketplace commissions.
+                {t('100% of proceeds directly support indigenous craft lineages without marketplace commissions.')}
               </p>
             </div>
+
+            {errorMessage && (
+              <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-400 text-xs flex items-center gap-2.5 animate-fadeIn">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span className="font-semibold">{errorMessage}</span>
+              </div>
+            )}
 
             {/* Delivery Address */}
             <div className="space-y-3">
@@ -167,7 +188,7 @@ export const CheckoutModal: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   type="text"
-                  placeholder="Full Name"
+                  placeholder={t('Full Name')}
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -175,7 +196,7 @@ export const CheckoutModal: React.FC = () => {
                 />
                 <input
                   type="tel"
-                  placeholder="Phone Number"
+                  placeholder={t('Phone Number')}
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -185,7 +206,7 @@ export const CheckoutModal: React.FC = () => {
 
               <input
                 type="text"
-                placeholder="Street Address / House No."
+                placeholder={t('Street Address / House No.')}
                 required
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
@@ -195,7 +216,7 @@ export const CheckoutModal: React.FC = () => {
               <div className="grid grid-cols-3 gap-3">
                 <input
                   type="text"
-                  placeholder="City"
+                  placeholder={t('City')}
                   required
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
@@ -203,7 +224,7 @@ export const CheckoutModal: React.FC = () => {
                 />
                 <input
                   type="text"
-                  placeholder="State"
+                  placeholder={t('State')}
                   required
                   value={state}
                   onChange={(e) => setState(e.target.value)}
@@ -211,7 +232,7 @@ export const CheckoutModal: React.FC = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Pincode"
+                  placeholder={t('Pincode')}
                   required
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
@@ -266,7 +287,7 @@ export const CheckoutModal: React.FC = () => {
             {/* Total summary & submit */}
             <div className="pt-4 border-t border-outline/20 flex items-center justify-between">
               <div>
-                <span className="text-[11px] text-on-surface-variant uppercase">Total Payable</span>
+                <span className="text-[11px] text-on-surface-variant uppercase">{t('Total Payable')}</span>
                 <p className="font-serif text-xl font-bold text-primary">
                   ₹{cartTotal.toLocaleString('en-IN')}
                 </p>
@@ -278,10 +299,10 @@ export const CheckoutModal: React.FC = () => {
                 className="px-6 py-3 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-md flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {isProcessing ? (
-                  <span>Securing Artisan Loom Order...</span>
+                  <span>{t('Securing Artisan Loom Order...')}</span>
                 ) : (
                   <>
-                    <span>Pay & Place Order</span>
+                    <span>{t('Pay & Place Order')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}

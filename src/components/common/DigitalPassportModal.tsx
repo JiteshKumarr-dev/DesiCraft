@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export const DigitalPassportModal: React.FC = () => {
-  const { selectedPassport, setSelectedPassport, showNotification } = useApp();
+  const { selectedPassport, setSelectedPassport, showNotification, t } = useApp();
 
   if (!selectedPassport) return null;
 
@@ -177,10 +177,10 @@ export const DigitalPassportModal: React.FC = () => {
             <div className="space-y-2 text-center sm:text-left flex-1 min-w-0">
               <div className="flex items-center justify-center sm:justify-start gap-1 text-xs font-semibold text-primary">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Cryptographic Proof of Authenticity</span>
+                <span>{t('Cryptographic Proof of Authenticity')}</span>
               </div>
               <p className="text-[11px] text-on-surface-variant leading-tight">
-                Scan this QR code with any mobile device to inspect original loom footage, artisan guild endorsement, and physical testing report.
+                {t('Scan this QR code with any mobile device to inspect original loom footage, artisan guild endorsement, and physical testing report.')}
               </p>
               <div className="flex items-center gap-2 bg-surface p-2 rounded-lg border border-outline/20 text-xs">
                 <Hash className="w-3.5 h-3.5 text-on-surface-variant shrink-0" />
@@ -191,7 +191,7 @@ export const DigitalPassportModal: React.FC = () => {
                   onClick={handleCopyHash}
                   className="text-primary hover:underline text-[11px] font-semibold shrink-0 cursor-pointer"
                 >
-                  Copy
+                  {t('Copy')}
                 </button>
               </div>
             </div>
@@ -204,20 +204,20 @@ export const DigitalPassportModal: React.FC = () => {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5 text-primary" />
-              <span>Print Certificate</span>
+              <span>{t('Print Certificate')}</span>
             </button>
             <button
               onClick={handleShare}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-outline/30 text-xs font-semibold text-on-surface hover:bg-surface-container transition cursor-pointer"
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span>Share</span>
+              <span>{t('Share')}</span>
             </button>
             <button
               onClick={() => setSelectedPassport(null)}
               className="px-5 py-2 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs cursor-pointer"
             >
-              Done
+              {t('Done')}
             </button>
           </div>
         </div>

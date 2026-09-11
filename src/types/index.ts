@@ -105,6 +105,8 @@ export interface DigitalCraftPassport {
   created_at: string;
 }
 
+export type ProductStatus = 'PUBLISHED' | 'EDITING' | 'UNPUBLISHED' | 'DRAFT' | 'ARCHIVED';
+
 export interface Product {
   id: string;
   artisan_id: string;
@@ -121,7 +123,11 @@ export interface Product {
   quantity: number;
   production_time: string;
   region: string;
-  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  status: ProductStatus;
+  previous_status?: 'PUBLISHED' | 'UNPUBLISHED';
+  editing_by?: string;
+  editing_started_at?: string;
+  edit_session_id?: string;
   images: string[];
   primary_image: string;
   passport_id: string;

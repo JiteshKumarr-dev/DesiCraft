@@ -282,11 +282,11 @@ export const IndiaHeritageMap: React.FC = () => {
         <div className="absolute top-5 right-5 z-20 flex items-center gap-2">
           <button
             onClick={() => setIs3DEnabled(!is3DEnabled)}
-            aria-label="Toggle 3D isometric view"
+            aria-label={t('Toggle 3D isometric view')}
             className="px-3 py-1.5 rounded-full text-xs font-bold bg-white/80 dark:bg-black/60 backdrop-blur-md text-amber-950 dark:text-amber-100 border border-amber-800/20 hover:bg-white transition cursor-pointer shadow-xs flex items-center gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span>{is3DEnabled ? '3D View: ON' : '2D Flat View'}</span>
+            <span>{is3DEnabled ? t('3D View: ON') : t('2D Flat View')}</span>
           </button>
         </div>
 
@@ -295,25 +295,24 @@ export const IndiaHeritageMap: React.FC = () => {
           <div className="lg:col-span-3 space-y-6 text-center lg:text-left">
             <div className="space-y-3">
               <span className="text-[11px] font-bold text-primary uppercase tracking-widest block">
-                VIBRANT CLUSTERS OF BHARAT
+                {t('VIBRANT CLUSTERS OF BHARAT')}
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#3a2012] dark:text-[#f8edd9] leading-tight">
-                India <br className="hidden lg:block" />
-                Handcrafted
+                {t('India Handcrafted')}
               </h2>
               <p className="text-xs sm:text-sm text-[#634832] dark:text-on-surface-variant leading-relaxed max-w-md mx-auto lg:mx-0">
-                Explore the crafts, stories and artisans that make India unique. Hover over any state to reveal its signature masterworks.
+                {t('Explore the crafts, stories and artisans that make India unique. Hover over any state to reveal its signature masterworks.')}
               </p>
             </div>
 
             {/* Architectural Heritage Sketch Emblem */}
             <div className="pt-4 border-t border-amber-900/10 space-y-2 hidden sm:block">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold font-serif">
-                <span>Many Crafts • One Bharat</span>
+                <span>{t('Many Crafts • One Bharat')}</span>
                 <span className="text-sm">🇮🇳</span>
               </div>
               <p className="text-[11px] text-[#785b42] dark:text-on-surface-variant italic font-serif">
-                "From Himalayan Pashmina to Deccan Ikat and Kutch Block Prints"
+                "{t('From Himalayan Pashmina to Deccan Ikat and Kutch Block Prints')}"
               </p>
             </div>
           </div>
@@ -454,7 +453,7 @@ export const IndiaHeritageMap: React.FC = () => {
                             : 'fill-[#3d2411] dark:fill-[#ffeedd] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)] dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]'
                         }`}
                       >
-                        {lbl.name}
+                        {t(lbl.name)}
                       </text>
                     );
                   })}
@@ -485,7 +484,7 @@ export const IndiaHeritageMap: React.FC = () => {
                     700+
                   </span>
                   <span className="text-xs font-semibold text-[#634832] dark:text-on-surface-variant">
-                    Unique Crafts
+                    {t('Unique Crafts')}
                   </span>
                 </div>
               </div>
@@ -497,7 +496,7 @@ export const IndiaHeritageMap: React.FC = () => {
                     1M+
                   </span>
                   <span className="text-xs font-semibold text-[#634832] dark:text-on-surface-variant">
-                    Living Master Artisans
+                    {t('Living Master Artisans')}
                   </span>
                 </div>
               </div>
@@ -506,10 +505,10 @@ export const IndiaHeritageMap: React.FC = () => {
                 <span className="text-2xl p-2 rounded-xl bg-amber-500/15">🌿</span>
                 <div>
                   <span className="font-serif font-bold text-2xl text-[#3a2012] dark:text-primary block leading-tight">
-                    28 States & 8 UTs
+                    {t('28 States & 8 UTs')}
                   </span>
                   <span className="text-xs font-semibold text-[#634832] dark:text-on-surface-variant">
-                    Geographical Heritage
+                    {t('Geographical Heritage')}
                   </span>
                 </div>
               </div>
@@ -518,18 +517,18 @@ export const IndiaHeritageMap: React.FC = () => {
             {/* Cultural Manifesto Quote Card */}
             <div className="p-4 rounded-2xl bg-amber-900/5 dark:bg-amber-100/5 border border-amber-900/10 text-center space-y-2">
               <p className="font-serif italic text-xs sm:text-sm text-[#4d321d] dark:text-amber-100/90 leading-relaxed">
-                “India's heritage lives in the hands of its people.”
+                “{t("India's heritage lives in the hands of its people.")}”
               </p>
               <div className="w-12 h-0.5 bg-primary/40 mx-auto" />
               <p className="text-[10px] uppercase tracking-wider font-bold text-primary">
-                Explore • Support • Preserve
+                {t('Explore • Support • Preserve')}
               </p>
             </div>
 
             {/* Vintage Nautical Compass Rose */}
             <div className="flex items-center justify-center gap-2 text-amber-900/60 dark:text-amber-100/50 text-[11px] font-mono">
               <Compass className="w-5 h-5 text-primary animate-spin-slow" />
-              <span>INDIAN OCEAN • BHARAT</span>
+              <span>{t('INDIAN OCEAN • BHARAT')}</span>
             </div>
           </div>
         </div>

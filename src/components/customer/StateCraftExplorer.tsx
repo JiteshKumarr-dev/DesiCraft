@@ -173,7 +173,7 @@ export const StateCraftExplorer: React.FC = () => {
               }`}
             >
               <Compass className="w-3.5 h-3.5" />
-              <span>3D Heritage Map</span>
+              <span>{t('3D Heritage Map')}</span>
             </button>
             <button
               onClick={() => setViewMode('DIRECTORY')}
@@ -183,7 +183,7 @@ export const StateCraftExplorer: React.FC = () => {
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              <span>Directory List</span>
+              <span>{t('Directory List')}</span>
             </button>
           </div>
 

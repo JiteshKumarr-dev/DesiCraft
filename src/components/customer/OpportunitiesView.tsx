@@ -129,7 +129,7 @@ export const OpportunitiesView: React.FC = () => {
                   rel="noreferrer"
                   className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition text-xs font-bold"
                 >
-                  <span>Official Details</span>
+                  <span>{t('Official Details')}</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
