@@ -65,7 +65,11 @@ CREATE TABLE IF NOT EXISTS public.products (
   quantity INTEGER DEFAULT 1,
   production_time TEXT,
   region TEXT,
-  status TEXT DEFAULT 'PUBLISHED',
+  status TEXT DEFAULT 'PUBLISHED' CHECK (status IN ('PUBLISHED', 'EDITING', 'UNPUBLISHED', 'DRAFT', 'ARCHIVED')),
+  previous_status TEXT DEFAULT 'PUBLISHED',
+  editing_by TEXT,
+  editing_started_at TIMESTAMPTZ,
+  edit_session_id TEXT,
   images JSONB DEFAULT '[]'::jsonb,
   primary_image TEXT,
   passport_id TEXT,
@@ -75,6 +79,12 @@ CREATE TABLE IF NOT EXISTS public.products (
   is_ai_enhanced BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration safety for existing tables
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS previous_status TEXT DEFAULT 'PUBLISHED';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS editing_by TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS editing_started_at TIMESTAMPTZ;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS edit_session_id TEXT;
 
 -- 5. Digital Craft Passports (Blockchain & Provenance)
 CREATE TABLE IF NOT EXISTS public.passports (
@@ -239,10 +249,287 @@ CREATE POLICY "Public Read Artisan Profiles" ON public.artisan_profiles FOR SELE
 CREATE POLICY "Public Insert Artisan Profiles" ON public.artisan_profiles FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Update Artisan Profiles" ON public.artisan_profiles FOR UPDATE USING (true);
 
-CREATE POLICY "Public Read Products" ON public.products FOR SELECT USING (true);
-CREATE POLICY "Public Insert Products" ON public.products FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public Update Products" ON public.products FOR UPDATE USING (true);
-CREATE POLICY "Public Delete Products" ON public.products FOR DELETE USING (true);
+-- =====================================================================
+-- SAFE PRODUCT EDITING WORKFLOW — ATOMIC DATABASE RPC FUNCTIONS
+-- =====================================================================
+
+-- 1. BEGIN PRODUCT EDIT (Transitions PUBLISHED -> EDITING, captures previous_status, locks session)
+CREATE OR REPLACE FUNCTION public.begin_product_edit(
+  p_product_id TEXT,
+  p_seller_id TEXT,
+  p_session_id TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_product RECORD;
+  v_now TIMESTAMPTZ := NOW();
+  v_lock_timeout INTERVAL := INTERVAL '30 minutes';
+BEGIN
+  -- Fetch row with row-level lock
+  SELECT * INTO v_product FROM public.products WHERE id = p_product_id FOR UPDATE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Product not found: %', p_product_id;
+  END IF;
+
+  -- Verify ownership (artisan owns the product, with master artisan demo fallback compatibility)
+  IF v_product.artisan_id IS NOT NULL 
+     AND v_product.artisan_id != p_seller_id 
+     AND v_product.artisan_id != 'artisan-rajesh-varanasi' 
+     AND p_seller_id != 'artisan-rajesh-varanasi' THEN
+    RAISE EXCEPTION 'Unauthorized: You do not have permission to edit this product';
+  END IF;
+
+  -- Concurrency check: if already EDITING by another seller within lock timeout
+  IF v_product.status = 'EDITING' 
+     AND v_product.editing_by IS NOT NULL 
+     AND v_product.editing_by != p_seller_id 
+     AND v_product.editing_started_at IS NOT NULL 
+     AND (v_now - v_product.editing_started_at) < v_lock_timeout THEN
+    RAISE EXCEPTION 'Product is currently being edited by another session';
+  END IF;
+
+  -- Transition status to EDITING and preserve previous_status
+  UPDATE public.products
+  SET 
+    previous_status = CASE 
+      WHEN status = 'EDITING' THEN COALESCE(previous_status, 'PUBLISHED')
+      ELSE status 
+    END,
+    status = 'EDITING',
+    editing_by = p_seller_id,
+    editing_started_at = v_now,
+    edit_session_id = p_session_id
+  WHERE id = p_product_id
+  RETURNING * INTO v_product;
+
+  RETURN to_jsonb(v_product);
+END;
+$$;
+
+-- 2. UPDATE PRODUCT SAFELY (Atomically updates price & description, restores previous status)
+CREATE OR REPLACE FUNCTION public.update_product_safely(
+  p_product_id TEXT,
+  p_seller_id TEXT,
+  p_session_id TEXT,
+  p_new_price NUMERIC,
+  p_new_description TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_product RECORD;
+  v_target_status TEXT;
+BEGIN
+  -- Validation
+  IF p_new_price IS NULL OR p_new_price <= 0 THEN
+    RAISE EXCEPTION 'Invalid price: Price must be greater than zero';
+  END IF;
+
+  IF p_new_description IS NULL OR LENGTH(TRIM(p_new_description)) = 0 THEN
+    RAISE EXCEPTION 'Invalid description: Description cannot be empty';
+  END IF;
+
+  -- Fetch row with row-level lock
+  SELECT * INTO v_product FROM public.products WHERE id = p_product_id FOR UPDATE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Product not found: %', p_product_id;
+  END IF;
+
+  -- Verify ownership
+  IF v_product.artisan_id IS NOT NULL 
+     AND v_product.artisan_id != p_seller_id 
+     AND v_product.artisan_id != 'artisan-rajesh-varanasi' 
+     AND p_seller_id != 'artisan-rajesh-varanasi' THEN
+    RAISE EXCEPTION 'Unauthorized: You do not have permission to update this product';
+  END IF;
+
+  -- Verify editing session
+  IF v_product.status != 'EDITING' AND v_product.editing_by != p_seller_id THEN
+    RAISE EXCEPTION 'Product is not in an active editing session for this seller';
+  END IF;
+
+  -- Restore previous visibility status (PUBLISHED or UNPUBLISHED)
+  v_target_status := COALESCE(v_product.previous_status, 'PUBLISHED');
+  IF v_target_status = 'EDITING' THEN
+    v_target_status := 'PUBLISHED';
+  END IF;
+
+  -- Atomically apply price & description updates, restore status, clear edit lock
+  UPDATE public.products
+  SET 
+    price = p_new_price,
+    description = TRIM(p_new_description),
+    status = v_target_status,
+    previous_status = v_target_status,
+    editing_by = NULL,
+    editing_started_at = NULL,
+    edit_session_id = NULL
+  WHERE id = p_product_id
+  RETURNING * INTO v_product;
+
+  RETURN to_jsonb(v_product);
+END;
+$$;
+
+-- 3. CANCEL PRODUCT EDIT (Reverts status to previous_status, clears lock, preserves original fields)
+CREATE OR REPLACE FUNCTION public.cancel_product_edit(
+  p_product_id TEXT,
+  p_seller_id TEXT,
+  p_session_id TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_product RECORD;
+  v_target_status TEXT;
+BEGIN
+  SELECT * INTO v_product FROM public.products WHERE id = p_product_id FOR UPDATE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Product not found: %', p_product_id;
+  END IF;
+
+  -- Verify ownership
+  IF v_product.artisan_id IS NOT NULL 
+     AND v_product.artisan_id != p_seller_id 
+     AND v_product.artisan_id != 'artisan-rajesh-varanasi' 
+     AND p_seller_id != 'artisan-rajesh-varanasi' THEN
+    RAISE EXCEPTION 'Unauthorized: You do not have permission to cancel editing for this product';
+  END IF;
+
+  v_target_status := COALESCE(v_product.previous_status, 'PUBLISHED');
+  IF v_target_status = 'EDITING' THEN
+    v_target_status := 'PUBLISHED';
+  END IF;
+
+  UPDATE public.products
+  SET 
+    status = v_target_status,
+    editing_by = NULL,
+    editing_started_at = NULL,
+    edit_session_id = NULL
+  WHERE id = p_product_id
+  RETURNING * INTO v_product;
+
+  RETURN to_jsonb(v_product);
+END;
+$$;
+
+-- 4. PLACE ORDER SAFELY (Database-enforced purchase protection & authoritative price verification)
+CREATE OR REPLACE FUNCTION public.place_order_safely(
+  p_order JSONB
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_items JSONB;
+  v_item JSONB;
+  v_prod_id TEXT;
+  v_prod_qty INT;
+  v_db_prod RECORD;
+  v_calculated_total NUMERIC := 0;
+  v_verified_items JSONB := '[]'::jsonb;
+  v_order_id TEXT;
+  v_new_order JSONB;
+BEGIN
+  v_items := p_order->'items';
+  IF v_items IS NULL OR jsonb_array_length(v_items) = 0 THEN
+    RAISE EXCEPTION 'Order must contain at least one item';
+  END IF;
+
+  -- Verify every item against authoritative database row
+  FOR i IN 0 .. (jsonb_array_length(v_items) - 1) LOOP
+    v_item := v_items->i;
+    v_prod_id := v_item->>'product_id';
+    v_prod_qty := COALESCE((v_item->>'quantity')::INT, 1);
+
+    SELECT * INTO v_db_prod FROM public.products WHERE id = v_prod_id FOR SHARE;
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Product not found: %', v_prod_id;
+    END IF;
+
+    -- CRITICAL CHECK: Product MUST be published to be purchasable
+    IF v_db_prod.status != 'PUBLISHED' THEN
+      RAISE EXCEPTION 'Sorry, this product is temporarily unavailable: %', v_db_prod.name;
+    END IF;
+
+    -- Authoritative price calculated from database
+    v_calculated_total := v_calculated_total + (v_db_prod.price * v_prod_qty);
+
+    -- Build verified item using authoritative database price
+    v_verified_items := v_verified_items || jsonb_build_object(
+      'id', COALESCE(v_item->>'id', 'item-' || floor(random() * 1000000)::TEXT),
+      'product_id', v_db_prod.id,
+      'product_name', v_db_prod.name,
+      'artisan_id', v_db_prod.artisan_id,
+      'artisan_name', v_db_prod.artisan_name,
+      'quantity', v_prod_qty,
+      'price', v_db_prod.price,
+      'image', v_db_prod.primary_image
+    );
+  END LOOP;
+
+  v_order_id := COALESCE(p_order->>'id', 'ORD-' || to_char(NOW(), 'YYYY') || '-' || floor(random() * 8999 + 1000)::TEXT);
+
+  -- Insert verified order atomically
+  INSERT INTO public.orders (
+    id,
+    customer_id,
+    customer_name,
+    customer_email,
+    artisan_id,
+    artisan_name,
+    items,
+    order_status,
+    total_price,
+    payment_method,
+    shipping_address,
+    tracking_id,
+    placed_at,
+    updated_at
+  ) VALUES (
+    v_order_id,
+    p_order->>'customer_id',
+    p_order->>'customer_name',
+    p_order->>'customer_email',
+    COALESCE(p_order->>'artisan_id', v_verified_items->0->>'artisan_id'),
+    COALESCE(p_order->>'artisan_name', v_verified_items->0->>'artisan_name'),
+    v_verified_items,
+    'ORDERED',
+    v_calculated_total,
+    COALESCE(p_order->>'payment_method', 'UPI'),
+    COALESCE(p_order->'shipping_address', '{}'::jsonb),
+    COALESCE(p_order->>'tracking_id', 'IND-SPEEDPOST-' || floor(random() * 89999999 + 10000000)::TEXT),
+    NOW(),
+    NOW()
+  );
+
+  SELECT to_jsonb(o.*) INTO v_new_order FROM public.orders o WHERE o.id = v_order_id;
+  RETURN v_new_order;
+END;
+$$;
+
+-- RLS Policies for Products: Public can only view PUBLISHED products; sellers see their own
+CREATE POLICY "Public Read Published Products" ON public.products 
+  FOR SELECT USING (status = 'PUBLISHED' OR auth.uid()::text = artisan_id);
+
+CREATE POLICY "Artisan Insert Products" ON public.products 
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Artisan Update Own Products" ON public.products 
+  FOR UPDATE USING (auth.uid()::text = artisan_id OR artisan_id = 'artisan-rajesh-varanasi') 
+  WITH CHECK (auth.uid()::text = artisan_id OR artisan_id = 'artisan-rajesh-varanasi');
+
+CREATE POLICY "Artisan Delete Own Products" ON public.products 
+  FOR DELETE USING (auth.uid()::text = artisan_id OR artisan_id = 'artisan-rajesh-varanasi');
 
 CREATE POLICY "Public Read Passports" ON public.passports FOR SELECT USING (true);
 CREATE POLICY "Public Insert Passports" ON public.passports FOR INSERT WITH CHECK (true);

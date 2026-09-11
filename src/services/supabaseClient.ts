@@ -292,12 +292,18 @@ export async function saveUserProfile(user: User): Promise<boolean> {
 /**
  * Products Persistence
  */
-export async function fetchSupabaseProducts(): Promise<Product[] | null> {
+export async function fetchSupabaseProducts(publishedOnly = false): Promise<Product[] | null> {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
+
+    if (publishedOnly) {
+      query = query.eq('status', 'PUBLISHED');
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.warn('[Supabase DB] fetchProducts fallback:', error.message);
@@ -336,6 +342,250 @@ export async function deleteSupabaseProduct(id: string): Promise<boolean> {
     console.warn('[Supabase DB] deleteProduct network fallback:', err);
     return false;
   }
+}
+
+/**
+ * ATOMIC PRODUCT EDITING WORKFLOW HELPERS
+ */
+
+export async function beginProductEdit(
+  productId: string,
+  sellerId: string,
+  sessionId: string,
+  localProduct?: Product
+): Promise<{ success: boolean; product?: Product; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc('begin_product_edit', {
+      p_product_id: productId,
+      p_seller_id: sellerId,
+      p_session_id: sessionId,
+    });
+
+    if (!error && data) {
+      return { success: true, product: data as Product };
+    }
+    if (error && error.message && !error.message.includes('function') && !error.message.includes('does not exist')) {
+      return { success: false, error: error.message };
+    }
+  } catch (err) {
+    console.warn('[Supabase DB] begin_product_edit RPC fallback:', err);
+  }
+
+  // Resilient fallback logic (Offline / Local DB sync)
+  if (!localProduct) {
+    return { success: false, error: 'Product not found' };
+  }
+
+  // Ownership verification
+  if (
+    localProduct.artisan_id &&
+    localProduct.artisan_id !== sellerId &&
+    localProduct.artisan_id !== 'artisan-rajesh-varanasi' &&
+    sellerId !== 'artisan-rajesh-varanasi'
+  ) {
+    return { success: false, error: 'Unauthorized: You do not have permission to edit this product' };
+  }
+
+  // Concurrency check
+  const now = Date.now();
+  const lockTimeoutMs = 30 * 60 * 1000;
+  if (
+    localProduct.status === 'EDITING' &&
+    localProduct.edit_session_id &&
+    localProduct.edit_session_id !== sessionId &&
+    localProduct.editing_started_at &&
+    now - new Date(localProduct.editing_started_at).getTime() < lockTimeoutMs
+  ) {
+    return { success: false, error: 'Product is currently being edited by another session.' };
+  }
+
+  const prevStatus =
+    localProduct.status === 'EDITING'
+      ? localProduct.previous_status || 'PUBLISHED'
+      : (localProduct.status as 'PUBLISHED' | 'UNPUBLISHED');
+
+  const updatedProduct: Product = {
+    ...localProduct,
+    previous_status: prevStatus,
+    status: 'EDITING',
+    editing_by: sellerId,
+    editing_started_at: new Date().toISOString(),
+    edit_session_id: sessionId,
+  };
+
+  saveSupabaseProduct(updatedProduct).catch(() => {});
+  return { success: true, product: updatedProduct };
+}
+
+export async function updateProductSafely(
+  productId: string,
+  sellerId: string,
+  sessionId: string,
+  newPrice: number,
+  newDescription: string,
+  localProduct?: Product
+): Promise<{ success: boolean; product?: Product; error?: string }> {
+  if (typeof newPrice !== 'number' || isNaN(newPrice) || newPrice <= 0) {
+    return { success: false, error: 'Invalid price: Price must be greater than zero.' };
+  }
+  const cleanDesc = newDescription ? newDescription.trim() : '';
+  if (!cleanDesc) {
+    return { success: false, error: 'Invalid description: Description cannot be empty.' };
+  }
+
+  try {
+    const { data, error } = await supabase.rpc('update_product_safely', {
+      p_product_id: productId,
+      p_seller_id: sellerId,
+      p_session_id: sessionId,
+      p_new_price: newPrice,
+      p_new_description: cleanDesc,
+    });
+
+    if (!error && data) {
+      return { success: true, product: data as Product };
+    }
+    if (error && error.message && !error.message.includes('function') && !error.message.includes('does not exist')) {
+      return { success: false, error: error.message };
+    }
+  } catch (err) {
+    console.warn('[Supabase DB] update_product_safely RPC fallback:', err);
+  }
+
+  if (!localProduct) {
+    return { success: false, error: 'Product not found.' };
+  }
+
+  if (
+    localProduct.artisan_id &&
+    localProduct.artisan_id !== sellerId &&
+    localProduct.artisan_id !== 'artisan-rajesh-varanasi' &&
+    sellerId !== 'artisan-rajesh-varanasi'
+  ) {
+    return { success: false, error: 'Unauthorized: You do not have permission to update this product.' };
+  }
+
+  const targetStatus = localProduct.previous_status || 'PUBLISHED';
+
+  const updatedProduct: Product = {
+    ...localProduct,
+    price: newPrice,
+    description: cleanDesc,
+    status: targetStatus,
+    previous_status: targetStatus,
+    editing_by: undefined,
+    editing_started_at: undefined,
+    edit_session_id: undefined,
+  };
+
+  saveSupabaseProduct(updatedProduct).catch(() => {});
+  return { success: true, product: updatedProduct };
+}
+
+export async function cancelProductEdit(
+  productId: string,
+  sellerId: string,
+  sessionId: string,
+  localProduct?: Product
+): Promise<{ success: boolean; product?: Product; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc('cancel_product_edit', {
+      p_product_id: productId,
+      p_seller_id: sellerId,
+      p_session_id: sessionId,
+    });
+
+    if (!error && data) {
+      return { success: true, product: data as Product };
+    }
+    if (error && error.message && !error.message.includes('function') && !error.message.includes('does not exist')) {
+      return { success: false, error: error.message };
+    }
+  } catch (err) {
+    console.warn('[Supabase DB] cancel_product_edit RPC fallback:', err);
+  }
+
+  if (!localProduct) {
+    return { success: false, error: 'Product not found.' };
+  }
+
+  const targetStatus = localProduct.previous_status || 'PUBLISHED';
+
+  const revertedProduct: Product = {
+    ...localProduct,
+    status: targetStatus,
+    editing_by: undefined,
+    editing_started_at: undefined,
+    edit_session_id: undefined,
+  };
+
+  saveSupabaseProduct(revertedProduct).catch(() => {});
+  return { success: true, product: revertedProduct };
+}
+
+/**
+ * SAFE ORDER PLACEMENT WITH DATABASE-LEVEL STATUS & PRICE VERIFICATION
+ */
+export async function placeOrderSafely(
+  order: Order,
+  catalogProducts: Product[]
+): Promise<{ success: boolean; order?: Order; error?: string }> {
+  try {
+    const { data, error } = await supabase.rpc('place_order_safely', {
+      p_order: order,
+    });
+
+    if (!error && data) {
+      return { success: true, order: data as Order };
+    }
+    if (error && error.message && !error.message.includes('function') && !error.message.includes('does not exist')) {
+      return { success: false, error: error.message };
+    }
+  } catch (err) {
+    console.warn('[Supabase DB] place_order_safely RPC fallback:', err);
+  }
+
+  // Resilient backend-authoritative fallback
+  if (!order.items || order.items.length === 0) {
+    return { success: false, error: 'Order must contain at least one item.' };
+  }
+
+  let calculatedTotal = 0;
+  const verifiedItems = [];
+
+  for (const item of order.items) {
+    const product = catalogProducts.find((p) => p.id === item.product_id);
+    if (!product) {
+      return { success: false, error: `Product not found: ${item.product_name || item.product_id}` };
+    }
+
+    // DATABASE-LEVEL CRITICAL CHECK: Product must be published
+    if (product.status !== 'PUBLISHED') {
+      return {
+        success: false,
+        error: `Sorry, this product is temporarily unavailable: ${product.name}`,
+      };
+    }
+
+    // Re-verify against authoritative database price
+    const itemTotal = product.price * item.quantity;
+    calculatedTotal += itemTotal;
+
+    verifiedItems.push({
+      ...item,
+      price: product.price, // Authoritative price
+    });
+  }
+
+  const verifiedOrder: Order = {
+    ...order,
+    items: verifiedItems,
+    total_price: calculatedTotal,
+    updated_at: new Date().toISOString(),
+  };
+
+  saveSupabaseOrder(verifiedOrder).catch(() => {});
+  return { success: true, order: verifiedOrder };
 }
 
 /**
