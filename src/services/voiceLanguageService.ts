@@ -109,6 +109,7 @@ class UniversalVoiceEngine {
   private listeners: Set<(speaking: boolean, activeLang: LanguageCode | null) => void> = new Set();
   private voices: SpeechSynthesisVoice[] = [];
   private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  private currentPlayId = 0;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -180,19 +181,28 @@ class UniversalVoiceEngine {
   }
 
   public stop() {
+    this.currentPlayId++;
     this.clearHeartbeat();
 
-    // 1. Stop any audio element
+    // 1. Forcefully stop, detach listeners, and destroy any audio element
     if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
-      this.currentAudio.src = '';
+      const audioToStop = this.currentAudio;
       this.currentAudio = null;
+      audioToStop.onplay = null;
+      audioToStop.onended = null;
+      audioToStop.onerror = null;
+      try {
+        audioToStop.pause();
+        audioToStop.currentTime = 0;
+        audioToStop.src = '';
+      } catch (_) {}
     }
 
     // 2. Stop SpeechSynthesis
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {}
     }
 
     this.isSpeakingState = false;
@@ -261,8 +271,9 @@ class UniversalVoiceEngine {
   public async play(options: PlayVoiceOptions): Promise<boolean> {
     const { text, lang, phoneticFallback, onStart, onEnd, onError } = options;
 
-    // Stop any existing speech cleanly
+    // Stop any existing speech cleanly and acquire a new unique play ID
     this.stop();
+    const playId = ++this.currentPlayId;
 
     this.isSpeakingState = true;
     this.activeLangCode = lang;
@@ -271,31 +282,42 @@ class UniversalVoiceEngine {
     const textToSpeak = phoneticFallback || text;
 
     // Strategy 1: High-fidelity natural audio stream (via local /api/tts proxy or direct stream)
-    const audioSuccess = await this.tryAudioStream(textToSpeak, lang, onStart, onEnd);
+    const audioSuccess = await this.tryAudioStream(textToSpeak, lang, playId, onStart, onEnd);
+    if (this.currentPlayId !== playId) {
+      // Obsolete request - cancelled or superseded by another play/stop call
+      return false;
+    }
     if (audioSuccess) {
       return true;
     }
 
-    // Strategy 2: Native Web Speech API fallback with precise voice matching
-    const webSpeechSuccess = this.tryWebSpeech(textToSpeak, lang, onStart, onEnd, onError);
+    // Strategy 2: Native Web Speech API fallback with precise voice matching (only if STILL active request!)
+    if (this.currentPlayId !== playId) {
+      return false;
+    }
+    const webSpeechSuccess = this.tryWebSpeech(textToSpeak, lang, playId, onStart, onEnd, onError);
     if (webSpeechSuccess) {
       return true;
     }
 
-    this.isSpeakingState = false;
-    this.activeLangCode = null;
-    this.notify();
-    onError?.(new Error(`Unable to play voice for ${lang}`));
+    if (this.currentPlayId === playId) {
+      this.isSpeakingState = false;
+      this.activeLangCode = null;
+      this.notify();
+      onError?.(new Error(`Unable to play voice for ${lang}`));
+    }
     return false;
   }
 
   private tryWebSpeech(
     text: string,
     lang: LanguageCode,
+    playId: number,
     onStart?: () => void,
     onEnd?: () => void,
     onError?: (err: any) => void
   ): boolean {
+    if (this.currentPlayId !== playId) return false;
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       return false;
     }
@@ -315,6 +337,12 @@ class UniversalVoiceEngine {
       utterance.pitch = 1.0;
 
       utterance.onstart = () => {
+        if (this.currentPlayId !== playId) {
+          try {
+            window.speechSynthesis.cancel();
+          } catch (_) {}
+          return;
+        }
         this.isSpeakingState = true;
         this.activeLangCode = lang;
         this.notify();
@@ -322,6 +350,7 @@ class UniversalVoiceEngine {
       };
 
       utterance.onend = () => {
+        if (this.currentPlayId !== playId) return;
         this.clearHeartbeat();
         this.isSpeakingState = false;
         this.activeLangCode = null;
@@ -330,6 +359,7 @@ class UniversalVoiceEngine {
       };
 
       utterance.onerror = (e) => {
+        if (this.currentPlayId !== playId) return;
         this.clearHeartbeat();
         if (e.error !== 'interrupted' && e.error !== 'canceled') {
           console.warn('[UniversalVoiceEngine] SpeechSynthesis error:', e);
@@ -341,7 +371,7 @@ class UniversalVoiceEngine {
       };
 
       this.heartbeatInterval = setInterval(() => {
-        if (!this.isSpeakingState) {
+        if (this.currentPlayId !== playId || !this.isSpeakingState) {
           this.clearHeartbeat();
           return;
         }
@@ -356,6 +386,7 @@ class UniversalVoiceEngine {
       window.speechSynthesis.cancel();
       setTimeout(() => {
         try {
+          if (this.currentPlayId !== playId) return;
           if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
             window.speechSynthesis.speak(utterance);
             if (window.speechSynthesis.paused) {
@@ -363,6 +394,7 @@ class UniversalVoiceEngine {
             }
           }
         } catch (err) {
+          if (this.currentPlayId !== playId) return;
           this.clearHeartbeat();
           this.isSpeakingState = false;
           this.activeLangCode = null;
@@ -380,11 +412,17 @@ class UniversalVoiceEngine {
   private tryAudioStream(
     text: string,
     lang: LanguageCode,
+    playId: number,
     onStart?: () => void,
     onEnd?: () => void
   ): Promise<boolean> {
     return new Promise((resolve) => {
       try {
+        if (this.currentPlayId !== playId) {
+          resolve(false);
+          return;
+        }
+
         const googleLang = GOOGLE_TTS_LANG_MAP[lang] || 'en';
         // Priority 1: Use local Vite proxy endpoint for reliable zero-CORS streaming
         const proxyUrl = `/api/tts?tl=${encodeURIComponent(googleLang)}&q=${encodeURIComponent(text)}`;
@@ -403,12 +441,20 @@ class UniversalVoiceEngine {
           if (this.currentAudio === audio) {
             this.currentAudio = null;
           }
-          this.isSpeakingState = false;
-          this.activeLangCode = null;
-          this.notify();
+          if (this.currentPlayId === playId) {
+            this.isSpeakingState = false;
+            this.activeLangCode = null;
+            this.notify();
+          }
         };
 
         audio.onplay = () => {
+          if (this.currentPlayId !== playId) {
+            try {
+              audio.pause();
+            } catch (_) {}
+            return;
+          }
           this.isSpeakingState = true;
           this.activeLangCode = lang;
           this.notify();
@@ -416,6 +462,7 @@ class UniversalVoiceEngine {
         };
 
         audio.onended = () => {
+          if (this.currentPlayId !== playId) return;
           cleanup();
           onEnd?.();
           if (!hasResolved) {
@@ -425,7 +472,15 @@ class UniversalVoiceEngine {
         };
 
         audio.onerror = () => {
-          // If proxy URL failed, try direct URL as fallback
+          if (this.currentPlayId !== playId) {
+            cleanup();
+            if (!hasResolved) {
+              hasResolved = true;
+              resolve(false);
+            }
+            return;
+          }
+          // If proxy URL failed and this is still the active request, try direct URL as fallback
           if (audio.src.includes('/api/tts')) {
             audio.src = directUrl;
             audio.play().catch(() => {
@@ -445,9 +500,12 @@ class UniversalVoiceEngine {
         };
 
         const timer = setTimeout(() => {
+          if (this.currentPlayId !== playId) return;
           if (!hasResolved && audio.paused && audio.currentTime === 0) {
             hasResolved = true;
-            audio.pause();
+            try {
+              audio.pause();
+            } catch (_) {}
             cleanup();
             resolve(false);
           }
@@ -461,6 +519,13 @@ class UniversalVoiceEngine {
           playPromise
             .then(() => {
               clearTimeout(timer);
+              if (this.currentPlayId !== playId) {
+                try {
+                  audio.pause();
+                } catch (_) {}
+                resolve(false);
+                return;
+              }
               if (!hasResolved) {
                 hasResolved = true;
                 resolve(true);
@@ -468,6 +533,10 @@ class UniversalVoiceEngine {
             })
             .catch(() => {
               clearTimeout(timer);
+              if (this.currentPlayId !== playId) {
+                resolve(false);
+                return;
+              }
               if (audio.src.includes('/api/tts')) {
                 audio.src = directUrl;
                 audio.play().catch(() => {

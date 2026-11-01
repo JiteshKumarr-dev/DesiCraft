@@ -21,6 +21,7 @@ import { LearningView } from './LearningView';
 import { OpportunitiesView } from './OpportunitiesView';
 import { StateCraftExplorer } from './StateCraftExplorer';
 import { IndiaHeritageMap } from './IndiaHeritageMap';
+import { speechController } from '../../services/guidedHelpService';
 
 export const CustomerHome: React.FC = () => {
   const {
@@ -51,6 +52,7 @@ export const CustomerHome: React.FC = () => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
   const toggleSpeechAudio = (storyText: string) => {
+    speechController.stop();
     if (isPlayingAudio) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();

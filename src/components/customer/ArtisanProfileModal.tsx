@@ -15,6 +15,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { MapArtisanItem } from '../../data/heritageMapData';
+import { speechController } from '../../services/guidedHelpService';
 
 interface ArtisanProfileModalProps {
   artisan: MapArtisanItem | null;
@@ -38,6 +39,7 @@ export const ArtisanProfileModal: React.FC<ArtisanProfileModalProps> = ({
   );
 
   const toggleStoryAudio = () => {
+    speechController.stop();
     if (isPlayingAudio) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();

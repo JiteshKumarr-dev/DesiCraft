@@ -3,12 +3,13 @@
 
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { GUIDE_UI_LABELS } from '../../services/guidedHelpService';
+import { GUIDE_UI_LABELS, speechController } from '../../services/guidedHelpService';
 import { Sparkles, Volume2, ArrowRight, X } from 'lucide-react';
 
 export const FirstTimeWelcomeModal: React.FC = () => {
   const {
     language,
+    activeMode,
     isFirstTimeWelcomeOpen,
     setIsFirstTimeWelcomeOpen,
     startTour,
@@ -19,12 +20,15 @@ export const FirstTimeWelcomeModal: React.FC = () => {
   if (!isFirstTimeWelcomeOpen || !guidedHelpEnabled) return null;
 
   const handleStartTour = () => {
+    speechController.stop();
     localStorage.setItem('desi_craft_welcomed', 'true');
     setIsFirstTimeWelcomeOpen(false);
-    startTour('CUSTOMER_HOME_TOUR', 0);
+    const tourToStart = activeMode === 'ARTISAN' ? 'ARTISAN_DASHBOARD_TOUR' : 'CUSTOMER_HOME_TOUR';
+    startTour(tourToStart, 0);
   };
 
   const handleSkip = () => {
+    speechController.stop();
     localStorage.setItem('desi_craft_welcomed', 'true');
     setIsFirstTimeWelcomeOpen(false);
   };

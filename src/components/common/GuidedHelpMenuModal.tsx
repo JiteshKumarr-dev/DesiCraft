@@ -29,6 +29,7 @@ export const GuidedHelpMenuModal: React.FC = () => {
   const {
     language,
     activeMode,
+    currentRoute,
     isHelpMenuOpen,
     setIsHelpMenuOpen,
     startTour,
@@ -47,7 +48,7 @@ export const GuidedHelpMenuModal: React.FC = () => {
 
   if (!isHelpMenuOpen) return null;
 
-  // Determine current contextual tour ID based on active mode and modal state
+  // Determine current contextual tour ID based on active page, mode, and modal state
   let currentTourId = 'CUSTOMER_HOME_TOUR';
   if (isPhotoEnhancerOpen) {
     currentTourId = 'AI_DEBLUR_TOUR';
@@ -68,26 +69,25 @@ export const GuidedHelpMenuModal: React.FC = () => {
   const currentTour = TOURS[currentTourId];
 
   const handleStartTour = () => {
+    speechController.stop();
     setIsHelpMenuOpen(false);
     if (!guidedHelpEnabled) {
       setGuidedHelpEnabled(true);
     }
-    setTimeout(() => {
-      startTour(currentTourId, 0);
-    }, 100);
+    startTour(currentTourId, 0);
   };
 
   const handleRestartTour = () => {
+    speechController.stop();
     setIsHelpMenuOpen(false);
     if (!guidedHelpEnabled) {
       setGuidedHelpEnabled(true);
     }
-    setTimeout(() => {
-      restartTour(currentTourId);
-    }, 100);
+    restartTour(currentTourId);
   };
 
   const handleListenOverview = () => {
+    speechController.stop();
     if (!currentTour) return;
     const firstStep = currentTour.steps[0];
     const stepTitle = firstStep.title[language] || firstStep.title.en || '';
@@ -100,24 +100,22 @@ export const GuidedHelpMenuModal: React.FC = () => {
   };
 
   const handleLaunchHeritageMapTour = () => {
+    speechController.stop();
     setIsHelpMenuOpen(false);
     if (!guidedHelpEnabled) {
       setGuidedHelpEnabled(true);
     }
-    setTimeout(() => {
-      startTour('HERITAGE_MAP_TOUR', 0);
-    }, 100);
+    startTour('HERITAGE_MAP_TOUR', 0);
   };
 
   const handleLaunchCollaborationTour = () => {
+    speechController.stop();
     setIsHelpMenuOpen(false);
     if (!guidedHelpEnabled) {
       setGuidedHelpEnabled(true);
     }
     setSellerTab('COLLABORATE');
-    setTimeout(() => {
-      startTour('SELLER_COLLABORATION_TOUR', 0);
-    }, 100);
+    startTour('SELLER_COLLABORATION_TOUR', 0);
   };
 
   return (

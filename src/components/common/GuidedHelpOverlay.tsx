@@ -43,6 +43,7 @@ export const GuidedHelpOverlay: React.FC = () => {
     finishTour,
     closeTour,
     activeMode,
+    currentRoute,
     t,
   } = useApp();
 
@@ -277,7 +278,18 @@ export const GuidedHelpOverlay: React.FC = () => {
 
   // Synchronized voice guidance: speaks step accurately in selected language
   useEffect(() => {
-    if (!guidedHelpEnabled || !tour || !currentStep) {
+    if (!guidedHelpEnabled || !tour || !currentStep || !activeTourId) {
+      speechController.stop();
+      return;
+    }
+
+    // Guard: Tour must strictly match current page & active mode!
+    const isMismatch =
+      currentRoute === '/login' ||
+      (tour.mode === 'ARTISAN' && activeMode !== 'ARTISAN') ||
+      (tour.mode === 'CUSTOMER' && activeMode !== 'CUSTOMER');
+
+    if (isMismatch) {
       speechController.stop();
       return;
     }
@@ -291,10 +303,11 @@ export const GuidedHelpOverlay: React.FC = () => {
     const voiceAvail = speechController.isVoiceAvailableForLanguage(language);
     setHasVoiceFallback(!voiceAvail);
 
-    const stepVoiceKey = `${activeTourId}_${activeStepIndex}_${language}`;
+    const stepVoiceKey = `${activeTourId}_step${activeStepIndex}_${language}`;
 
     if (lastSpokenStepKeyRef.current !== stepVoiceKey) {
       lastSpokenStepKeyRef.current = stepVoiceKey;
+      speechController.stop();
       const stepTitle = currentStep.title[language] || currentStep.title.en || '';
       const stepContent = currentStep.content[language] || currentStep.content.en || '';
       const textToSpeak = `${stepTitle}. ${stepContent}`.trim();
@@ -302,6 +315,11 @@ export const GuidedHelpOverlay: React.FC = () => {
         speechController.speak(textToSpeak, language);
       }
     }
+
+    // Cleanup: when navigating to next step or unmounting, cleanly stop prior step's voice
+    return () => {
+      speechController.stop();
+    };
   }, [
     activeTourId,
     activeStepIndex,
@@ -310,6 +328,8 @@ export const GuidedHelpOverlay: React.FC = () => {
     voiceGuidanceEnabled,
     tour,
     currentStep,
+    currentRoute,
+    activeMode,
   ]);
 
   // Keyboard navigation & accessibility
@@ -341,12 +361,20 @@ export const GuidedHelpOverlay: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeTourId, isFirstStep, isLastStep, nextTourStep, prevTourStep, closeTour, finishTour, cleanupGuide]);
 
-  if (!guidedHelpEnabled || !tour || !currentStep) {
+  if (
+    !guidedHelpEnabled ||
+    !tour ||
+    !currentStep ||
+    currentRoute === '/login' ||
+    (tour.mode === 'ARTISAN' && activeMode !== 'ARTISAN') ||
+    (tour.mode === 'CUSTOMER' && activeMode !== 'CUSTOMER')
+  ) {
     return null;
   }
 
   // Voice playback actions
   const handlePlayOrReplay = () => {
+    speechController.stop();
     const stepTitle = currentStep.title[language] || currentStep.title.en || '';
     const stepContent = currentStep.content[language] || currentStep.content.en || '';
     const textToSpeak = `${stepTitle}. ${stepContent}`.trim();

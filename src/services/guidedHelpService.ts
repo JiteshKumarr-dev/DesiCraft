@@ -2612,6 +2612,11 @@ class SpeechGuidanceController {
 
   public stop() {
     universalVoiceEngine.stop();
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {}
+    }
     this.isSpeaking = false;
     this.isPaused = false;
     this.currentUtterance = null;
