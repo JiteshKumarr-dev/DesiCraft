@@ -276,61 +276,14 @@ export const GuidedHelpOverlay: React.FC = () => {
     };
   }, [guidedHelpEnabled, activeTourId, currentStep, measureTargetInViewport]);
 
-  // Synchronized voice guidance: speaks step accurately in selected language
+  // Step & Route audio safety: Cleanly stops any active voice speech on step transitions or route/mode changes
   useEffect(() => {
-    if (!guidedHelpEnabled || !tour || !currentStep || !activeTourId) {
-      speechController.stop();
-      return;
-    }
+    speechController.stop();
 
-    // Guard: Tour must strictly match current page & active mode!
-    const isMismatch =
-      currentRoute === '/login' ||
-      (tour.mode === 'ARTISAN' && activeMode !== 'ARTISAN') ||
-      (tour.mode === 'CUSTOMER' && activeMode !== 'CUSTOMER');
-
-    if (isMismatch) {
-      speechController.stop();
-      return;
-    }
-
-    if (!voiceGuidanceEnabled) {
-      lastSpokenStepKeyRef.current = null;
-      speechController.stop();
-      return;
-    }
-
-    const voiceAvail = speechController.isVoiceAvailableForLanguage(language);
-    setHasVoiceFallback(!voiceAvail);
-
-    const stepVoiceKey = `${activeTourId}_step${activeStepIndex}_${language}`;
-
-    if (lastSpokenStepKeyRef.current !== stepVoiceKey) {
-      lastSpokenStepKeyRef.current = stepVoiceKey;
-      speechController.stop();
-      const stepTitle = currentStep.title[language] || currentStep.title.en || '';
-      const stepContent = currentStep.content[language] || currentStep.content.en || '';
-      const textToSpeak = `${stepTitle}. ${stepContent}`.trim();
-      if (textToSpeak) {
-        speechController.speak(textToSpeak, language);
-      }
-    }
-
-    // Cleanup: when navigating to next step or unmounting, cleanly stop prior step's voice
     return () => {
       speechController.stop();
     };
-  }, [
-    activeTourId,
-    activeStepIndex,
-    language,
-    guidedHelpEnabled,
-    voiceGuidanceEnabled,
-    tour,
-    currentStep,
-    currentRoute,
-    activeMode,
-  ]);
+  }, [activeTourId, activeStepIndex, currentRoute, activeMode]);
 
   // Keyboard navigation & accessibility
   useEffect(() => {
@@ -372,14 +325,16 @@ export const GuidedHelpOverlay: React.FC = () => {
     return null;
   }
 
-  // Voice playback actions
+  // Voice playback actions: speaks the guide's natural audio narration (never reads out card UI text)
   const handlePlayOrReplay = () => {
     speechController.stop();
-    const stepTitle = currentStep.title[language] || currentStep.title.en || '';
-    const stepContent = currentStep.content[language] || currentStep.content.en || '';
-    const textToSpeak = `${stepTitle}. ${stepContent}`.trim();
-    if (textToSpeak) {
-      speechController.speak(textToSpeak, language);
+    const guideVoice =
+      currentStep.voiceScript?.[language] ||
+      currentStep.voiceScript?.en ||
+      '';
+    if (guideVoice) {
+      lastSpokenStepKeyRef.current = `${activeTourId}_${activeStepIndex}_${language}`;
+      speechController.speak(guideVoice, language);
     }
   };
 

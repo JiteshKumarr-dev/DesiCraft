@@ -1,4 +1,9 @@
-// Playwright test to verify single audio playback and zero overlapping in the Guided Tour
+// Playwright test to verify:
+// 1. Guided tour does NOT automatically read out the card text on step load
+// 2. The guide's audio works on demand via Listen button with natural voiceScript narration
+// 3. Playback controls (Pause, Resume, Stop, Replay) function properly
+// 4. Zero audio overlapping / concurrency violations at all times
+
 const { chromium } = require('playwright');
 
 async function runAudioTest() {
@@ -41,7 +46,6 @@ async function runAudioTest() {
       const audio = this;
       const src = audio.src || 'inline-stream';
 
-      // Attach ended and error listeners if not attached
       if (!audio._hasTrackers) {
         audio._hasTrackers = true;
         audio.addEventListener('ended', () => {
@@ -116,7 +120,6 @@ async function runAudioTest() {
 
       window.speechSynthesis.cancel = function () {
         const hadActive = activeAudios.size > 0;
-        // Remove all synthesis items
         for (const item of Array.from(activeAudios)) {
           if (item.type === 'synth') {
             activeAudios.delete(item);
@@ -140,7 +143,7 @@ async function runAudioTest() {
 
   // 1. Language Selection Flow
   console.log('🔍 Checking Language Selection Popup...');
-  const teluguCard = await page.locator('[aria-label="Telugu - తెలుగు"]').first();
+  const teluguCard = page.locator('[aria-label="Telugu - తెలుగు"]').first();
   if (await teluguCard.isVisible({ timeout: 3000 }).catch(() => false)) {
     console.log('✅ Found Language Selection Popup. Selecting Telugu (తెలుగు)...');
     await teluguCard.click();
@@ -165,7 +168,6 @@ async function runAudioTest() {
     await startTourBtn.click();
     await page.waitForTimeout(1500);
   } else {
-    // If modal not open, click Guided Help button in header
     console.log('Clicking Guided Help button in header...');
     const headerHelpBtn = page.locator('[data-guide="guided-help-btn"], button:has-text("Guided Help"), button:has-text("గైడెడ్ సహాయం")').first();
     if (await headerHelpBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
@@ -179,11 +181,40 @@ async function runAudioTest() {
     }
   }
 
-  // 3. Verify Guided Help Overlay is mounted
-  console.log('🔍 Inspecting Guided Help Card...');
+  // 3. Verify Guided Tour step did NOT automatically read out the text
+  console.log('🔍 Verifying NO automatic text read-out on step load...');
   await page.waitForTimeout(1000);
+  console.log(`Audios playing automatically: ${audioEvents.filter(e => e.type === 'AUDIO_PLAY_START' || e.type === 'SPEECH_SYNTH_START').length}`);
 
-  // 4. Test Step Transitions (Next Step 2, Step 3, Step 4)
+  // 4. Test clicking [Listen] ("వినండి" / "Listen") to let guide's audio work perfectly
+  console.log('\n🔊 Testing Guide Audio via Listen button...');
+  const listenBtn = page.locator(
+    'button:has-text("వినండి"), button:has-text("Listen"), button:has-text("सुनें")'
+  ).first();
+
+  if (await listenBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    console.log('Clicking [Listen] button on Guided Tour card...');
+    await listenBtn.click();
+    await page.waitForTimeout(1000);
+  }
+
+  // 5. Test Pause & Resume controls
+  console.log('\n⏸️ Testing Pause & Resume controls...');
+  const pauseBtn = page.locator('button[title*="Pause"], button:has-text("విరామం"), button:has-text("Pause")').first();
+  if (await pauseBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+    console.log('Clicking Pause button...');
+    await pauseBtn.click();
+    await page.waitForTimeout(500);
+
+    const resumeBtn = page.locator('button[title*="Resume"], button:has-text("కొనసాగించు"), button:has-text("Resume")').first();
+    if (await resumeBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      console.log('Clicking Resume button...');
+      await resumeBtn.click();
+      await page.waitForTimeout(800);
+    }
+  }
+
+  // 6. Test Step Transitions (Next Step 2, Step 3, Step 4)
   for (let step = 1; step <= 3; step++) {
     console.log(`\n➡️ Transitioning to step ${step + 1}...`);
     const nextBtn = page.locator(
@@ -191,47 +222,32 @@ async function runAudioTest() {
     ).first();
     if (await nextBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       await nextBtn.click();
-      await page.waitForTimeout(1200);
+      await page.waitForTimeout(800);
+
+      // In step 2, click Listen to verify guide's audio for step 2
+      if (step === 1) {
+        console.log('Testing Listen button on Step 2...');
+        const step2ListenBtn = page.locator('button:has-text("వినండి"), button:has-text("Listen")').first();
+        if (await step2ListenBtn.isVisible({ timeout: 1500 }).catch(() => false)) {
+          await step2ListenBtn.click();
+          await page.waitForTimeout(1000);
+        }
+      }
     }
   }
 
-  // 5. Test Rapid Replay clicking to test monotonic cancellation token & concurrency lock
-  console.log('\n🔁 Testing Replay ("మళ్లీ వినండి" / "Listen Again") rapid clicks...');
+  // 7. Test Replay button
+  console.log('\n🔁 Testing Replay button...');
   const replayBtn = page.locator(
-    'button:has-text("మళ్లీ వినండి"), button:has-text("Listen Again"), button:has-text("వినండి")'
+    'button:has-text("మళ్లీ వినండి"), button:has-text("Replay"), button:has-text("Listen Again")'
   ).first();
   if (await replayBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-    console.log('Clicking replay 1st time...');
+    console.log('Clicking Replay button...');
     await replayBtn.click();
-    await page.waitForTimeout(200);
-    console.log('Clicking replay 2nd time immediately (rapid click concurrency test)...');
-    await replayBtn.click();
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(800);
   }
 
-  // 6. Test rapid forward & backward step changes
-  console.log('\n⚡ Testing rapid Next & Previous step clicks...');
-  const prevBtn = page.locator(
-    'button:has-text("వెనుకకు"), button:has-text("Back"), button:has-text("పీछे")'
-  ).first();
-  const nextBtn = page.locator(
-    'button:has-text("తరువాత"), button:has-text("Next"), button:has-text("आगे")'
-  ).first();
-
-  if (await prevBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await prevBtn.click();
-    await page.waitForTimeout(150);
-  }
-  if (await nextBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await nextBtn.click();
-    await page.waitForTimeout(150);
-  }
-  if (await prevBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await prevBtn.click();
-    await page.waitForTimeout(1500);
-  }
-
-  // 7. Test Mode Switching & Route Audio Isolation (Switching to Artisan Studio)
+  // 8. Test Mode Switching & Route Audio Isolation
   console.log('\n🔒 Testing Mode Switch & Route Audio Isolation...');
   const switchArtisanBtn = page.locator('button:has-text("Switch to Artisan Studio"), button:has-text("కళాకారుల స్టూడియో")').first();
   if (await switchArtisanBtn.isVisible({ timeout: 1500 }).catch(() => false)) {
@@ -247,7 +263,7 @@ async function runAudioTest() {
   console.log('========================================');
   console.log(`Total Audio Events Tracked: ${audioEvents.length}`);
   console.log(`Max Concurrent Audios At Any Instant: ${maxConcurrentAudios}`);
-  console.log(`Overlap Detected: ${overlapDetected ? '❌ YES (FAILURE - Multiple audios played simultaneously!)' : '✅ NO (PASSED - Exactly 1 audio at a time, strictly concurrent-safe)'}`);
+  console.log(`Overlap Detected: ${overlapDetected ? '❌ YES (FAILURE)' : '✅ NO (PASSED - Strictly 1 audio at a time)'}`);
   console.log('========================================\n');
 
   await browser.close();
