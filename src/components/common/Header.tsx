@@ -304,7 +304,10 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Sign In / Join Button or Profile Avatar */}
             {!isLoggedIn ? (
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => {
+                  setAuthMode('LOGIN');
+                  setIsAuthModalOpen(true);
+                }}
                 className="px-3.5 py-1.5 rounded-full bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition shadow-xs flex items-center gap-1.5 cursor-pointer shrink-0"
               >
                 <UserIcon className="w-3.5 h-3.5" />

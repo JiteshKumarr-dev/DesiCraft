@@ -20,6 +20,8 @@ export const CartDrawer: React.FC = () => {
     removeFromCart,
     updateCartQuantity,
     setIsCheckoutOpen,
+    isLoggedIn,
+    initiatePaymentFlow,
     t,
   } = useApp();
 
@@ -140,13 +142,10 @@ export const CartDrawer: React.FC = () => {
             </div>
 
             <button
-              onClick={() => {
-                setIsCartOpen(false);
-                setIsCheckoutOpen(true);
-              }}
+              onClick={initiatePaymentFlow}
               className="w-full py-3 px-4 rounded-full bg-primary text-on-primary font-bold text-xs sm:text-sm hover:bg-primary/90 transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>{t('Buy Now')}</span>
+              <span>{isLoggedIn ? t('Proceed to Payment') : t('Sign In & Proceed to Payment')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

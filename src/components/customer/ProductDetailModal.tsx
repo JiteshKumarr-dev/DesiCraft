@@ -34,6 +34,8 @@ export const ProductDetailModal: React.FC = () => {
     artisans,
     setIsCustomOrderModalOpen,
     setIsCartOpen,
+    initiatePaymentFlow,
+    isLoggedIn,
     t,
   } = useApp();
 
@@ -55,7 +57,7 @@ export const ProductDetailModal: React.FC = () => {
     if (!isPurchasable) return;
     addToCart(selectedProduct, 1);
     setSelectedProduct(null);
-    setIsCartOpen(true);
+    initiatePaymentFlow();
   };
 
   return (

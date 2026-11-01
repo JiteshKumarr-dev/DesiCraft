@@ -238,6 +238,9 @@ interface AppContextType {
   setIsSignupSuccessModalOpen: (open: boolean) => void;
   isVoiceArtisanSetupOpen: boolean;
   setIsVoiceArtisanSetupOpen: (open: boolean) => void;
+  pendingCheckoutAfterAuth: boolean;
+  setPendingCheckoutAfterAuth: (pending: boolean) => void;
+  initiatePaymentFlow: () => void;
   // Guided Help & Voice Assistance Mode
   guidedHelpEnabled: boolean;
   setGuidedHelpEnabled: (enabled: boolean) => void;
@@ -760,10 +763,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     const saved = localStorage.getItem('desi_craft_logged_in');
-    return saved ? JSON.parse(saved) : true;
+    return saved === 'true';
   });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'SIGNUP' | 'LOGIN'>('SIGNUP');
+  const [pendingCheckoutAfterAuth, setPendingCheckoutAfterAuth] = useState<boolean>(false);
 
   // First popup on every visit or refresh: show language preference selection
   const [isLanguagePopupOpen, setIsLanguagePopupOpen] = useState<boolean>(true);
@@ -1351,6 +1355,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const cartTotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
+  const initiatePaymentFlow = () => {
+    if (!isLoggedIn) {
+      setPendingCheckoutAfterAuth(true);
+      setAuthMode('LOGIN');
+      setIsCartOpen(false);
+      setIsAuthModalOpen(true);
+      showNotification(t('Please sign in to proceed to payment.'));
+    } else {
+      setIsCartOpen(false);
+      setIsCheckoutOpen(true);
+    }
+  };
+
   const toggleWishlist = (productId: string) => {
     setWishlist((prev) => {
       const exists = prev.includes(productId);
@@ -1843,9 +1860,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('desi_craft_user', JSON.stringify(newUser));
     setLanguage(userData.preferred_language);
     setIsAuthModalOpen(false);
-    // Open celebratory non-permanent mode selection modal
-    setIsSignupSuccessModalOpen(true);
-    showNotification(`Universal Desi Craft account created for ${userData.name}!`);
+
+    if (pendingCheckoutAfterAuth) {
+      setPendingCheckoutAfterAuth(false);
+      setIsSignupSuccessModalOpen(false);
+      setIsCheckoutOpen(true);
+      showNotification(t('Account created successfully! Proceeding to payment.'));
+    } else {
+      // Open celebratory non-permanent mode selection modal
+      setIsSignupSuccessModalOpen(true);
+      showNotification(`Universal Desi Craft account created for ${userData.name}!`);
+    }
   };
 
   const loginUser = async (
@@ -1935,11 +1960,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIntendedMode(null);
       navigate(destinationPath);
 
-      showNotification(
-        resolvedMode === 'ARTISAN'
-          ? t('Switched to Artisan Studio Mode — Welcome to your digital loom workspace!')
-          : t('Switched to Heritage Marketplace Mode — Explore India’s authentic treasures!')
-      );
+      if (pendingCheckoutAfterAuth) {
+        setPendingCheckoutAfterAuth(false);
+        setIsAuthModalOpen(false);
+        setIsCheckoutOpen(true);
+        showNotification(t('Signed in successfully! Accessing payment page.'));
+      } else {
+        showNotification(
+          resolvedMode === 'ARTISAN'
+            ? t('Switched to Artisan Studio Mode — Welcome to your digital loom workspace!')
+            : t('Switched to Heritage Marketplace Mode — Explore India’s authentic treasures!')
+        );
+      }
 
       return { success: true };
     } catch (err: unknown) {
@@ -2081,6 +2113,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsSignupSuccessModalOpen,
         isVoiceArtisanSetupOpen,
         setIsVoiceArtisanSetupOpen,
+        pendingCheckoutAfterAuth,
+        setPendingCheckoutAfterAuth,
+        initiatePaymentFlow,
         guidedHelpEnabled,
         setGuidedHelpEnabled,
         voiceGuidanceEnabled,

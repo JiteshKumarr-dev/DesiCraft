@@ -20,6 +20,8 @@ export const CheckoutModal: React.FC = () => {
     cartTotal,
     createOrder,
     user,
+    isLoggedIn,
+    initiatePaymentFlow,
     setSelectedPassport,
     passports,
     t,
@@ -37,6 +39,20 @@ export const CheckoutModal: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Sync user details when signing in
+  React.useEffect(() => {
+    if (user?.name) setFullName(user.name);
+    if (user?.email) setEmail(user.email);
+    if (user?.phone) setPhone(user.phone);
+  }, [user]);
+
+  // Ensure user is signed in before viewing checkout/payment
+  React.useEffect(() => {
+    if (isCheckoutOpen && !isLoggedIn) {
+      initiatePaymentFlow();
+    }
+  }, [isCheckoutOpen, isLoggedIn]);
 
   if (!isCheckoutOpen) return null;
 

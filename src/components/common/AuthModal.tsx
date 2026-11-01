@@ -17,6 +17,7 @@ import {
   Globe,
   Award,
   BookOpen,
+  ShoppingBag,
 } from 'lucide-react';
 
 const INDIAN_STATES = [
@@ -51,6 +52,7 @@ export const AuthModal: React.FC = () => {
     setIsLanguagePopupOpen,
     signUpUser,
     loginUser,
+    pendingCheckoutAfterAuth,
     showNotification,
     t,
   } = useApp();
@@ -240,6 +242,20 @@ export const AuthModal: React.FC = () => {
         {/* RIGHT COLUMN: Universal Sign Up / Login Form */}
         <div className="flex-1 p-6 sm:p-8 overflow-y-auto no-scrollbar flex flex-col justify-between">
           <div>
+            {pendingCheckoutAfterAuth && (
+              <div className="mb-5 p-3.5 rounded-2xl bg-primary/10 border border-primary/30 flex items-center gap-3 text-xs text-primary animate-fadeIn shadow-2xs">
+                <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center shrink-0 text-primary">
+                  <ShoppingBag className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="font-bold text-on-surface">{t('Sign In to Complete Payment')}</p>
+                  <p className="text-[11px] text-on-surface-variant">
+                    {t('Please sign in or register an account to access the secure payment gateway and complete your order.')}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Tab Switcher: Sign Up vs Login */}
             <div className="flex border-b border-outline/20 mb-6">
               <button
