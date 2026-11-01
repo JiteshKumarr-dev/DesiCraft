@@ -171,16 +171,12 @@ export const LanguageSelectionPopup: React.FC = () => {
     setLanguage(selectedCode);
     localStorage.setItem('desi_craft_lang_selected', 'true');
     setIsLanguagePopupOpen(false);
-    setIsHelpMenuOpen(false);
     setIsFirstTimeWelcomeOpen(false);
-    setGuidedHelpEnabled(true);
-    setVoiceGuidanceEnabled(true);
 
-    // Launch guided tour directly in selected language on the rendered page
+    // Show Guided Help tab modal so user can choose to start tour
     setTimeout(() => {
-      const tourId = activeMode === 'ARTISAN' ? 'ARTISAN_DASHBOARD_TOUR' : 'CUSTOMER_HOME_TOUR';
-      startTour(tourId, 0);
-    }, 150);
+      setIsHelpMenuOpen(true);
+    }, 100);
   };
 
   const handleClose = () => {
@@ -188,16 +184,12 @@ export const LanguageSelectionPopup: React.FC = () => {
     setLanguage(selectedCode);
     localStorage.setItem('desi_craft_lang_selected', 'true');
     setIsLanguagePopupOpen(false);
-    setIsHelpMenuOpen(false);
     setIsFirstTimeWelcomeOpen(false);
-    setGuidedHelpEnabled(true);
-    setVoiceGuidanceEnabled(true);
 
-    // Launch guided tour directly in selected language
+    // Show Guided Help tab modal so user can choose to start tour
     setTimeout(() => {
-      const tourId = activeMode === 'ARTISAN' ? 'ARTISAN_DASHBOARD_TOUR' : 'CUSTOMER_HOME_TOUR';
-      startTour(tourId, 0);
-    }, 150);
+      setIsHelpMenuOpen(true);
+    }, 100);
   };
 
   return (

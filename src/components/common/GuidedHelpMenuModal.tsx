@@ -72,7 +72,9 @@ export const GuidedHelpMenuModal: React.FC = () => {
     if (!guidedHelpEnabled) {
       setGuidedHelpEnabled(true);
     }
-    startTour(currentTourId, 0);
+    setTimeout(() => {
+      startTour(currentTourId, 0);
+    }, 100);
   };
 
   const handleRestartTour = () => {
@@ -80,7 +82,9 @@ export const GuidedHelpMenuModal: React.FC = () => {
     if (!guidedHelpEnabled) {
       setGuidedHelpEnabled(true);
     }
-    restartTour(currentTourId);
+    setTimeout(() => {
+      restartTour(currentTourId);
+    }, 100);
   };
 
   const handleListenOverview = () => {
@@ -98,7 +102,9 @@ export const GuidedHelpMenuModal: React.FC = () => {
     if (!guidedHelpEnabled) {
       setGuidedHelpEnabled(true);
     }
-    startTour('HERITAGE_MAP_TOUR', 0);
+    setTimeout(() => {
+      startTour('HERITAGE_MAP_TOUR', 0);
+    }, 100);
   };
 
   const handleLaunchCollaborationTour = () => {
@@ -107,11 +113,20 @@ export const GuidedHelpMenuModal: React.FC = () => {
       setGuidedHelpEnabled(true);
     }
     setSellerTab('COLLABORATE');
-    startTour('SELLER_COLLABORATION_TOUR', 0);
+    setTimeout(() => {
+      startTour('SELLER_COLLABORATION_TOUR', 0);
+    }, 100);
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setIsHelpMenuOpen(false);
+        }
+      }}
+    >
       <div
         className="relative w-full max-w-md bg-surface text-on-surface rounded-3xl shadow-2xl border-2 border-primary/40 p-5 sm:p-6 space-y-4 animate-scaleUp z-[10000] max-h-[90vh] overflow-y-auto"
         role="dialog"
