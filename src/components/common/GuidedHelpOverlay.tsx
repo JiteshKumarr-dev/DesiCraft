@@ -275,13 +275,16 @@ export const GuidedHelpOverlay: React.FC = () => {
     };
   }, [guidedHelpEnabled, activeTourId, currentStep, measureTargetInViewport]);
 
-  // Synchronized voice guidance: cancels old speech before speaking new step
+  // Synchronized voice guidance: speaks step accurately in selected language
   useEffect(() => {
     if (!guidedHelpEnabled || !tour || !currentStep) {
       speechController.stop();
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      return;
+    }
+
+    if (!voiceGuidanceEnabled) {
+      lastSpokenStepKeyRef.current = null;
+      speechController.stop();
       return;
     }
 
@@ -290,15 +293,10 @@ export const GuidedHelpOverlay: React.FC = () => {
 
     const stepVoiceKey = `${activeTourId}_${activeStepIndex}_${language}`;
 
-    if (voiceGuidanceEnabled && lastSpokenStepKeyRef.current !== stepVoiceKey) {
+    if (lastSpokenStepKeyRef.current !== stepVoiceKey) {
       lastSpokenStepKeyRef.current = stepVoiceKey;
       const textToSpeak = currentStep.voiceScript[language] || currentStep.content[language];
       if (textToSpeak) {
-        // Immediate cancellation of previous utterance to prevent speech overlapping
-        speechController.stop();
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-        }
         speechController.speak(textToSpeak, language);
       }
     }

@@ -2599,24 +2599,19 @@ class SpeechGuidanceController {
   }
 
   public pause() {
-    universalVoiceEngine.stop();
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-      window.speechSynthesis.pause();
-    }
+    universalVoiceEngine.pause();
     this.isPaused = true;
     this.notify();
   }
 
   public resume() {
+    universalVoiceEngine.resume();
     this.isPaused = false;
     this.notify();
   }
 
   public stop() {
     universalVoiceEngine.stop();
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
     this.isSpeaking = false;
     this.isPaused = false;
     this.currentUtterance = null;
