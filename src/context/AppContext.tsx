@@ -283,6 +283,10 @@ interface AppContextType {
     password?: string;
     state?: string;
     district?: string;
+    targetMode?: UserMode;
+    craftName?: string;
+    experienceYears?: number;
+    guildName?: string;
   }) => void | Promise<void>;
   loginUser: (
     identifier: string,
@@ -632,7 +636,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Load saved state or defaults
   const [user, setUser] = useState<User>(() => {
     const saved = localStorage.getItem('desi_craft_user');
-    return saved ? JSON.parse(saved) : defaultUser;
+    const u: User = saved ? JSON.parse(saved) : defaultUser;
+    const isSavedLoggedIn = localStorage.getItem('desi_craft_logged_in') === 'true';
+    if (!isSavedLoggedIn && u.active_mode === 'ARTISAN') {
+      return { ...u, active_mode: 'CUSTOMER' };
+    }
+    return u;
   });
 
   const [language, setLanguageState] = useState<LanguageCode>(() => {
@@ -1157,6 +1166,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveTourId(null);
     setActiveStepIndex(0);
 
+    // Artisan Studio access guard: requires registered/signed-in artisan account
+    if (mode === 'ARTISAN' && !isLoggedIn) {
+      setIntendedDestination('/artisan-studio', 'ARTISAN');
+      setIntendedMode('ARTISAN');
+      navigate('/login');
+      return;
+    }
+
     setUser((prev) => ({ ...prev, active_mode: mode }));
     setModeGateStatus(mode);
     sessionStorage.setItem('desi_craft_mode_gate', mode);
@@ -1173,6 +1190,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveStepIndex(0);
 
     const target: UserMode = targetMode || (user.active_mode === 'CUSTOMER' ? 'ARTISAN' : 'CUSTOMER');
+
+    // Artisan Studio access guard: requires registered/signed-in artisan account
+    if (target === 'ARTISAN' && !isLoggedIn) {
+      setIntendedDestination('/artisan-studio', 'ARTISAN');
+      setIntendedMode('ARTISAN');
+      navigate('/login');
+      return;
+    }
+
     setUser((prev) => ({ ...prev, active_mode: target }));
     setModeGateStatus(target);
     sessionStorage.setItem('desi_craft_mode_gate', target);
@@ -1832,17 +1858,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     email: string;
     phone: string;
     preferred_language: LanguageCode;
+    password?: string;
     state?: string;
     district?: string;
+    targetMode?: UserMode;
+    craftName?: string;
+    experienceYears?: number;
+    guildName?: string;
   }) => {
     const newUserId = `user-${Date.now()}`;
+    const resolvedMode: UserMode = userData.targetMode || intendedMode || 'CUSTOMER';
+    const isArtisan = resolvedMode === 'ARTISAN';
+
     const newUser: User = {
       id: newUserId,
       name: userData.name,
       email: userData.email,
       phone: userData.phone,
       preferred_language: userData.preferred_language,
-      active_mode: 'CUSTOMER',
+      active_mode: resolvedMode,
       customer_profile: {
         id: `cp-${Date.now()}`,
         user_id: newUserId,
@@ -1851,13 +1885,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         interests: ['Handloom Sarees', 'Traditional Crafts'],
         budget_preference: 20000,
       },
+      artisan_profile: isArtisan
+        ? {
+            id: `artisan-${newUserId}`,
+            user_id: newUserId,
+            name: userData.name,
+            craft_id: 'craft-varanasi-brocade',
+            craft_name: userData.craftName || 'Traditional Handloom & GI Crafts',
+            state: userData.state || 'Uttar Pradesh',
+            district: userData.district || 'Varanasi',
+            experience_years: userData.experienceYears || 15,
+            bio: `${userData.name} is a master artisan specializing in ${userData.craftName || 'heritage Indian crafts'}.`,
+            craft_story: 'Carrying forward ancestral craftsmanship with pride and integrity.',
+            learning_available: true,
+            collaboration_available: true,
+            verification_status: 'VERIFIED',
+            languages_spoken: ['Hindi', 'English'],
+            avatar_url:
+              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+            guild_name: userData.guildName || 'National Heritage Artisan Guild',
+            rating: 5.0,
+            reviews_count: 1,
+          }
+        : defaultUser.artisan_profile,
       created_at: new Date().toISOString(),
     };
 
     setUser(newUser);
     setIsLoggedIn(true);
+    setModeGateStatus(resolvedMode);
     localStorage.setItem('desi_craft_logged_in', 'true');
     localStorage.setItem('desi_craft_user', JSON.stringify(newUser));
+    sessionStorage.setItem('desi_craft_mode_gate', resolvedMode);
     setLanguage(userData.preferred_language);
     setIsAuthModalOpen(false);
 
@@ -1866,6 +1925,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsSignupSuccessModalOpen(false);
       setIsCheckoutOpen(true);
       showNotification(t('Account created successfully! Proceeding to payment.'));
+    } else if (isArtisan) {
+      setIsSignupSuccessModalOpen(false);
+      clearIntendedDestination();
+      setIntendedMode(null);
+      navigate('/artisan-studio');
+      showNotification(t(`Welcome to Artisan Studio, ${userData.name}! Your workspace is ready.`));
     } else {
       // Open celebratory non-permanent mode selection modal
       setIsSignupSuccessModalOpen(true);

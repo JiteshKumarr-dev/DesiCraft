@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { navigate, setIntendedDestination } from '../../services/router';
 import {
   Sparkles,
   ShoppingBag,
@@ -14,7 +15,17 @@ import {
 } from 'lucide-react';
 
 export const PublicLanding: React.FC = () => {
-  const { enterMode, t } = useApp();
+  const { enterMode, isLoggedIn, setIntendedMode, t } = useApp();
+
+  const handleEnterArtisan = () => {
+    if (!isLoggedIn) {
+      setIntendedDestination('/artisan-studio', 'ARTISAN');
+      setIntendedMode('ARTISAN');
+      navigate('/login');
+      return;
+    }
+    enterMode('ARTISAN');
+  };
 
   return (
     <div className="space-y-12 py-4 animate-fadeIn">
@@ -129,7 +140,7 @@ export const PublicLanding: React.FC = () => {
 
           <div className="pt-8">
             <button
-              onClick={() => enterMode('ARTISAN')}
+              onClick={handleEnterArtisan}
               className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-600 to-primary hover:from-amber-700 hover:to-primary/90 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:gap-3 cursor-pointer"
             >
               <span>{t('Enter Artisan Studio')}</span>

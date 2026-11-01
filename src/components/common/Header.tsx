@@ -19,7 +19,7 @@ import {
   MapPin,
   HelpCircle,
 } from 'lucide-react';
-import { navigate } from '../../services/router';
+import { navigate, setIntendedDestination } from '../../services/router';
 
 interface HeaderProps {
   onOpenProfile: () => void;
@@ -37,6 +37,8 @@ export const Header: React.FC<HeaderProps> = ({
   const {
     activeMode,
     toggleMode,
+    requestModeSwitch,
+    setIntendedMode,
     language,
     setLanguage,
     t,
@@ -71,6 +73,20 @@ export const Header: React.FC<HeaderProps> = ({
     { code: 'gu', name: 'Gujarati', native: 'ગુજરાતી' },
     { code: 'pa', name: 'Punjabi', native: 'ਪੰਜਾਬੀ' },
   ];
+
+  const handleModeToggle = () => {
+    if (activeMode === 'CUSTOMER') {
+      if (!isLoggedIn) {
+        setIntendedDestination('/artisan-studio', 'ARTISAN');
+        setIntendedMode('ARTISAN');
+        navigate('/login');
+        return;
+      }
+      requestModeSwitch('ARTISAN');
+    } else {
+      requestModeSwitch('CUSTOMER');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline/20 shadow-xs transition-colors">
@@ -184,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-2 sm:gap-3">
             {/* ONE ACCOUNT → TWO MODES TOGGLE BUTTON */}
             <button
-              onClick={toggleMode}
+              onClick={handleModeToggle}
               data-guide="artisan-switch"
               className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-xs font-semibold shadow-xs transition cursor-pointer border ${
                 activeMode === 'CUSTOMER'

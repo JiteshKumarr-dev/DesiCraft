@@ -36,13 +36,25 @@ import { VoiceArtisanSetupModal } from './components/artisan/VoiceArtisanSetupMo
 
 // Public Portal & Auth Guard
 import { LoginPage } from './components/common/LoginPage';
+import { navigate, setIntendedDestination } from './services/router';
 
 export const App: React.FC = () => {
-  const { currentRoute, activeMode } = useApp();
+  const { currentRoute, activeMode, isLoggedIn, setIntendedMode } = useApp();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
   const [isEndangeredOpen, setIsEndangeredOpen] = useState(false);
+
+  // Artisan Studio Security Guard: Redirect unauthenticated requests to Artisan Sign In / Sign Up
+  React.useEffect(() => {
+    if ((currentRoute === '/artisan-studio' || activeMode === 'ARTISAN') && !isLoggedIn) {
+      setIntendedDestination('/artisan-studio', 'ARTISAN');
+      setIntendedMode('ARTISAN');
+      if (currentRoute !== '/login') {
+        navigate('/login', true);
+      }
+    }
+  }, [currentRoute, activeMode, isLoggedIn, setIntendedMode]);
 
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col font-sans transition-colors">
@@ -59,7 +71,11 @@ export const App: React.FC = () => {
         {currentRoute === '/login' ? (
           <LoginPage />
         ) : activeMode === 'ARTISAN' || currentRoute === '/artisan-studio' ? (
-          <ArtisanDashboard />
+          isLoggedIn ? (
+            <ArtisanDashboard />
+          ) : (
+            <LoginPage />
+          )
         ) : (
           <CustomerHome />
         )}

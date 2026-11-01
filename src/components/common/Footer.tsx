@@ -1,9 +1,24 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { Sparkles, ShieldCheck, Heart, Compass, Award, ExternalLink } from 'lucide-react';
+import { navigate, setIntendedDestination } from '../../services/router';
 
 export const Footer: React.FC = () => {
-  const { t, activeMode, toggleMode } = useApp();
+  const { t, activeMode, requestModeSwitch, setIntendedMode, isLoggedIn } = useApp();
+
+  const handleModeToggle = () => {
+    if (activeMode === 'CUSTOMER') {
+      if (!isLoggedIn) {
+        setIntendedDestination('/artisan-studio', 'ARTISAN');
+        setIntendedMode('ARTISAN');
+        navigate('/login');
+        return;
+      }
+      requestModeSwitch('ARTISAN');
+    } else {
+      requestModeSwitch('CUSTOMER');
+    }
+  };
 
   return (
     <footer data-guide="desi-footer" className="bg-surface-container-high border-t border-outline/20 text-on-surface pt-12 pb-8 transition-colors">
@@ -106,7 +121,7 @@ export const Footer: React.FC = () => {
                 {t('Switch between purchasing living art and creating listings via voice in your mother tongue:')}
               </p>
               <button
-                onClick={toggleMode}
+                onClick={handleModeToggle}
                 className="w-full py-2 px-3 rounded-lg bg-surface border border-outline/30 text-primary font-semibold hover:bg-primary/10 transition text-left flex items-center justify-between cursor-pointer"
               >
                 <span>{activeMode === 'CUSTOMER' ? t('Switch to Artisan Studio') : t('Switch to Buyer Marketplace')}</span>
