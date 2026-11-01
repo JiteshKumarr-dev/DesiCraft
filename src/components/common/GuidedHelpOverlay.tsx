@@ -295,7 +295,9 @@ export const GuidedHelpOverlay: React.FC = () => {
 
     if (lastSpokenStepKeyRef.current !== stepVoiceKey) {
       lastSpokenStepKeyRef.current = stepVoiceKey;
-      const textToSpeak = currentStep.voiceScript[language] || currentStep.content[language];
+      const stepTitle = currentStep.title[language] || currentStep.title.en || '';
+      const stepContent = currentStep.content[language] || currentStep.content.en || '';
+      const textToSpeak = `${stepTitle}. ${stepContent}`.trim();
       if (textToSpeak) {
         speechController.speak(textToSpeak, language);
       }
@@ -345,7 +347,9 @@ export const GuidedHelpOverlay: React.FC = () => {
 
   // Voice playback actions
   const handlePlayOrReplay = () => {
-    const textToSpeak = currentStep.voiceScript[language] || currentStep.content[language];
+    const stepTitle = currentStep.title[language] || currentStep.title.en || '';
+    const stepContent = currentStep.content[language] || currentStep.content.en || '';
+    const textToSpeak = `${stepTitle}. ${stepContent}`.trim();
     if (textToSpeak) {
       speechController.speak(textToSpeak, language);
     }

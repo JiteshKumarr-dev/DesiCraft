@@ -90,7 +90,9 @@ export const GuidedHelpMenuModal: React.FC = () => {
   const handleListenOverview = () => {
     if (!currentTour) return;
     const firstStep = currentTour.steps[0];
-    const textToSpeak = firstStep.voiceScript[language] || firstStep.content[language];
+    const stepTitle = firstStep.title[language] || firstStep.title.en || '';
+    const stepContent = firstStep.content[language] || firstStep.content.en || '';
+    const textToSpeak = `${stepTitle}. ${stepContent}`.trim();
     if (textToSpeak) {
       speechController.speak(textToSpeak, language);
     }

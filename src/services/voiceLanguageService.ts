@@ -270,15 +270,15 @@ class UniversalVoiceEngine {
 
     const textToSpeak = phoneticFallback || text;
 
-    // Strategy 1: Native Web Speech API with precise BCP-47 and matched voice
-    const webSpeechSuccess = this.tryWebSpeech(textToSpeak, lang, onStart, onEnd, onError);
-    if (webSpeechSuccess) {
+    // Strategy 1: High-fidelity natural audio stream (via local /api/tts proxy or direct stream)
+    const audioSuccess = await this.tryAudioStream(textToSpeak, lang, onStart, onEnd);
+    if (audioSuccess) {
       return true;
     }
 
-    // Strategy 2: High-fidelity natural audio stream fallback
-    const audioSuccess = await this.tryAudioStream(textToSpeak, lang, onStart, onEnd);
-    if (audioSuccess) {
+    // Strategy 2: Native Web Speech API fallback with precise voice matching
+    const webSpeechSuccess = this.tryWebSpeech(textToSpeak, lang, onStart, onEnd, onError);
+    if (webSpeechSuccess) {
       return true;
     }
 
@@ -340,7 +340,6 @@ class UniversalVoiceEngine {
         onError?.(e);
       };
 
-      // Heartbeat guard against Chromium 15-second speech silence bug
       this.heartbeatInterval = setInterval(() => {
         if (!this.isSpeakingState) {
           this.clearHeartbeat();
@@ -354,7 +353,6 @@ class UniversalVoiceEngine {
         }
       }, 10000);
 
-      // Cancel prior utterances and queue after brief tick to prevent Chromium cancellation drop bug
       window.speechSynthesis.cancel();
       setTimeout(() => {
         try {
@@ -374,8 +372,7 @@ class UniversalVoiceEngine {
       }, 20);
 
       return true;
-    } catch (e) {
-      console.warn('[UniversalVoiceEngine] Web Speech fallback exception:', e);
+    } catch {
       return false;
     }
   }
@@ -389,9 +386,11 @@ class UniversalVoiceEngine {
     return new Promise((resolve) => {
       try {
         const googleLang = GOOGLE_TTS_LANG_MAP[lang] || 'en';
-        const trimmedText = text.slice(0, 180);
-        const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
-          trimmedText
+        // Priority 1: Use local Vite proxy endpoint for reliable zero-CORS streaming
+        const proxyUrl = `/api/tts?tl=${encodeURIComponent(googleLang)}&q=${encodeURIComponent(text)}`;
+        // Priority 2: Direct Google Translate TTS endpoint
+        const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
+          text.slice(0, 180)
         )}&tl=${googleLang}&client=tw-ob`;
 
         const audio = new Audio();
@@ -410,6 +409,9 @@ class UniversalVoiceEngine {
         };
 
         audio.onplay = () => {
+          this.isSpeakingState = true;
+          this.activeLangCode = lang;
+          this.notify();
           onStart?.();
         };
 
@@ -423,6 +425,18 @@ class UniversalVoiceEngine {
         };
 
         audio.onerror = () => {
+          // If proxy URL failed, try direct URL as fallback
+          if (audio.src.includes('/api/tts')) {
+            audio.src = directUrl;
+            audio.play().catch(() => {
+              cleanup();
+              if (!hasResolved) {
+                hasResolved = true;
+                resolve(false);
+              }
+            });
+            return;
+          }
           cleanup();
           if (!hasResolved) {
             hasResolved = true;
@@ -437,10 +451,10 @@ class UniversalVoiceEngine {
             cleanup();
             resolve(false);
           }
-        }, 1200);
+        }, 3000);
 
         this.currentAudio = audio;
-        audio.src = ttsUrl;
+        audio.src = proxyUrl;
 
         const playPromise = audio.play();
         if (playPromise !== undefined) {
@@ -454,6 +468,17 @@ class UniversalVoiceEngine {
             })
             .catch(() => {
               clearTimeout(timer);
+              if (audio.src.includes('/api/tts')) {
+                audio.src = directUrl;
+                audio.play().catch(() => {
+                  cleanup();
+                  if (!hasResolved) {
+                    hasResolved = true;
+                    resolve(false);
+                  }
+                });
+                return;
+              }
               cleanup();
               if (!hasResolved) {
                 hasResolved = true;
