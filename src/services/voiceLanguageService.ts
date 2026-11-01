@@ -184,21 +184,22 @@ class UniversalVoiceEngine {
     this.currentPlayId++;
     this.clearHeartbeat();
 
-    // 1. Forcefully stop, detach listeners, and destroy any audio element
+    // 1. Forcefully stop, detach listeners, unload and destroy any audio element
     if (this.currentAudio) {
       const audioToStop = this.currentAudio;
       this.currentAudio = null;
-      audioToStop.onplay = null;
-      audioToStop.onended = null;
-      audioToStop.onerror = null;
       try {
+        audioToStop.onplay = null;
+        audioToStop.onended = null;
+        audioToStop.onerror = null;
         audioToStop.pause();
         audioToStop.currentTime = 0;
-        audioToStop.src = '';
+        audioToStop.removeAttribute('src');
+        audioToStop.load();
       } catch (_) {}
     }
 
-    // 2. Stop SpeechSynthesis
+    // 2. Stop SpeechSynthesis immediately
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
         window.speechSynthesis.cancel();
@@ -281,18 +282,18 @@ class UniversalVoiceEngine {
 
     const textToSpeak = phoneticFallback || text;
 
-    // Strategy 1: High-fidelity natural audio stream (via local /api/tts proxy or direct stream)
+    // Strategy 1: High-fidelity natural audio stream (via local /api/tts proxy)
     const audioSuccess = await this.tryAudioStream(textToSpeak, lang, playId, onStart, onEnd);
-    if (this.currentPlayId !== playId) {
-      // Obsolete request - cancelled or superseded by another play/stop call
-      return false;
+    if (this.currentPlayId !== playId || this.isPausedState || this.currentAudio !== null) {
+      return audioSuccess;
     }
     if (audioSuccess) {
       return true;
     }
 
-    // Strategy 2: Native Web Speech API fallback with precise voice matching (only if STILL active request!)
-    if (this.currentPlayId !== playId) {
+    // Strategy 2: Native Web Speech API fallback with precise voice matching
+    // Strictly runs ONLY if audio stream completely failed and audio element is null!
+    if (this.currentPlayId !== playId || this.isPausedState || this.currentAudio !== null) {
       return false;
     }
     const webSpeechSuccess = this.tryWebSpeech(textToSpeak, lang, playId, onStart, onEnd, onError);
@@ -417,146 +418,105 @@ class UniversalVoiceEngine {
     onEnd?: () => void
   ): Promise<boolean> {
     return new Promise((resolve) => {
-      try {
-        if (this.currentPlayId !== playId) {
-          resolve(false);
+      if (this.currentPlayId !== playId) {
+        resolve(false);
+        return;
+      }
+
+      const googleLang = GOOGLE_TTS_LANG_MAP[lang] || 'en';
+      const proxyUrl = `/api/tts?tl=${encodeURIComponent(googleLang)}&q=${encodeURIComponent(text)}`;
+
+      const audio = new Audio();
+      audio.setAttribute('referrerpolicy', 'no-referrer');
+      (audio as any).referrerPolicy = 'no-referrer';
+
+      let resolved = false;
+
+      const terminateAudio = () => {
+        try {
+          audio.onplay = null;
+          audio.onended = null;
+          audio.onerror = null;
+          audio.pause();
+          audio.currentTime = 0;
+          audio.removeAttribute('src');
+          audio.load();
+        } catch (_) {}
+        if (this.currentAudio === audio) {
+          this.currentAudio = null;
+        }
+      };
+
+      const finalize = (success: boolean) => {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(timeoutId);
+        if (!success) {
+          terminateAudio();
+        }
+        resolve(success);
+      };
+
+      const timeoutId = setTimeout(() => {
+        if (this.currentPlayId !== playId || this.isPausedState) {
           return;
         }
-
-        const googleLang = GOOGLE_TTS_LANG_MAP[lang] || 'en';
-        // Priority 1: Use local Vite proxy endpoint for reliable zero-CORS streaming
-        const proxyUrl = `/api/tts?tl=${encodeURIComponent(googleLang)}&q=${encodeURIComponent(text)}`;
-        // Priority 2: Direct Google Translate TTS endpoint
-        const directUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
-          text.slice(0, 180)
-        )}&tl=${googleLang}&client=tw-ob`;
-
-        const audio = new Audio();
-        audio.setAttribute('referrerpolicy', 'no-referrer');
-        (audio as any).referrerPolicy = 'no-referrer';
-
-        let hasResolved = false;
-
-        const cleanup = () => {
-          if (this.currentAudio === audio) {
-            this.currentAudio = null;
-          }
-          if (this.currentPlayId === playId) {
-            this.isSpeakingState = false;
-            this.activeLangCode = null;
-            this.notify();
-          }
-        };
-
-        audio.onplay = () => {
-          if (this.currentPlayId !== playId) {
-            try {
-              audio.pause();
-            } catch (_) {}
-            return;
-          }
-          this.isSpeakingState = true;
-          this.activeLangCode = lang;
-          this.notify();
-          onStart?.();
-        };
-
-        audio.onended = () => {
-          if (this.currentPlayId !== playId) return;
-          cleanup();
-          onEnd?.();
-          if (!hasResolved) {
-            hasResolved = true;
-            resolve(true);
-          }
-        };
-
-        audio.onerror = () => {
-          if (this.currentPlayId !== playId) {
-            cleanup();
-            if (!hasResolved) {
-              hasResolved = true;
-              resolve(false);
-            }
-            return;
-          }
-          // If proxy URL failed and this is still the active request, try direct URL as fallback
-          if (audio.src.includes('/api/tts')) {
-            audio.src = directUrl;
-            audio.play().catch(() => {
-              cleanup();
-              if (!hasResolved) {
-                hasResolved = true;
-                resolve(false);
-              }
-            });
-            return;
-          }
-          cleanup();
-          if (!hasResolved) {
-            hasResolved = true;
-            resolve(false);
-          }
-        };
-
-        const timer = setTimeout(() => {
-          if (this.currentPlayId !== playId) return;
-          if (!hasResolved && audio.paused && audio.currentTime === 0) {
-            hasResolved = true;
-            try {
-              audio.pause();
-            } catch (_) {}
-            cleanup();
-            resolve(false);
-          }
-        }, 3000);
-
-        this.currentAudio = audio;
-        audio.src = proxyUrl;
-
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              clearTimeout(timer);
-              if (this.currentPlayId !== playId) {
-                try {
-                  audio.pause();
-                } catch (_) {}
-                resolve(false);
-                return;
-              }
-              if (!hasResolved) {
-                hasResolved = true;
-                resolve(true);
-              }
-            })
-            .catch(() => {
-              clearTimeout(timer);
-              if (this.currentPlayId !== playId) {
-                resolve(false);
-                return;
-              }
-              if (audio.src.includes('/api/tts')) {
-                audio.src = directUrl;
-                audio.play().catch(() => {
-                  cleanup();
-                  if (!hasResolved) {
-                    hasResolved = true;
-                    resolve(false);
-                  }
-                });
-                return;
-              }
-              cleanup();
-              if (!hasResolved) {
-                hasResolved = true;
-                resolve(false);
-              }
-            });
+        // If not playing after 2.5s, terminate stream cleanly and fall back to native speech
+        if (audio.paused && audio.currentTime === 0) {
+          finalize(false);
         }
-      } catch {
-        resolve(false);
+      }, 2500);
+
+      audio.onplay = () => {
+        if (this.currentPlayId !== playId) {
+          terminateAudio();
+          finalize(false);
+          return;
+        }
+        this.isSpeakingState = true;
+        this.activeLangCode = lang;
+        this.notify();
+        onStart?.();
+      };
+
+      audio.onended = () => {
+        if (this.currentPlayId === playId) {
+          this.isSpeakingState = false;
+          this.activeLangCode = null;
+          this.notify();
+          onEnd?.();
+        }
+        terminateAudio();
+        finalize(true);
+      };
+
+      audio.onerror = () => {
+        if (this.currentPlayId !== playId || this.isPausedState) {
+          return;
+        }
+        finalize(false);
+      };
+
+      this.currentAudio = audio;
+      audio.src = proxyUrl;
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            if (this.currentPlayId !== playId) {
+              terminateAudio();
+              finalize(false);
+              return;
+            }
+            finalize(true);
+          })
+          .catch((err) => {
+            if (this.currentPlayId !== playId || this.isPausedState) {
+              return;
+            }
+            finalize(false);
+          });
       }
     });
   }

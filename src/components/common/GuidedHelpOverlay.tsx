@@ -63,6 +63,7 @@ export const GuidedHelpOverlay: React.FC = () => {
   const triggerElementRef = useRef<HTMLElement | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef<boolean>(true);
+  const isPlayDebouncingRef = useRef<boolean>(false);
 
   const tour = activeTourId ? TOURS[activeTourId] : null;
   const currentStep = tour && tour.steps[activeStepIndex] ? tour.steps[activeStepIndex] : null;
@@ -327,6 +328,12 @@ export const GuidedHelpOverlay: React.FC = () => {
 
   // Voice playback actions: speaks the guide's natural audio narration (never reads out card UI text)
   const handlePlayOrReplay = () => {
+    if (isPlayDebouncingRef.current) return;
+    isPlayDebouncingRef.current = true;
+    setTimeout(() => {
+      isPlayDebouncingRef.current = false;
+    }, 350);
+
     speechController.stop();
     const guideVoice =
       currentStep.voiceScript?.[language] ||
