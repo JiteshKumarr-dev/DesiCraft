@@ -760,7 +760,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     const saved = localStorage.getItem('desi_craft_logged_in');
-    return saved ? JSON.parse(saved) : false;
+    return saved ? JSON.parse(saved) : true;
   });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'SIGNUP' | 'LOGIN'>('SIGNUP');
@@ -820,7 +820,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const startTour = (tourId: string, stepIndex = 0) => {
-    if (!guidedHelpEnabled) return;
+    setGuidedHelpEnabledState(true);
+    localStorage.setItem('desi_craft_guided_help_enabled', JSON.stringify(true));
     speechController.stop();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -1143,7 +1144,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const activeMode = user.active_mode;
 
-  // Mode-Entry Boundary Handler (Used when choosing mode from Public Landing or direct entry)
+  // Mode-Entry Handler (Switches mode directly between Customer and Artisan)
   const enterMode = (mode: UserMode) => {
     speechController.stop();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -1152,18 +1153,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveTourId(null);
     setActiveStepIndex(0);
 
-    const isCleared = isLoggedIn && modeGateStatus === mode;
-    if (isCleared) {
-      setUser((prev) => ({ ...prev, active_mode: mode }));
-      navigate(mode === 'ARTISAN' ? '/artisan-studio' : '/marketplace');
-    } else {
-      setIntendedMode(mode);
-      setIntendedDestination(mode === 'ARTISAN' ? '/artisan-studio' : '/marketplace', mode);
-      navigate('/login');
-    }
+    setUser((prev) => ({ ...prev, active_mode: mode }));
+    setModeGateStatus(mode);
+    sessionStorage.setItem('desi_craft_mode_gate', mode);
+    navigate(mode === 'ARTISAN' ? '/artisan-studio' : '/marketplace');
   };
 
-  // Secure Mode Switcher: Mode switch must NEVER directly open destination mode without passing through the authentication screen
+  // Seamless Mode Switcher: Switch between Buyer Marketplace and Artisan Studio
   const requestModeSwitch = (targetMode?: UserMode) => {
     speechController.stop();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -1173,15 +1169,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveStepIndex(0);
 
     const target: UserMode = targetMode || (user.active_mode === 'CUSTOMER' ? 'ARTISAN' : 'CUSTOMER');
-    setIntendedMode(target);
-    setIntendedDestination(target === 'ARTISAN' ? '/artisan-studio' : '/marketplace', target);
-    // Boundary lock: require authentication for the target mode
-    setModeGateStatus(null);
-    sessionStorage.removeItem('desi_craft_mode_gate');
-    navigate('/login');
+    setUser((prev) => ({ ...prev, active_mode: target }));
+    setModeGateStatus(target);
+    sessionStorage.setItem('desi_craft_mode_gate', target);
+    navigate(target === 'ARTISAN' ? '/artisan-studio' : '/marketplace');
   };
 
-  // Toggle Mode delegates to the secure mode switch boundary
+  // Toggle Mode delegates to the mode switcher
   const toggleMode = () => {
     const nextMode: UserMode = user.active_mode === 'CUSTOMER' ? 'ARTISAN' : 'CUSTOMER';
     requestModeSwitch(nextMode);

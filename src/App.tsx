@@ -35,9 +35,7 @@ import { PhotoEnhancerModal } from './components/artisan/PhotoEnhancerModal';
 import { VoiceArtisanSetupModal } from './components/artisan/VoiceArtisanSetupModal';
 
 // Public Portal & Auth Guard
-import { PublicLanding } from './components/common/PublicLanding';
 import { LoginPage } from './components/common/LoginPage';
-import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 export const App: React.FC = () => {
   const { currentRoute, activeMode } = useApp();
@@ -56,20 +54,14 @@ export const App: React.FC = () => {
         onOpenEndangeredModal={() => setIsEndangeredOpen(true)}
       />
 
-      {/* Main Content Area: Route-level Authentication Guard */}
+      {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {currentRoute === '/login' ? (
           <LoginPage />
-        ) : currentRoute === '/marketplace' ? (
-          <ProtectedRoute requiredMode="CUSTOMER">
-            <CustomerHome />
-          </ProtectedRoute>
-        ) : currentRoute === '/artisan-studio' ? (
-          <ProtectedRoute requiredMode="ARTISAN">
-            <ArtisanDashboard />
-          </ProtectedRoute>
+        ) : activeMode === 'ARTISAN' || currentRoute === '/artisan-studio' ? (
+          <ArtisanDashboard />
         ) : (
-          <PublicLanding />
+          <CustomerHome />
         )}
       </main>
 

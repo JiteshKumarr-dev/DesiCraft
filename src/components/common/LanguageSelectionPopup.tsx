@@ -106,7 +106,19 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
 ];
 
 export const LanguageSelectionPopup: React.FC = () => {
-  const { language, setLanguage, isLanguagePopupOpen, setIsLanguagePopupOpen, setIsHelpMenuOpen, t } = useApp();
+  const {
+    language,
+    setLanguage,
+    isLanguagePopupOpen,
+    setIsLanguagePopupOpen,
+    setIsHelpMenuOpen,
+    setIsFirstTimeWelcomeOpen,
+    setGuidedHelpEnabled,
+    setVoiceGuidanceEnabled,
+    startTour,
+    activeMode,
+    t,
+  } = useApp();
 
   const [selectedCode, setSelectedCode] = useState<LanguageCode>(language);
   const [searchQuery, setSearchQuery] = useState('');
@@ -159,8 +171,33 @@ export const LanguageSelectionPopup: React.FC = () => {
     setLanguage(selectedCode);
     localStorage.setItem('desi_craft_lang_selected', 'true');
     setIsLanguagePopupOpen(false);
-    // Trigger 2nd popup: Guided Help immediately
-    setIsHelpMenuOpen(true);
+    setIsHelpMenuOpen(false);
+    setIsFirstTimeWelcomeOpen(false);
+    setGuidedHelpEnabled(true);
+    setVoiceGuidanceEnabled(true);
+
+    // Launch guided tour directly in selected language on the rendered page
+    setTimeout(() => {
+      const tourId = activeMode === 'ARTISAN' ? 'ARTISAN_DASHBOARD_TOUR' : 'CUSTOMER_HOME_TOUR';
+      startTour(tourId, 0);
+    }, 150);
+  };
+
+  const handleClose = () => {
+    universalVoiceEngine.stop();
+    setLanguage(selectedCode);
+    localStorage.setItem('desi_craft_lang_selected', 'true');
+    setIsLanguagePopupOpen(false);
+    setIsHelpMenuOpen(false);
+    setIsFirstTimeWelcomeOpen(false);
+    setGuidedHelpEnabled(true);
+    setVoiceGuidanceEnabled(true);
+
+    // Launch guided tour directly in selected language
+    setTimeout(() => {
+      const tourId = activeMode === 'ARTISAN' ? 'ARTISAN_DASHBOARD_TOUR' : 'CUSTOMER_HOME_TOUR';
+      startTour(tourId, 0);
+    }, 150);
   };
 
   return (
@@ -169,13 +206,7 @@ export const LanguageSelectionPopup: React.FC = () => {
         {/* Header Ribbon */}
         <div className="bg-surface-container-high border-b border-outline/20 p-6 sm:p-7 text-center relative">
           <button
-            onClick={() => {
-              universalVoiceEngine.stop();
-              localStorage.setItem('desi_craft_lang_selected', 'true');
-              setIsLanguagePopupOpen(false);
-              // Trigger 2nd popup: Guided Help immediately
-              setIsHelpMenuOpen(true);
-            }}
+            onClick={handleClose}
             className="absolute top-4 right-4 p-2 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface transition cursor-pointer"
             aria-label={t('Close')}
           >

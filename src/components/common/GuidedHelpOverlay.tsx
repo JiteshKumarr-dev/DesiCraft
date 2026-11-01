@@ -193,14 +193,20 @@ export const GuidedHelpOverlay: React.FC = () => {
           height: rect.height,
         });
 
-        // Smoothly scroll into view strictly ONCE when step changes
+        // Smoothly scroll into view strictly ONCE when step changes if not already visible
         if (lastScrolledStepKeyRef.current !== currentStepKey) {
           lastScrolledStepKeyRef.current = currentStepKey;
-          element.scrollIntoView({
-            behavior: prefersReducedMotion ? 'auto' : 'smooth',
-            block: 'center',
-            inline: 'nearest',
-          });
+          const isFullyVisible = (
+            rect.top >= 70 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) - 20
+          );
+          if (!isFullyVisible) {
+            element.scrollIntoView({
+              behavior: prefersReducedMotion ? 'auto' : 'smooth',
+              block: 'center',
+              inline: 'nearest',
+            });
+          }
         }
       } else {
         // Element not in DOM yet. Retry up to 6 times at 100ms intervals (600ms total)
